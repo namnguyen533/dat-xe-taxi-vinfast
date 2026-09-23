@@ -262,6 +262,237 @@ button {
 
 .service-card p {
   color: var(--text);
+  margin-bottom: 16px;
+}
+
+.service-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  text-align: left;
+}
+
+.service-features li {
+  color: var(--text);
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.service-features li::before {
+  content: "✓ ";
+  color: var(--primary);
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.btn-service {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.btn-service:hover {
+  background: var(--primary-dark);
+}
+
+.about-section {
+  background: var(--bg);
+  padding: 80px 24px;
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about-text {
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 48px;
+}
+
+.about-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  color: var(--primary);
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  color: var(--text);
+  font-size: 16px;
+}
+
+.nav-link.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.cars-section {
+  padding: 80px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.section-subtitle {
+  color: var(--text);
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+.cars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+}
+
+.car-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.car-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.car-image {
+  height: 200px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+.car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.car-card:hover .car-img {
+  transform: scale(1.05);
+}
+
+.car-info {
+  padding: 24px;
+}
+
+.car-name {
+  color: var(--text-h);
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.car-type {
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.car-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.spec {
+  background: var(--accent-bg);
+  color: var(--text-h);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.car-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.price-label {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.price-value {
+  color: var(--primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.car-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-view,
+.btn-book {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-view {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.btn-view:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-book {
+  background: var(--primary);
+  border: 2px solid var(--primary);
+  color: white;
+}
+
+.btn-book:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
 }
 
 .footer {
@@ -352,5 +583,22 @@ button {
   .footer-container {
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+
+  .cars-section {
+    padding: 48px 16px;
+  }
+
+  .cars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-stats {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .stat-number {
+    font-size: 36px;
   }
 }
