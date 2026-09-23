@@ -1,13 +1,85 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vite-project</title>
+    <title>TaxiBooking - Đặt xe taxi nhanh chóng</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <h1>TaxiVinfast</h1>
+        </div>
+        <nav class="nav-menu">
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="#" class="nav-link">Về chúng tôi</a></li>
+            <li><a href="#" class="nav-link">Liên hệ</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <button class="btn-login">Đăng nhập</button>
+          <button class="btn-register">Đăng ký</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section id="home" class="hero-section">
+        <div class="hero-content">
+          <h2 class="hero-title">Đặt xe taxi nhanh chóng và tiện lợi</h2>
+          <p class="hero-subtitle">Chúng tôi cung cấp dịch vụ taxi chất lượng cao với giá cả hợp lý</p>
+          <a href="booking.html" class="btn-booking">Đặt xe ngay</a>
+        </div>
+      </section>
+
+      <section id="services" class="services-section">
+        <h2 class="section-title">Dịch vụ của chúng tôi</h2>
+        <div class="services-grid">
+          <div class="service-card">
+            <h3>Taxi tiêu chuẩn</h3>
+            <p>Xe 4 chỗ, giá rẻ, tiện lợi</p>
+          </div>
+          <div class="service-card">
+            <h3>Taxi cao cấp</h3>
+            <p>Xe sang, phục vụ chuyên nghiệp</p>
+          </div>
+          <div class="service-card">
+            <h3>Taxi gia đình</h3>
+            <p>Xe 7 chỗ, rộng rãi, an toàn</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>TaxiBooking</h3>
+          <p>Dịch vụ taxi uy tín, chất lượng</p>
+        </div>
+        <div class="footer-section">
+          <h3>Liên kết</h3>
+          <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="cars.html">Danh sách xe</a></li>
+            <li><a href="booking.html">Đặt xe</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Liên hệ</h3>
+          <p>Hotline: 1900 xxxx</p>
+          <p>Email: info@taxibooking.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 TaxiBooking. All rights reserved.</p>
+      </div>
+    </footer>
   </body>
 </html>
