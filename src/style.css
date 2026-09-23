@@ -495,6 +495,243 @@ button {
   border-color: var(--primary-dark);
 }
 
+.car-detail-section {
+  padding: 40px 24px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  padding: 16px 0;
+  margin-bottom: 32px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb span {
+  color: var(--text);
+}
+
+.car-detail-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.car-gallery {
+  position: sticky;
+  top: 100px;
+}
+
+.main-image {
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  background: var(--border);
+}
+
+.detail-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-gallery {
+  display: flex;
+  gap: 12px;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+  border-color: var(--primary);
+}
+
+.car-info-detail {
+  padding: 24px;
+}
+
+.detail-title {
+  color: var(--text-h);
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.detail-subtitle {
+  color: var(--primary);
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.detail-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: var(--accent-bg);
+  border-radius: 12px;
+  margin-bottom: 32px;
+}
+
+.detail-features h3,
+.detail-specs h3 {
+  color: var(--text-h);
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+}
+
+.features-list li {
+  color: var(--text);
+  padding: 8px 0;
+  font-size: 16px;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.spec-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.spec-label {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.spec-value {
+  color: var(--text-h);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.btn-book-detail,
+.btn-back {
+  flex: 1;
+  padding: 16px 24px;
+  border-radius: 8px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.btn-book-detail {
+  background: var(--primary);
+  color: white;
+  border: 2px solid var(--primary);
+}
+
+.btn-book-detail:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.btn-back {
+  background: transparent;
+  color: var(--text-h);
+  border: 2px solid var(--border);
+}
+
+.btn-back:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.pricing-section {
+  padding: 80px 24px;
+  background: var(--bg);
+}
+
+.pricing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pricing-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 32px;
+  background: var(--bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.pricing-table th,
+.pricing-table td {
+  padding: 16px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.pricing-table th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.pricing-table tr:hover {
+  background: var(--accent-bg);
+}
+
+.pricing-table tr:last-child td {
+  border-bottom: none;
+}
+
+.price-cell {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 18px;
+}
+
 .footer {
   background: var(--secondary);
   color: white;
@@ -600,5 +837,43 @@ button {
 
   .stat-number {
     font-size: 36px;
+  }
+
+  .car-detail-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .car-gallery {
+    position: static;
+  }
+
+  .main-image {
+    height: 300px;
+  }
+
+  .detail-title {
+    font-size: 28px;
+  }
+
+  .specs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-actions {
+    flex-direction: column;
+  }
+
+  .pricing-table {
+    font-size: 14px;
+  }
+
+  .pricing-table th,
+  .pricing-table td {
+    padding: 12px 16px;
+  }
+
+  .pricing-section {
+    padding: 48px 16px;
   }
 }
