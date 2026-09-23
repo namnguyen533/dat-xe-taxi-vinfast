@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xác nhận đặt xe - TaxiVinFast</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <h1>TaxiVinFast</h1>
+        </div>
+        <nav class="nav-menu">
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="index.html#pricing" class="nav-link">Bảng giá</a></li>
+            <li><a href="#" class="nav-link">Liên hệ</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <button class="btn-login">Đăng nhập</button>
+          <button class="btn-register">Đăng ký</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="confirm-section">
+        <div class="confirm-container">
+          <h2 class="section-title">Xác nhận thông tin chuyến đi</h2>
+          <p class="section-subtitle">Vui lòng kiểm tra thông tin trước khi xác nhận đặt xe</p>
+
+          <div class="confirm-card">
+            <div class="confirm-header">
+              <h3>Thông tin hành trình</h3>
+            </div>
+            
+            <div class="confirm-details">
+              <div class="confirm-item">
+                <span class="confirm-label">Điểm đón:</span>
+                <span class="confirm-value" id="confirm-pickup">-</span>
+              </div>
+              
+              <div class="confirm-item">
+                <span class="confirm-label">Điểm đến:</span>
+                <span class="confirm-value" id="confirm-dropoff">-</span>
+              </div>
+              
+              <div class="confirm-item">
+                <span class="confirm-label">Ngày đón:</span>
+                <span class="confirm-value" id="confirm-date">-</span>
+              </div>
+              
+              <div class="confirm-item">
+                <span class="confirm-label">Giờ đón:</span>
+                <span class="confirm-value" id="confirm-time">-</span>
+              </div>
+              
+              <div class="confirm-item">
+                <span class="confirm-label">Loại đặt xe:</span>
+                <span class="confirm-value" id="confirm-bookingType">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="confirm-card">
+            <div class="confirm-header">
+              <h3>Thông tin xe</h3>
+            </div>
+            
+            <div class="confirm-details">
+              <div class="confirm-item">
+                <span class="confirm-label">Loại xe:</span>
+                <span class="confirm-value" id="confirm-car">-</span>
+              </div>
+              
+              <div class="confirm-item">
+                <span class="confirm-label">Giá ước tính:</span>
+                <span class="confirm-value price-highlight" id="confirm-price">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="confirm-card">
+            <div class="confirm-header">
+              <h3>Thông tin liên hệ</h3>
+            </div>
+            
+            <div class="confirm-details">
+              <div class="confirm-item">
+                <span class="confirm-label">Họ tên:</span>
+                <span class="confirm-value" id="confirm-name">-</span>
+              </div>
+              
+              <div class="confirm-item">
+                <span class="confirm-label">Số điện thoại:</span>
+                <span class="confirm-value" id="confirm-phone">-</span>
+              </div>
+              
+              <div class="confirm-item">
+                <span class="confirm-label">Email:</span>
+                <span class="confirm-value" id="confirm-email">-</span>
+              </div>
+              
+              <div class="confirm-item">
+                <span class="confirm-label">Ghi chú:</span>
+                <span class="confirm-value" id="confirm-notes">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="confirm-actions">
+            <a href="booking.html" class="btn-back-confirm">Quay lại sửa</a>
+            <button class="btn-confirm" id="confirmBookingBtn">Xác nhận đặt xe</button>
+          </div>
+
+          <div class="confirm-notice">
+            <p>⚠️ Bằng cách nhấn "Xác nhận đặt xe", bạn đồng ý với các điều khoản và điều kiện dịch vụ của TaxiVinFast.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>TaxiVinFast</h3>
+          <p>Dịch vụ taxi điện uy tín, chất lượng</p>
+        </div>
+        <div class="footer-section">
+          <h3>Liên kết</h3>
+          <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="cars.html">Danh sách xe</a></li>
+            <li><a href="booking.html">Đặt xe</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Liên hệ</h3>
+          <p>Hotline: 1900 xxxx</p>
+          <p>Email: info@taxivinfast.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
