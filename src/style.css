@@ -732,6 +732,370 @@ button {
   font-size: 18px;
 }
 
+.booking-section {
+  padding: 80px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.booking-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.booking-form {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+
+.form-section {
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.form-section-title {
+  color: var(--text-h);
+  font-size: 20px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-label {
+  display: block;
+  color: var(--text-h);
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: var(--sans);
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-input::placeholder {
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.form-hint {
+  display: block;
+  color: var(--text);
+  font-size: 12px;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.booking-type-options {
+  display: flex;
+  gap: 16px;
+}
+
+.booking-type-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 12px 20px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.booking-type-option:hover {
+  border-color: var(--primary);
+}
+
+.booking-type-option input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+.booking-type-option input[type="radio"]:checked + span {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.booking-type-option span {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.car-selection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.car-option {
+  position: relative;
+}
+
+.car-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.car-option-label {
+  display: block;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.car-option-label:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.car-radio:checked + .car-option-label {
+  border-color: var(--primary);
+  background: var(--accent-bg);
+}
+
+.car-option-content {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 16px;
+}
+
+.car-option-img {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.car-option-info {
+  flex: 1;
+}
+
+.car-option-info h4 {
+  color: var(--text-h);
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.car-option-type {
+  color: var(--text);
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.car-option-price {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.btn-submit,
+.btn-reset {
+  flex: 1;
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.btn-submit {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-submit:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.btn-reset {
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--border);
+}
+
+.btn-reset:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.confirm-section {
+  padding: 80px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.confirm-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.confirm-card {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.confirm-header {
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.confirm-header h3 {
+  color: var(--primary);
+  font-size: 20px;
+  margin: 0;
+}
+
+.confirm-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.confirm-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.confirm-item:last-child {
+  border-bottom: none;
+}
+
+.confirm-label {
+  color: var(--text);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.confirm-value {
+  color: var(--text-h);
+  font-weight: 600;
+  font-size: 16px;
+  text-align: right;
+  max-width: 60%;
+}
+
+.price-highlight {
+  color: var(--primary);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 16px;
+  margin: 32px 0;
+}
+
+.btn-back-confirm,
+.btn-confirm {
+  flex: 1;
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+}
+
+.btn-back-confirm {
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--border);
+}
+
+.btn-back-confirm:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-confirm {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.confirm-notice {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 24px;
+}
+
+.confirm-notice p {
+  color: var(--text);
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+}
+
 .footer {
   background: var(--secondary);
   color: white;
@@ -875,5 +1239,69 @@ button {
 
   .pricing-section {
     padding: 48px 16px;
+  }
+
+  .booking-section {
+    padding: 48px 16px;
+  }
+
+  .booking-form {
+    padding: 24px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .car-selection {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .car-option-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .car-option-img {
+    width: 100%;
+    height: 120px;
+  }
+
+  .confirm-section {
+    padding: 48px 16px;
+  }
+
+  .confirm-card {
+    padding: 20px;
+  }
+
+  .confirm-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .confirm-value {
+    text-align: left;
+    max-width: 100%;
+  }
+
+  .confirm-actions {
+    flex-direction: column;
+  }
+
+  .booking-type-options {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .booking-type-option {
+    width: 100%;
+    justify-content: center;
   }
 }
