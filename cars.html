@@ -12,15 +12,15 @@
     <header class="header">
       <div class="header-container">
         <div class="logo">
-          <h1>TaxiVinFast</h1>
+          <a href="index.html"><h1>TaxiVinFast</h1></a>
         </div>
         <nav class="nav-menu">
           <ul class="nav-list">
             <li><a href="index.html" class="nav-link">Trang chủ</a></li>
             <li><a href="cars.html" class="nav-link active">Danh sách xe</a></li>
             <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html" class="nav-link">Lịch sử chuyến</a></li>
             <li><a href="index.html#pricing" class="nav-link">Bảng giá</a></li>
-            <li><a href="#" class="nav-link">Liên hệ</a></li>
           </ul>
         </nav>
         <div class="header-actions">
@@ -33,153 +33,23 @@
     <main class="main-content">
       <section class="cars-section">
         <div class="section-header">
-          <h2 class="section-title">Danh sách xe taxi</h2>
-          <p class="section-subtitle">Chọn loại xe điện VinFast phù hợp với nhu cầu của bạn</p>
+          <h2 class="section-title">Danh sách xe điện VinFast</h2>
+          <p class="section-subtitle">Dữ liệu được nạp động từ file JSON (cars.json) bằng JavaScript</p>
+
+          <!-- Dynamic Filter Bar -->
+          <div class="cars-filter-bar">
+            <button class="car-filter-btn active" data-filter="all">Tất cả xe</button>
+            <button class="car-filter-btn" data-filter="2">2 chỗ (Mini)</button>
+            <button class="car-filter-btn" data-filter="4">4 chỗ</button>
+            <button class="car-filter-btn" data-filter="5">5 chỗ</button>
+            <button class="car-filter-btn" data-filter="7">7 chỗ (Luxury)</button>
+          </div>
         </div>
 
-        <div class="cars-grid">
-          <div class="car-card">
-            <div class="car-image">
-              <img src="/src/assets/vf3.webp" alt="VinFast VF 3" class="car-img">
-            </div>
-            <div class="car-info">
-              <h3 class="car-name">VinFast VF 3</h3>
-              <p class="car-type">Taxi mini điện - 2 chỗ</p>
-              <div class="car-specs">
-                <span class="spec">2 chỗ</span>
-                <span class="spec">Xe điện 100%</span>
-                <span class="spec">Pin lithium</span>
-                <span class="spec">Máy lạnh</span>
-              </div>
-              <div class="car-price">
-                <span class="price-label">Giá khởi điểm:</span>
-                <span class="price-value">10.000đ/km</span>
-              </div>
-              <div class="car-actions">
-                <a href="car-detail.html" class="btn-view">Xem chi tiết</a>
-                <a href="booking.html" class="btn-book">Đặt xe</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="car-card">
-            <div class="car-image">
-              <img src="/src/assets/vf5.jpg" alt="VinFast VF 5 Plus" class="car-img">
-            </div>
-            <div class="car-info">
-              <h3 class="car-name">VinFast VF 5 Plus</h3>
-              <p class="car-type">Taxi điện hạng A - 4 chỗ</p>
-              <div class="car-specs">
-                <span class="spec">4 chỗ</span>
-                <span class="spec">Xe điện 100%</span>
-                <span class="spec">Pin lithium</span>
-                <span class="spec">Máy lạnh</span>
-              </div>
-              <div class="car-price">
-                <span class="price-label">Giá khởi điểm:</span>
-                <span class="price-value">12.000đ/km</span>
-              </div>
-              <div class="car-actions">
-                <a href="car-detail.html" class="btn-view">Xem chi tiết</a>
-                <a href="booking.html" class="btn-book">Đặt xe</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="car-card">
-            <div class="car-image">
-              <img src="/src/assets/vf6.jpg" alt="VinFast VF 6" class="car-img">
-            </div>
-            <div class="car-info">
-              <h3 class="car-name">VinFast VF 6</h3>
-              <p class="car-type">Taxi điện hạng B - 5 chỗ</p>
-              <div class="car-specs">
-                <span class="spec">5 chỗ</span>
-                <span class="spec">Xe điện 100%</span>
-                <span class="spec">Pin lithium</span>
-                <span class="spec">Máy lạnh</span>
-              </div>
-              <div class="car-price">
-                <span class="price-label">Giá khởi điểm:</span>
-                <span class="price-value">15.000đ/km</span>
-              </div>
-              <div class="car-actions">
-                <a href="car-detail.html" class="btn-view">Xem chi tiết</a>
-                <a href="booking.html" class="btn-book">Đặt xe</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="car-card">
-            <div class="car-image">
-              <img src="/src/assets/vf7.jpg" alt="VinFast VF 7" class="car-img">
-            </div>
-            <div class="car-info">
-              <h3 class="car-name">VinFast VF 7</h3>
-              <p class="car-type">Taxi điện hạng C - 5 chỗ</p>
-              <div class="car-specs">
-                <span class="spec">5 chỗ</span>
-                <span class="spec">Xe điện 100%</span>
-                <span class="spec">Pin lithium</span>
-                <span class="spec">Máy lạnh</span>
-              </div>
-              <div class="car-price">
-                <span class="price-label">Giá khởi điểm:</span>
-                <span class="price-value">18.000đ/km</span>
-              </div>
-              <div class="car-actions">
-                <a href="car-detail.html" class="btn-view">Xem chi tiết</a>
-                <a href="booking.html" class="btn-book">Đặt xe</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="car-card">
-            <div class="car-image">
-              <img src="/src/assets/vf8.jpg" alt="VinFast VF 8" class="car-img">
-            </div>
-            <div class="car-info">
-              <h3 class="car-name">VinFast VF 8</h3>
-              <p class="car-type">Taxi điện hạng D - 5 chỗ</p>
-              <div class="car-specs">
-                <span class="spec">5 chỗ</span>
-                <span class="spec">Xe điện 100%</span>
-                <span class="spec">Pin lithium</span>
-                <span class="spec">Máy lạnh</span>
-              </div>
-              <div class="car-price">
-                <span class="price-label">Giá khởi điểm:</span>
-                <span class="price-value">22.000đ/km</span>
-              </div>
-              <div class="car-actions">
-                <a href="car-detail.html" class="btn-view">Xem chi tiết</a>
-                <a href="booking.html" class="btn-book">Đặt xe</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="car-card">
-            <div class="car-image">
-              <img src="/src/assets/vf9.png" alt="VinFast VF 9" class="car-img">
-            </div>
-            <div class="car-info">
-              <h3 class="car-name">VinFast VF 9</h3>
-              <p class="car-type">Taxi điện hạng E - 7 chỗ</p>
-              <div class="car-specs">
-                <span class="spec">7 chỗ</span>
-                <span class="spec">Xe điện 100%</span>
-                <span class="spec">Pin lithium</span>
-                <span class="spec">Máy lạnh</span>
-              </div>
-              <div class="car-price">
-                <span class="price-label">Giá khởi điểm:</span>
-                <span class="price-value">28.000đ/km</span>
-              </div>
-              <div class="car-actions">
-                <a href="car-detail.html" class="btn-view">Xem chi tiết</a>
-                <a href="booking.html" class="btn-book">Đặt xe</a>
-              </div>
-            </div>
+        <!-- Dynamic Container where JavaScript will insert HTML -->
+        <div id="cars-grid-container" class="cars-grid">
+          <div class="loading-spinner">
+            <p>🔄 Đang tải dữ liệu từ cars.json...</p>
           </div>
         </div>
       </section>
@@ -197,17 +67,21 @@
             <li><a href="index.html">Trang chủ</a></li>
             <li><a href="cars.html">Danh sách xe</a></li>
             <li><a href="booking.html">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html">Lịch sử chuyến xe</a></li>
           </ul>
         </div>
         <div class="footer-section">
           <h3>Liên hệ</h3>
-          <p>Hotline: 1900 xxxx</p>
-          <p>Email: info@taxibooking.com</p>
+          <p>Hotline: 1900 232389</p>
+          <p>Email: hotro@taxivinfast.com</p>
         </div>
       </div>
       <div class="footer-bottom">
         <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
       </div>
     </footer>
+
+    <!-- JavaScript đọc dữ liệu JSON động -->
+    <script type="module" src="/src/cars-dynamic.js"></script>
   </body>
 </html>
