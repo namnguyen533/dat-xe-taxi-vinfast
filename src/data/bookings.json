@@ -1,0 +1,233 @@
+[
+  {
+    "bookingId": "VF-2026-9821",
+    "customer": {
+      "name": "Nguyễn Văn Minh",
+      "phone": "0912 345 678",
+      "email": "vanminh.nguyen@gmail.com"
+    },
+    "serviceType": "point-to-point",
+    "vehicle": {
+      "model": "VinFast VF 5 Plus",
+      "seats": 4,
+      "licensePlate": "51K-882.19"
+    },
+    "driver": {
+      "name": "Trần Thanh Sơn",
+      "phone": "0903 112 233",
+      "rating": 4.9,
+      "avatar": "https://i.pravatar.cc/150?img=11"
+    },
+    "route": {
+      "pickupLocation": "Sân bay Tân Sơn Nhất, Phường 2, Tân Bình, TPHCM",
+      "destinationLocation": "Landmark 81, 720A Điện Biên Phủ, Bình Thạnh, TPHCM",
+      "distanceKm": 12.5,
+      "estimatedDurationMin": 25
+    },
+    "schedule": {
+      "pickupDate": "2026-09-24",
+      "pickupTime": "08:30",
+      "createdDate": "2026-09-24T08:15:00Z"
+    },
+    "fare": {
+      "basePrice": 12000,
+      "distanceCost": 125000,
+      "discountCode": "VINFAST20",
+      "discountAmount": 27400,
+      "totalAmount": 109600,
+      "currency": "VND"
+    },
+    "payment": {
+      "method": "momo",
+      "status": "paid"
+    },
+    "status": "completed",
+    "statusText": "Hoàn thành",
+    "note": "Khách có 2 vali nhỏ, đón tại cột số 5 sảnh đến quốc nội."
+  },
+  {
+    "bookingId": "VF-2026-9822",
+    "customer": {
+      "name": "Phạm Thị Hương",
+      "phone": "0987 654 321",
+      "email": "huong.pham@yahoo.com"
+    },
+    "serviceType": "airport",
+    "vehicle": {
+      "model": "VinFast VF 8",
+      "seats": 5,
+      "licensePlate": "30H-991.82"
+    },
+    "driver": {
+      "name": "Lê Hoàng Nam",
+      "phone": "0977 445 566",
+      "rating": 5.0,
+      "avatar": "https://i.pravatar.cc/150?img=12"
+    },
+    "route": {
+      "pickupLocation": "Khách sạn Metropole, 15 Phố Ngô Quyền, Hoàn Kiếm, Hà Nội",
+      "destinationLocation": "Sân bay Quốc tế Nội Bài, Nhà ga T2, Hà Nội",
+      "distanceKm": 28.0,
+      "estimatedDurationMin": 40
+    },
+    "schedule": {
+      "pickupDate": "2026-09-24",
+      "pickupTime": "10:15",
+      "createdDate": "2026-09-24T07:45:00Z"
+    },
+    "fare": {
+      "basePrice": 22000,
+      "distanceCost": 434000,
+      "discountCode": null,
+      "discountAmount": 0,
+      "totalAmount": 456000,
+      "currency": "VND"
+    },
+    "payment": {
+      "method": "banking",
+      "status": "paid"
+    },
+    "status": "in_progress",
+    "statusText": "Đang di chuyển",
+    "note": "Đón đúng giờ đi chuyến bay quốc tế lúc 13:00."
+  },
+  {
+    "bookingId": "VF-2026-9823",
+    "customer": {
+      "name": "Lê Quốc Bảo",
+      "phone": "0938 123 999",
+      "email": "quocbao.le@outlook.com"
+    },
+    "serviceType": "point-to-point",
+    "vehicle": {
+      "model": "VinFast VF 3",
+      "seats": 2,
+      "licensePlate": "51L-123.45"
+    },
+    "driver": {
+      "name": "Đặng Văn Hùng",
+      "phone": "0918 887 766",
+      "rating": 4.8,
+      "avatar": "https://i.pravatar.cc/150?img=13"
+    },
+    "route": {
+      "pickupLocation": "Chợ Bến Thành, Lê Lợi, Phường Bến Thành, Quận 1, TPHCM",
+      "destinationLocation": "Trung tâm thương mại Crescent Mall, Quận 7, TPHCM",
+      "distanceKm": 6.8,
+      "estimatedDurationMin": 18
+    },
+    "schedule": {
+      "pickupDate": "2026-09-24",
+      "pickupTime": "11:00",
+      "createdDate": "2026-09-24T08:00:00Z"
+    },
+    "fare": {
+      "basePrice": 10000,
+      "distanceCost": 54400,
+      "discountCode": null,
+      "discountAmount": 0,
+      "totalAmount": 64400,
+      "currency": "VND"
+    },
+    "payment": {
+      "method": "cash",
+      "status": "pending"
+    },
+    "status": "driver_assigned",
+    "statusText": "Đang điều xe",
+    "note": "Xin xe có máy lạnh mát."
+  },
+  {
+    "bookingId": "VF-2026-9824",
+    "customer": {
+      "name": "Vũ Anh Tuấn",
+      "phone": "0909 778 899",
+      "email": "anhtuan.vu@company.com"
+    },
+    "serviceType": "hourly",
+    "vehicle": {
+      "model": "VinFast VF 9",
+      "seats": 7,
+      "licensePlate": "51K-999.99"
+    },
+    "driver": {
+      "name": "Nguyễn Hoàng Đức",
+      "phone": "0933 665 544",
+      "rating": 5.0,
+      "avatar": "https://i.pravatar.cc/150?img=14"
+    },
+    "route": {
+      "pickupLocation": "Tòa nhà Bitexco Financial Tower, Quận 1, TPHCM",
+      "destinationLocation": "Thuê 4 tiếng phục vụ đối tác ngoại giao (Quận 1 - Q2 - Q7)",
+      "distanceKm": 45.0,
+      "estimatedDurationMin": 240
+    },
+    "schedule": {
+      "pickupDate": "2026-09-24",
+      "pickupTime": "14:00",
+      "createdDate": "2026-09-24T06:30:00Z"
+    },
+    "fare": {
+      "basePrice": 1300000,
+      "distanceCost": 0,
+      "discountCode": "XEXANH",
+      "discountAmount": 30000,
+      "totalAmount": 1270000,
+      "currency": "VND"
+    },
+    "payment": {
+      "method": "banking",
+      "status": "paid"
+    },
+    "status": "confirmed",
+    "statusText": "Đã xác nhận",
+    "note": "Tài xế mặc trang phục lịch sự veston, hỗ trợ mở cửa xe cho khách VIP."
+  },
+  {
+    "bookingId": "VF-2026-9825",
+    "customer": {
+      "name": "Đỗ Hoàng Anh",
+      "phone": "0945 667 889",
+      "email": "hoanganh.do@gmail.com"
+    },
+    "serviceType": "intercity",
+    "vehicle": {
+      "model": "VinFast VF 7",
+      "seats": 5,
+      "licensePlate": "60A-778.12"
+    },
+    "driver": {
+      "name": "Phạm Quốc Huy",
+      "phone": "0908 334 455",
+      "rating": 4.7,
+      "avatar": "https://i.pravatar.cc/150?img=15"
+    },
+    "route": {
+      "pickupLocation": "Quận 3, TPHCM",
+      "destinationLocation": "Thành phố Vũng Tàu, Bà Rịa - Vũng Tàu",
+      "distanceKm": 95.0,
+      "estimatedDurationMin": 110
+    },
+    "schedule": {
+      "pickupDate": "2026-09-23",
+      "pickupTime": "16:00",
+      "createdDate": "2026-09-23T14:20:00Z"
+    },
+    "fare": {
+      "basePrice": 18000,
+      "distanceCost": 1130500,
+      "discountCode": null,
+      "discountAmount": 0,
+      "totalAmount": 1148500,
+      "currency": "VND"
+    },
+    "payment": {
+      "method": "momo",
+      "status": "paid"
+    },
+    "status": "completed",
+    "statusText": "Hoàn thành",
+    "note": "Chuyến đi tỉnh Vũng Tàu khứ hồi."
+  }
+]
+
