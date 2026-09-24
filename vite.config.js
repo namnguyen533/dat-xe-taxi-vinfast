@@ -10,8 +10,8 @@ export default defineConfig({
         cars: resolve(import.meta.dirname, 'cars.html'),
         carDetail: resolve(import.meta.dirname, 'car-detail.html'),
         giaodiendatxe: resolve(import.meta.dirname, 'src/giaodiendatxe.html'),
+        danhsachchuyen: resolve(import.meta.dirname, 'danhsachchuyen.html'),
       },
     },
   },
 });
-

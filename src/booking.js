@@ -1,4 +1,5 @@
 import './style.css';
+import { calculateTripFare } from './price-calculator.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- DOM elements ---
@@ -63,131 +64,307 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Set default date & time
   const today = new Date();
-  dateInput.value = today.toISOString().split('T')[0];
+  if (dateInput) dateInput.value = today.toISOString().split('T')[0];
   const hours = String(today.getHours()).padStart(2, '0');
   const minutes = String(today.getMinutes()).padStart(2, '0');
-  timeInput.value = `${hours}:${minutes}`;
+  if (timeInput) timeInput.value = `${hours}:${minutes}`;
 
   // Format currency helper
   function formatVND(amount) {
     return new Intl.NumberFormat('vi-VN').format(Math.round(amount)) + ' đ';
   }
 
-  // Calculate Distance based on string lengths / hashes for realistic demo UI
+  // ==========================================================================
+  // XỬ LÝ NHẬP ĐIỂM ĐÓN & ĐIỂM ĐẾN BẰNG JAVASCRIPT (LOCATION INPUT LOGIC)
+  // ==========================================================================
+
+  // Danh sách địa điểm gợi ý phổ biến
+  const popularLocations = [
+    { title: "Sân bay Tân Sơn Nhất, TPHCM", icon: "✈️", zone: "Tân Bình" },
+    { title: "Chợ Bến Thành, Quận 1, TPHCM", icon: "🏢", zone: "Quận 1" },
+    { title: "Landmark 81, 720A Điện Biên Phủ, Bình Thạnh, TPHCM", icon: "🏙️", zone: "Bình Thạnh" },
+    { title: "Bến xe Miền Đông mới, TP. Thủ Đức", icon: "🚌", zone: "Thủ Đức" },
+    { title: "Sân bay Quốc tế Nội Bài, Hà Nội", icon: "✈️", zone: "Sóc Sơn" },
+    { title: "Hồ Hoàn Kiếm, Quận Hoàn Kiếm, Hà Nội", icon: "🏞️", zone: "Hoàn Kiếm" },
+    { title: "Crescent Mall, Quận 7, TPHCM", icon: "🛍️", zone: "Quận 7" },
+    { title: "Thành phố Vũng Tàu, Bà Rịa - Vũng Tàu", icon: "🏖️", zone: "Tỉnh khác" }
+  ];
+
+  /**
+   * Tạo menu gợi ý tự động (Autocomplete Dropdown) cho thẻ ô nhập liệu
+   * @param {HTMLInputElement} inputEl Thẻ input cần áp dụng
+   */
+  function setupLocationAutocomplete(inputEl) {
+    if (!inputEl) return;
+
+    // Tạo phần tử danh sách gợi ý bên dưới ô input
+    const parent = inputEl.parentElement;
+    if (parent.style.position !== 'relative') {
+      parent.style.position = 'relative';
+    }
+
+    const dropdown = document.createElement('ul');
+    dropdown.className = 'location-autocomplete-list';
+    dropdown.style.display = 'none';
+    parent.appendChild(dropdown);
+
+    // Hàm hiển thị danh sách lọc
+    function renderSuggestions(filterText = '') {
+      const keyword = filterText.toLowerCase().trim();
+      const matches = popularLocations.filter(loc => 
+        loc.title.toLowerCase().includes(keyword) || 
+        loc.zone.toLowerCase().includes(keyword)
+      );
+
+      if (matches.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+
+      dropdown.innerHTML = matches.map(loc => `
+        <li class="autocomplete-item" data-value="${loc.title}">
+          <span class="loc-icon">${loc.icon}</span>
+          <div class="loc-info">
+            <strong class="loc-title">${loc.title}</strong>
+            <span class="loc-zone">${loc.zone}</span>
+          </div>
+        </li>
+      `).join('');
+
+      dropdown.style.display = 'block';
+
+      // Lắng nghe sự kiện click vào từng địa điểm trong danh sách
+      dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+        item.addEventListener('click', () => {
+          inputEl.value = item.getAttribute('data-value');
+          dropdown.style.display = 'none';
+          updateDistance();
+        });
+      });
+    }
+
+    // Sự kiện khi người dùng gõ phím vào ô nhập liệu
+    inputEl.addEventListener('input', () => {
+      renderSuggestions(inputEl.value);
+    });
+
+    // Sự kiện khi bấm vào ô input (Focus)
+    inputEl.addEventListener('focus', () => {
+      renderSuggestions(inputEl.value);
+    });
+
+    // Ẩn menu khi click ra ngoài
+    document.addEventListener('click', (e) => {
+      if (!parent.contains(e.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
+  }
+
+  // Khởi tạo tính năng gợi ý tự động cho Điểm đón và Điểm đến
+  setupLocationAutocomplete(pickupInput);
+  setupLocationAutocomplete(destInput);
+
+  /**
+   * Tính toán khoảng cách (Km) & thời gian dựa trên điểm đi và điểm đến
+   */
   function updateDistance() {
-    const pickupVal = pickupInput.value.trim();
-    const destVal = destInput.value.trim();
+    const pickupVal = pickupInput ? pickupInput.value.trim() : '';
+    const destVal = destInput ? destInput.value.trim() : '';
+
+    // Cảnh báo nếu điểm đón trùng điểm đến
+    if (pickupVal && destVal && pickupVal.toLowerCase() === destVal.toLowerCase()) {
+      if (summaryPickup) summaryPickup.textContent = pickupVal;
+      if (summaryDest) summaryDest.textContent = destVal;
+      if (metricDistance) metricDistance.textContent = '0 km (Trùng nhau)';
+      if (metricDuration) metricDuration.textContent = '0 phút';
+      distanceKm = 0;
+      durationMin = 0;
+      calculatePrice();
+      return;
+    }
 
     if (!pickupVal || !destVal) {
       distanceKm = 0;
       durationMin = 0;
     } else {
-      // Generate a stable fake distance between 3.5km and 28km
+      // Giả lập khoảng cách linh hoạt từ 3.5 km tới 35 km
       const combined = (pickupVal + destVal).length;
-      distanceKm = parseFloat(((combined % 20) + 3.5).toFixed(1));
-      durationMin = Math.round(distanceKm * 2.2 + 5);
+      distanceKm = parseFloat(((combined % 25) + 4.2).toFixed(1));
+      durationMin = Math.round(distanceKm * 2.1 + 4);
     }
 
-    summaryPickup.textContent = pickupVal || '---';
-    summaryDest.textContent = destVal || '---';
-    metricDistance.textContent = distanceKm > 0 ? `${distanceKm} km` : '---';
-    metricDuration.textContent = durationMin > 0 ? `~${durationMin} phút` : '---';
+    if (summaryPickup) summaryPickup.textContent = pickupVal || '---';
+    if (summaryDest) summaryDest.textContent = destVal || '---';
+    if (metricDistance) metricDistance.textContent = distanceKm > 0 ? `${distanceKm} km` : '---';
+    if (metricDuration) metricDuration.textContent = durationMin > 0 ? `~${durationMin} phút` : '---';
 
     calculatePrice();
   }
 
-  // Calculate Price Breakdown
-  function calculatePrice() {
-    if (distanceKm === 0) {
-      priceBaseEl.textContent = '0 đ';
-      priceDistEl.textContent = '0 đ';
-      priceTotalEl.textContent = '0 đ';
-      return;
-    }
+  // Lắng nghe sự kiện thay đổi điểm đi & đến trực tiếp
+  if (pickupInput) pickupInput.addEventListener('input', updateDistance);
+  if (destInput) destInput.addEventListener('input', updateDistance);
 
-    let base = currentCar.basePrice;
-    let distCost = distanceKm * currentCar.perKmPrice;
-
-    // Service multiplier adjustments
-    if (selectedService === 'hourly') {
-      base += 50000;
-    } else if (selectedService === 'intercity') {
-      distCost *= 0.85; // 15% discount for long distance
-    } else if (selectedService === 'airport') {
-      base += 15000;
-    }
-
-    let subtotal = base + distCost;
-    let discount = 0;
-
-    if (activeDiscountPercent > 0) {
-      discount += (subtotal * activeDiscountPercent) / 100;
-    }
-    if (activeDiscountAmount > 0) {
-      discount += activeDiscountAmount;
-    }
-
-    let finalTotal = Math.max(0, subtotal - discount);
-
-    priceBaseEl.textContent = formatVND(base);
-    priceDistEl.textContent = `${formatVND(distCost)} (${distanceKm} km)`;
-    
-    if (discount > 0) {
-      rowDiscount.style.display = 'flex';
-      priceDiscEl.textContent = `- ${formatVND(discount)}`;
-    } else {
-      rowDiscount.style.display = 'none';
-    }
-
-    priceTotalEl.textContent = formatVND(finalTotal);
-  }
-
-  // Input listeners
-  pickupInput.addEventListener('input', updateDistance);
-  destInput.addEventListener('input', updateDistance);
-
-  // Swap locations button
+  // Nút Đổi Điểm Đi & Điểm Đến (Swap Locations)
   if (btnSwap) {
     btnSwap.addEventListener('click', () => {
+      if (!pickupInput || !destInput) return;
+
+      // Xoay icon hiệu ứng 180 độ
+      btnSwap.style.transform = 'rotate(180deg)';
+      setTimeout(() => { btnSwap.style.transform = 'none'; }, 300);
+
+      // Tráo đổi giá trị 2 ô input
       const temp = pickupInput.value;
       pickupInput.value = destInput.value;
       destInput.value = temp;
+
+      // Cập nhật lại khoảng cách & giá cước
       updateDistance();
     });
   }
 
-  // Geolocation button
+  // Nút Lấy vị trí hiện tại bằng Geolocation API (📍)
   if (btnGeo) {
     btnGeo.addEventListener('click', () => {
       btnGeo.textContent = '⌛';
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            pickupInput.value = `Vị trí hiện tại (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`;
+            const lat = pos.coords.latitude.toFixed(4);
+            const lng = pos.coords.longitude.toFixed(4);
+            pickupInput.value = `Vị trí hiện tại của tôi (${lat}, ${lng})`;
             btnGeo.textContent = '📍';
             updateDistance();
           },
-          () => {
-            pickupInput.value = 'Chợ Bến Thành, Quận 1, TPHCM';
+          (error) => {
+            console.warn('Geolocation Error:', error);
+            pickupInput.value = 'Chợ Bến Thành, Lê Lợi, Quận 1, TPHCM';
             btnGeo.textContent = '📍';
             updateDistance();
           }
         );
       } else {
-        pickupInput.value = 'Chợ Bến Thành, Quận 1, TPHCM';
+        pickupInput.value = 'Chợ Bến Thành, Lê Lợi, Quận 1, TPHCM';
         btnGeo.textContent = '📍';
         updateDistance();
       }
     });
   }
 
-  // Quick tag buttons
+  // Nút chọn gợi ý địa điểm nhanh (Quick Tags)
   quickTags.forEach(tag => {
     tag.addEventListener('click', () => {
-      destInput.value = tag.getAttribute('data-dest');
-      updateDistance();
+      if (destInput) {
+        destInput.value = tag.getAttribute('data-dest');
+        updateDistance();
+      }
     });
   });
+
+  // ==========================================================================
+
+  // Calculate Price Breakdown bằng Module mô phỏng giá cước
+  function calculatePrice() {
+    if (!priceBaseEl || !priceDistEl || !priceTotalEl) return;
+
+    const timeVal = timeInput ? timeInput.value : '12:00';
+    const couponVal = couponInput ? couponInput.value : '';
+
+    // Gọi công cụ mô phỏng tính cước
+    const result = calculateTripFare({
+      distanceKm: distanceKm,
+      basePrice: currentCar.basePrice,
+      perKmPrice: currentCar.perKmPrice,
+      serviceType: selectedService,
+      pickupTime: timeVal,
+      couponCode: couponVal
+    });
+
+    priceBaseEl.textContent = `${new Intl.NumberFormat('vi-VN').format(result.baseFare)} đ`;
+    priceDistEl.textContent = `${new Intl.NumberFormat('vi-VN').format(result.distanceCost)} đ (${distanceKm} km)`;
+
+    if (result.discount > 0 && rowDiscount) {
+      rowDiscount.style.display = 'flex';
+      if (priceDiscEl) priceDiscEl.textContent = `- ${new Intl.NumberFormat('vi-VN').format(result.discount)} đ`;
+    } else if (rowDiscount) {
+      rowDiscount.style.display = 'none';
+    }
+
+    priceTotalEl.textContent = result.formattedTotal;
+  }
+
+  // Select Car Card logic
+  function handleSelectCarCard(cardElement) {
+    if (!cardElement) return;
+
+    vehicleCards.forEach(c => c.classList.remove('active'));
+    cardElement.classList.add('active');
+
+    const radio = cardElement.querySelector('input[type="radio"]');
+    if (radio) radio.checked = true;
+
+    const model = cardElement.getAttribute('data-model');
+    const base = parseInt(cardElement.getAttribute('data-base'), 10);
+    const perKm = parseInt(cardElement.getAttribute('data-per-km'), 10);
+    const seats = cardElement.getAttribute('data-seats');
+    const imgEl = cardElement.querySelector('img');
+    const img = imgEl ? imgEl.src : '';
+    const typeTextEl = cardElement.querySelector('.vehicle-type');
+    const typeText = typeTextEl ? typeTextEl.textContent : '';
+
+    currentCar = {
+      model,
+      basePrice: base,
+      perKmPrice: perKm,
+      seats,
+      type: typeText,
+      img
+    };
+
+    if (summaryCarName) summaryCarName.textContent = `VinFast ${model}`;
+    if (summaryCarType) summaryCarType.textContent = typeText;
+    if (summaryCarImg && img) summaryCarImg.src = img;
+
+    calculatePrice();
+  }
+
+  function selectCarByModel(modelName) {
+    if (!modelName) return;
+    const cleanModel = modelName.trim().toUpperCase();
+
+    let targetCard = null;
+    vehicleCards.forEach(card => {
+      const cardModel = (card.getAttribute('data-model') || '').toUpperCase();
+      if (cardModel === cleanModel || cleanModel.includes(cardModel)) {
+        targetCard = card;
+      }
+    });
+
+    if (targetCard) {
+      handleSelectCarCard(targetCard);
+    }
+  }
+
+  vehicleCards.forEach(card => {
+    card.addEventListener('click', () => {
+      handleSelectCarCard(card);
+    });
+
+    const radio = card.querySelector('input[type="radio"]');
+    if (radio) {
+      radio.addEventListener('change', () => {
+        handleSelectCarCard(card);
+      });
+    }
+  });
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedModel = urlParams.get('model') || urlParams.get('car');
+  if (requestedModel) {
+    selectCarByModel(requestedModel);
+  }
 
   // Service tab switching
   serviceTabs.forEach(tab => {
@@ -195,40 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
       serviceTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       selectedService = tab.getAttribute('data-service');
-      calculatePrice();
-    });
-  });
-
-  // Vehicle Selection
-  vehicleCards.forEach(card => {
-    card.addEventListener('click', () => {
-      vehicleCards.forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-
-      const radio = card.querySelector('input[type="radio"]');
-      if (radio) radio.checked = true;
-
-      const model = card.getAttribute('data-model');
-      const base = parseInt(card.getAttribute('data-base'), 10);
-      const perKm = parseInt(card.getAttribute('data-per-km'), 10);
-      const seats = card.getAttribute('data-seats');
-      const img = card.querySelector('img').src;
-      const typeText = card.querySelector('.vehicle-type').textContent;
-
-      currentCar = {
-        model,
-        basePrice: base,
-        perKmPrice: perKm,
-        seats,
-        type: typeText,
-        img
-      };
-
-      // Update Summary UI
-      summaryCarName.textContent = `VinFast ${model}`;
-      summaryCarType.textContent = typeText;
-      summaryCarImg.src = img;
-
       calculatePrice();
     });
   });
@@ -274,26 +417,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Submit & Modal Confirmation
   if (btnConfirm) {
     btnConfirm.addEventListener('click', () => {
-      const name = customerName.value.trim();
-      const phone = customerPhone.value.trim();
-      const pickup = pickupInput.value.trim();
-      const dest = destInput.value.trim();
+      const name = customerName ? customerName.value.trim() : '';
+      const phone = customerPhone ? customerPhone.value.trim() : '';
+      const pickup = pickupInput ? pickupInput.value.trim() : '';
+      const dest = destInput ? destInput.value.trim() : '';
 
       if (!pickup || !dest) {
         alert('Vui lòng nhập đầy đủ điểm đón và điểm đến!');
-        pickupInput.focus();
+        if (pickupInput) pickupInput.focus();
         return;
       }
 
       if (!name) {
         alert('Vui lòng nhập họ và tên của bạn!');
-        customerName.focus();
+        if (customerName) customerName.focus();
         return;
       }
 
       if (!phone) {
         alert('Vui lòng nhập số điện thoại để tài xế liên hệ!');
-        customerPhone.focus();
+        if (customerPhone) customerPhone.focus();
         return;
       }
 
@@ -306,20 +449,20 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('receipt-pickup').textContent = pickup;
       document.getElementById('receipt-dest').textContent = dest;
 
-      const dateVal = dateInput.value;
-      const timeVal = timeInput.value;
+      const dateVal = dateInput ? dateInput.value : '';
+      const timeVal = timeInput ? timeInput.value : '';
       document.getElementById('receipt-time').textContent = `${timeVal} - ${dateVal}`;
 
       document.getElementById('receipt-total').textContent = priceTotalEl.textContent;
 
       // Show Modal
-      modal.style.display = 'flex';
+      if (modal) modal.style.display = 'flex';
     });
   }
 
   // Close Modal
   function closeModal() {
-    modal.style.display = 'none';
+    if (modal) modal.style.display = 'none';
   }
 
   if (btnModalClose) btnModalClose.addEventListener('click', closeModal);
@@ -328,4 +471,3 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial Calculation Run
   updateDistance();
 });
-
