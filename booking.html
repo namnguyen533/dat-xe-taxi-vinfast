@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đặt xe điện VinFast - TaxiVinFast</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <a href="index.html"><h1>TaxiVinFast</h1></a>
+        </div>
+        <nav class="nav-menu">
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="booking.html" class="nav-link active">Đặt xe</a></li>
+            <li><a href="index.html#pricing" class="nav-link">Bảng giá</a></li>
+            <li><a href="#" class="nav-link">Liên hệ</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <button class="btn-login">Đăng nhập</button>
+          <button class="btn-register">Đăng ký</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Banner Header -->
+      <section class="booking-hero">
+        <div class="booking-hero-content">
+          <span class="hero-badge">⚡ 100% Xe Điện VinFast Sang Trọng & Thân Thiện Môi Trường</span>
+          <h1 class="hero-page-title">Đặt Xe Taxi Điện Nhanh Chóng</h1>
+          <p class="hero-page-subtitle">Nhập điểm đi, điểm đến và chọn dòng xe VinFast yêu thích để trải nghiệm dịch vụ di chuyển đẳng cấp.</p>
+        </div>
+      </section>
+
+      <!-- Main Booking Section -->
+      <section class="booking-main-section">
+        <div class="booking-wrapper">
+          
+          <!-- Left Column: Form & Vehicle Selection -->
+          <div class="booking-form-column">
+            
+            <!-- Service Type Selector Tabs -->
+            <div class="booking-card service-tabs-card">
+              <h3 class="card-section-title"><span class="icon">🚕</span> Loại Dịch Vụ Đặt Xe</h3>
+              <div class="service-tabs">
+                <button type="button" class="tab-btn active" data-service="point-to-point">
+                  <span class="tab-icon">📍</span>
+                  <span class="tab-text">Taxi Nhanh (Theo Km)</span>
+                </button>
+                <button type="button" class="tab-btn" data-service="hourly">
+                  <span class="tab-icon">⏱️</span>
+                  <span class="tab-text">Thuê Theo Giờ</span>
+                </button>
+                <button type="button" class="tab-btn" data-service="intercity">
+                  <span class="tab-icon">🛣️</span>
+                  <span class="tab-text">Đi Tỉnh / Đường Dài</span>
+                </button>
+                <button type="button" class="tab-btn" data-service="airport">
+                  <span class="tab-icon">✈️</span>
+                  <span class="tab-text">Đưa Đón Sân Bay</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Route & Schedule Form -->
+            <div class="booking-card">
+              <h3 class="card-section-title"><span class="icon">🗺️</span> Lộ Trình & Thời Gian</h3>
+              
+              <!-- Pickup & Destination -->
+              <div class="route-inputs-group">
+                <div class="form-group">
+                  <label for="pickup-location" class="form-label">Điểm đón khách <span class="required">*</span></label>
+                  <div class="input-with-icon">
+                    <span class="input-icon pickup-marker">🟢</span>
+                    <input type="text" id="pickup-location" class="form-input" placeholder="Nhập địa chỉ đón (ví dụ: 123 Nguyễn Huệ, Q.1)" value="Sân bay Tân Sơn Nhất, TPHCM" required />
+                    <button type="button" class="btn-location-geo" title="Lấy vị trí hiện tại của tôi">📍</button>
+                  </div>
+                </div>
+
+                <div class="swap-locations-wrapper">
+                  <button type="button" id="btn-swap-locations" class="btn-swap" title="Đổi điểm đi và điểm đến">⇅</button>
+                </div>
+
+                <div class="form-group">
+                  <label for="destination-location" class="form-label">Điểm đến <span class="required">*</span></label>
+                  <div class="input-with-icon">
+                    <span class="input-icon dest-marker">🔴</span>
+                    <input type="text" id="destination-location" class="form-input" placeholder="Nhập địa chỉ đến (ví dụ: Landmark 81, Bình Thạnh)" value="Landmark 81, 720A Điện Biên Phủ, Bình Thạnh" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Location Tags -->
+              <div class="quick-locations-container">
+                <span class="quick-title">Gợi ý nhanh:</span>
+                <div class="quick-tags">
+                  <button type="button" class="quick-tag" data-dest="Sân bay Tân Sơn Nhất">✈️ Sân bay TSN</button>
+                  <button type="button" class="quick-tag" data-dest="Chợ Bến Thành, Quận 1">🏢 Chợ Bến Thành</button>
+                  <button type="button" class="quick-tag" data-dest="Landmark 81, Bình Thạnh">🏙️ Landmark 81</button>
+                  <button type="button" class="quick-tag" data-dest="Bến xe Miền Đông mới">🚌 Bến xe Miền Đông</button>
+                </div>
+              </div>
+
+              <!-- Schedule Date & Time -->
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="booking-date" class="form-label">Ngày đón</label>
+                  <input type="date" id="booking-date" class="form-input" />
+                </div>
+                <div class="form-group">
+                  <label for="booking-time" class="form-label">Giờ đón</label>
+                  <input type="time" id="booking-time" class="form-input" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Vehicle Selection Grid -->
+            <div class="booking-card">
+              <div class="section-title-with-badge">
+                <h3 class="card-section-title"><span class="icon">⚡</span> Chọn Dòng Xe VinFast</h3>
+                <span class="badge-count">6 Mẫu Xe Có Sẵn</span>
+              </div>
+              <p class="section-hint">Tất cả đều là xe điện 100%, êm ái, sạch sẽ, không mùi xăng dầu.</p>
+
+              <div class="vehicle-selection-grid">
+                
+                <!-- VF 3 -->
+                <label class="vehicle-card" data-model="VF 3" data-base="10000" data-per-km="8000" data-seats="2">
+                  <input type="radio" name="selected_car" value="VF 3">
+                  <div class="car-card-inner">
+                    <div class="car-badge">Tiết kiệm nhất</div>
+                    <img src="/src/assets/vf3.webp" alt="VinFast VF 3" class="vehicle-img" />
+                    <div class="vehicle-info">
+                      <h4 class="vehicle-name">VinFast VF 3</h4>
+                      <p class="vehicle-type">Mini SUV (2 chỗ)</p>
+                      <div class="vehicle-features">
+                        <span>⚡ Xe 100% điện</span>
+                        <span>❄️ Điều hòa</span>
+                      </div>
+                      <div class="vehicle-price-tag">
+                        <span class="price">8.000đ</span>/km
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- VF 5 Plus -->
+                <label class="vehicle-card active" data-model="VF 5 Plus" data-base="12000" data-per-km="10000" data-seats="4">
+                  <input type="radio" name="selected_car" value="VF 5 Plus" checked>
+                  <div class="car-card-inner">
+                    <div class="car-badge popular">Phổ biến nhất 🔥</div>
+                    <img src="/src/assets/vf5.jpg" alt="VinFast VF 5 Plus" class="vehicle-img" />
+                    <div class="vehicle-info">
+                      <h4 class="vehicle-name">VinFast VF 5 Plus</h4>
+                      <p class="vehicle-type">Compact SUV (4 chỗ)</p>
+                      <div class="vehicle-features">
+                        <span>⚡ Xe 100% điện</span>
+                        <span>🧳 Cốp vừa</span>
+                      </div>
+                      <div class="vehicle-price-tag">
+                        <span class="price">10.000đ</span>/km
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- VF 6 -->
+                <label class="vehicle-card" data-model="VF 6" data-base="15000" data-per-km="12000" data-seats="5">
+                  <input type="radio" name="selected_car" value="VF 6">
+                  <div class="car-card-inner">
+                    <img src="/src/assets/vf6.jpg" alt="VinFast VF 6" class="vehicle-img" />
+                    <div class="vehicle-info">
+                      <h4 class="vehicle-name">VinFast VF 6</h4>
+                      <p class="vehicle-type">Crossover B (5 chỗ)</p>
+                      <div class="vehicle-features">
+                        <span>⚡ Xe 100% điện</span>
+                        <span>✨ Rộng rãi</span>
+                      </div>
+                      <div class="vehicle-price-tag">
+                        <span class="price">12.000đ</span>/km
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- VF 7 -->
+                <label class="vehicle-card" data-model="VF 7" data-base="18000" data-per-km="14000" data-seats="5">
+                  <input type="radio" name="selected_car" value="VF 7">
+                  <div class="car-card-inner">
+                    <img src="/src/assets/vf7.jpg" alt="VinFast VF 7" class="vehicle-img" />
+                    <div class="vehicle-info">
+                      <h4 class="vehicle-name">VinFast VF 7</h4>
+                      <p class="vehicle-type">C-SUV Thể Thao (5 chỗ)</p>
+                      <div class="vehicle-features">
+                        <span>⚡ Động cơ mạnh</span>
+                        <span>💎 Nội thất cao cấp</span>
+                      </div>
+                      <div class="vehicle-price-tag">
+                        <span class="price">14.000đ</span>/km
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- VF 8 -->
+                <label class="vehicle-card" data-model="VF 8" data-base="22000" data-per-km="16000" data-seats="5">
+                  <input type="radio" name="selected_car" value="VF 8">
+                  <div class="car-card-inner">
+                    <div class="car-badge VIP">Hạng thương gia</div>
+                    <img src="/src/assets/vf8.jpg" alt="VinFast VF 8" class="vehicle-img" />
+                    <div class="vehicle-info">
+                      <h4 class="vehicle-name">VinFast VF 8</h4>
+                      <p class="vehicle-type">D-SUV Đẳng Cấp (5 chỗ)</p>
+                      <div class="vehicle-features">
+                        <span>👑 Ghế da cao cấp</span>
+                        <span>🔊 Loa cao cấp</span>
+                      </div>
+                      <div class="vehicle-price-tag">
+                        <span class="price">16.000đ</span>/km
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- VF 9 -->
+                <label class="vehicle-card" data-model="VF 9" data-base="28000" data-per-km="20000" data-seats="7">
+                  <input type="radio" name="selected_car" value="VF 9">
+                  <div class="car-card-inner">
+                    <div class="car-badge VIP">Luxury 7 chỗ</div>
+                    <img src="/src/assets/vf9.png" alt="VinFast VF 9" class="vehicle-img" />
+                    <div class="vehicle-info">
+                      <h4 class="vehicle-name">VinFast VF 9</h4>
+                      <p class="vehicle-type">E-SUV Full Size (7 chỗ)</p>
+                      <div class="vehicle-features">
+                        <span>👨‍👩‍👧‍👦 7 chỗ siêu rộng</span>
+                        <span>🛡️ An toàn 5 sao</span>
+                      </div>
+                      <div class="vehicle-price-tag">
+                        <span class="price">20.000đ</span>/km
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+              </div>
+            </div>
+
+            <!-- Customer Information & Payment -->
+            <div class="booking-card">
+              <h3 class="card-section-title"><span class="icon">👤</span> Thông Tin Đặt Xe & Thanh Toán</h3>
+              
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="customer-name" class="form-label">Họ và tên <span class="required">*</span></label>
+                  <input type="text" id="customer-name" class="form-input" placeholder="Ví dụ: Nguyễn Văn A" required />
+                </div>
+                <div class="form-group">
+                  <label for="customer-phone" class="form-label">Số điện thoại <span class="required">*</span></label>
+                  <input type="tel" id="customer-phone" class="form-input" placeholder="Ví dụ: 0912 345 678" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="customer-note" class="form-label">Ghi chú cho tài xế (không bắt buộc)</label>
+                <textarea id="customer-note" class="form-textarea" rows="2" placeholder="Ví dụ: Chở nhiều hành lý, đón tại sảnh A, xin gọi trước khi đến..."></textarea>
+              </div>
+
+              <!-- Payment Option -->
+              <div class="payment-methods">
+                <label class="payment-label">Phương thức thanh toán:</label>
+                <div class="payment-grid">
+                  <label class="payment-option active">
+                    <input type="radio" name="payment_method" value="cash" checked />
+                    <span class="pay-icon">💵</span>
+                    <span class="pay-name">Tiền mặt</span>
+                  </label>
+                  <label class="payment-option">
+                    <input type="radio" name="payment_method" value="momo" />
+                    <span class="pay-icon">📱</span>
+                    <span class="pay-name">Ví MoMo / ZaloPay</span>
+                  </label>
+                  <label class="payment-option">
+                    <input type="radio" name="payment_method" value="banking" />
+                    <span class="pay-icon">💳</span>
+                    <span class="pay-name">Chuyển khoản QR</span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Right Column: Booking Summary & Realtime Calculation -->
+          <div class="booking-summary-column">
+            <div class="summary-sticky-card">
+              <h3 class="summary-header">
+                <span>📋 Chi tiết chuyến đi</span>
+                <span class="live-indicator"><span class="dot"></span> Trực tiếp</span>
+              </h3>
+
+              <div class="summary-body">
+                
+                <!-- Selected Vehicle Info -->
+                <div class="summary-selected-vehicle">
+                  <img id="summary-car-img" src="/src/assets/vf5.jpg" alt="Selected Car" class="summary-car-thumb" />
+                  <div>
+                    <h4 id="summary-car-name" class="summary-car-title">VinFast VF 5 Plus</h4>
+                    <span id="summary-car-type" class="summary-car-sub">Compact SUV (4 chỗ)</span>
+                  </div>
+                </div>
+
+                <hr class="summary-divider" />
+
+                <!-- Route Summary -->
+                <div class="summary-route">
+                  <div class="route-item">
+                    <span class="dot green"></span>
+                    <div class="route-text">
+                      <span class="route-label">Điểm đón</span>
+                      <strong id="summary-pickup">Sân bay Tân Sơn Nhất, TPHCM</strong>
+                    </div>
+                  </div>
+                  <div class="route-line"></div>
+                  <div class="route-item">
+                    <span class="dot red"></span>
+                    <div class="route-text">
+                      <span class="route-label">Điểm đến</span>
+                      <strong id="summary-dest">Landmark 81, Bình Thạnh</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="summary-divider" />
+
+                <!-- Estimated Distance & Duration -->
+                <div class="trip-metrics">
+                  <div class="metric-box">
+                    <span class="metric-icon">📏</span>
+                    <div>
+                      <span class="metric-title">Khoảng cách</span>
+                      <strong id="metric-distance">12.5 km</strong>
+                    </div>
+                  </div>
+                  <div class="metric-box">
+                    <span class="metric-icon">⏱️</span>
+                    <div>
+                      <span class="metric-title">Thời gian</span>
+                      <strong id="metric-duration">~25 phút</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="summary-divider" />
+
+                <!-- Coupon Input -->
+                <div class="coupon-group">
+                  <div class="coupon-input-wrapper">
+                    <input type="text" id="coupon-code" placeholder="Mã giảm giá (VD: VINFAST20)" class="coupon-input" />
+                    <button type="button" id="btn-apply-coupon" class="btn-coupon">Áp dụng</button>
+                  </div>
+                  <div id="coupon-message" class="coupon-msg"></div>
+                </div>
+
+                <hr class="summary-divider" />
+
+                <!-- Price Breakdown -->
+                <div class="price-breakdown">
+                  <div class="price-row">
+                    <span>Giá mở cửa:</span>
+                    <span id="price-base">12.000 đ</span>
+                  </div>
+                  <div class="price-row">
+                    <span>Cước quãng đường (12.5 km):</span>
+                    <span id="price-distance">125.000 đ</span>
+                  </div>
+                  <div class="price-row text-success" id="row-discount" style="display: none;">
+                    <span>Giảm giá khuyến mãi:</span>
+                    <span id="price-discount">-0 đ</span>
+                  </div>
+                  <div class="price-row">
+                    <span>Phụ phí sân bay / Đêm:</span>
+                    <span class="text-free">Miễn phí ⚡</span>
+                  </div>
+
+                  <div class="price-total-row">
+                    <span>Tổng tiền ước tính:</span>
+                    <strong id="price-total" class="total-amount">137.000 đ</strong>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" id="btn-confirm-booking" class="btn-submit-booking">
+                  🚀 Xác Nhận Đặt Xe Ngay
+                </button>
+
+                <p class="summary-guarantee">
+                  ✓ Không tốn phí hủy chuyến trước 10 phút<br />
+                  ✓ Giá cố định, cam kết không phát sinh phụ phí
+                </p>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Why Choose Section -->
+      <section class="booking-features-section">
+        <div class="features-container">
+          <h2 class="section-title text-center">Tại Sao Nên Đặt Xe Taxi Điện VinFast?</h2>
+          <div class="features-grid">
+            <div class="feature-item">
+              <div class="feature-icon">🌿</div>
+              <h3>100% Xe Điện Xanh</h3>
+              <p>Không khói bụi, không mùi xăng dầu, vận hành êm ái mang lại sự thoải mái tuyệt đối trên mọi chuyến đi.</p>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">💰</div>
+              <h3>Bảng Giá Minh Bạch</h3>
+              <p>Biết trước chính xác giá cước chuyến đi, không tăng giá giờ cao điểm hay mưa bão.</p>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🛡️</div>
+              <h3>Tài Xế Chu Đáo</h3>
+              <p>Đội ngũ tài xế chuyên nghiệp, lịch sự, phục vụ ân cần và đảm bảo an toàn giao thông.</p>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">⚡</div>
+              <h3>Đón Nhanh 5-10 Phút</h3>
+              <p>Hệ thống định vị thông minh điều phối xe VinFast gần bạn nhất chỉ trong thời gian ngắn.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal Booking Confirmation Success -->
+    <div id="booking-success-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card">
+        <button class="modal-close" id="btn-modal-close">&times;</button>
+        <div class="modal-icon-success">🎉</div>
+        <h2 class="modal-title">Đặt Xe Thành Công!</h2>
+        <p class="modal-subtitle">Cảm ơn bạn đã lựa chọn dịch vụ TaxiVinFast. Thông tin chuyến xe của bạn đã được ghi nhận.</p>
+        
+        <div class="booking-receipt">
+          <div class="receipt-header">
+            <span>Mã chuyến xe: <strong id="receipt-id">#VF8924</strong></span>
+            <span class="receipt-status">Đang điều xe...</span>
+          </div>
+          <div class="receipt-body">
+            <div class="receipt-item">
+              <span>Họ tên khách:</span>
+              <strong id="receipt-name">---</strong>
+            </div>
+            <div class="receipt-item">
+              <span>Số điện thoại:</span>
+              <strong id="receipt-phone">---</strong>
+            </div>
+            <div class="receipt-item">
+              <span>Mẫu xe đặt:</span>
+              <strong id="receipt-car">---</strong>
+            </div>
+            <div class="receipt-item">
+              <span>Điểm đón:</span>
+              <span id="receipt-pickup">---</span>
+            </div>
+            <div class="receipt-item">
+              <span>Điểm đến:</span>
+              <span id="receipt-dest">---</span>
+            </div>
+            <div class="receipt-item">
+              <span>Thời gian đón:</span>
+              <span id="receipt-time">Ngay bây giờ</span>
+            </div>
+            <div class="receipt-item total">
+              <span>Tổng thanh toán:</span>
+              <strong id="receipt-total" class="receipt-price">0 đ</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-home" onclick="window.location.href='index.html'">Trang chủ</button>
+          <button type="button" class="btn-modal-close-main" id="btn-modal-done">Hoàn tất</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>TaxiVinFast</h3>
+          <p>Dịch vụ taxi điện uy tín, chất lượng hàng đầu Việt Nam</p>
+        </div>
+        <div class="footer-section">
+          <h3>Liên kết nhanh</h3>
+          <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="cars.html">Danh sách xe</a></li>
+            <li><a href="booking.html">Đặt xe</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Liên hệ</h3>
+          <p>Hotline: 1900 232389</p>
+          <p>Email: hotro@taxivinfast.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/booking.js"></script>
+  </body>
+</html>
+
