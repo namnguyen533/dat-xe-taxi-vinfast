@@ -5,6 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TaxiVinFast - Đặt xe điện VinFast</title>
+    <title>TaxiVinFast - Đặt xe điện VinFast nhanh chóng</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
@@ -12,12 +13,15 @@
       <div class="header-container">
         <div class="logo">
           <h1>TaxiVinfast</h1>
+          <a href="index.html"><h1>TaxiVinFast</h1></a>
         </div>
         <nav class="nav-menu">
           <ul class="nav-list">
             <li><a href="index.html" class="nav-link">Trang chủ</a></li>
             <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
             <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html" class="nav-link">Lịch sử chuyến</a></li>
+            <li><a href="#simulator" class="nav-link">Mô phỏng giá</a></li>
             <li><a href="#pricing" class="nav-link">Bảng giá</a></li>
             <li><a href="#" class="nav-link">Liên hệ</a></li>
           </ul>
@@ -33,6 +37,7 @@
       <section id="home" class="hero-section">
         <div class="hero-content">
           <h2 class="hero-title">Đặt xe điện VinFast</h2>
+          <h2 class="hero-title">Đặt xe điện VinFast nhanh chóng và tiện lợi</h2>
           <p class="hero-subtitle">Chúng tôi cung cấp dịch vụ taxi điện chất lượng cao, thân thiện môi trường với giá cả hợp lý</p>
           <a href="booking.html" class="btn-booking">Đặt xe ngay</a>
         </div>
@@ -86,15 +91,83 @@
               <div class="stat-item">
                 <h3 class="stat-number">10+</h3>
                 <p class="stat-label">Năm kinh nghiệm</p>
+      <!-- SIMULATOR SECTION (BỘ MÔ PHỎNG TÍNH GIÁ CƯỚC BẰNG JAVASCRIPT) -->
+      <section id="simulator" class="simulator-section">
+        <div class="simulator-container">
+          <div class="section-header text-center">
+            <span class="hero-badge">🧮 Công Cụ Mô Phỏng Trực Tiếp</span>
+            <h2 class="section-title">Tính Giá Cước Chuyến Đi Mô Phỏng</h2>
+            <p class="section-subtitle">Kéo chọn quãng đường và mẫu xe để xem dự toán cước phí chính xác tức thì bằng JavaScript</p>
+          </div>
+
+          <div class="simulator-card">
+            <!-- Controls Form -->
+            <div class="sim-controls-col">
+              
+              <div class="sim-group">
+                <label for="sim-model-select" class="form-label">Chọn dòng xe VinFast:</label>
+                <select id="sim-model-select" class="form-select">
+                  <option value="VF 3" data-base="10000" data-per-km="8000">VinFast VF 3 (Mini - 8.000đ/km)</option>
+                  <option value="VF 5 Plus" data-base="12000" data-per-km="10000" selected>VinFast VF 5 Plus (4 chỗ - 10.000đ/km)</option>
+                  <option value="VF 6" data-base="15000" data-per-km="12000">VinFast VF 6 (5 chỗ - 12.000đ/km)</option>
+                  <option value="VF 7" data-base="18000" data-per-km="14000">VinFast VF 7 (5 chỗ - 14.000đ/km)</option>
+                  <option value="VF 8" data-base="22000" data-per-km="16000">VinFast VF 8 (VIP 5 chỗ - 16.000đ/km)</option>
+                  <option value="VF 9" data-base="28000" data-per-km="20000">VinFast VF 9 (Luxury 7 chỗ - 20.000đ/km)</option>
+                </select>
               </div>
               <div class="stat-item">
                 <h3 class="stat-number">5000+</h3>
                 <p class="stat-label">Khách hàng hài lòng</p>
+
+              <div class="sim-group">
+                <div class="label-with-val">
+                  <label for="sim-distance-slider" class="form-label">Quãng đường dự kiến:</label>
+                  <strong id="sim-distance-val" class="slider-val">12.5 km</strong>
+                </div>
+                <input type="range" id="sim-distance-slider" min="1" max="100" step="0.5" value="12.5" class="sim-slider" />
+                <div class="slider-marks">
+                  <span>1 km</span>
+                  <span>25 km (Giảm 15%)</span>
+                  <span>50 km</span>
+                  <span>100 km</span>
+                </div>
               </div>
               <div class="stat-item">
                 <h3 class="stat-number">200+</h3>
                 <p class="stat-label">Xe hoạt động</p>
+
+              <div class="sim-row-2">
+                <div class="sim-group">
+                  <label for="sim-time-select" class="form-label">Khung giờ đón:</label>
+                  <select id="sim-time-select" class="form-select">
+                    <option value="12:00">☀️ Ban ngày (05:00 - 22:00)</option>
+                    <option value="23:30">🌙 Ban đêm (+10% từ 22:00 - 05:00)</option>
+                  </select>
+                </div>
+                <div class="sim-group">
+                  <label for="sim-coupon-input" class="form-label">Mã khuyến mãi:</label>
+                  <input type="text" id="sim-coupon-input" placeholder="Mã (VD: VINFAST20)" class="form-input" style="padding-left: 14px;" />
+                </div>
               </div>
+
+            </div>
+
+            <!-- Simulation Result Card -->
+            <div class="sim-result-col">
+              <h3 class="result-title">📊 Chi Tiết Cước Phí Chuyến Đi</h3>
+              
+              <ul id="sim-breakdown-list" class="sim-breakdown-ul">
+                <!-- Javascript nạp danh sách -->
+              </ul>
+
+              <div class="sim-total-box">
+                <span>Tổng cước ước tính:</span>
+                <strong id="sim-out-total" class="total-big">127.000 đ</strong>
+              </div>
+
+              <a href="booking.html" class="btn-submit-booking text-center" style="display: block; text-decoration: none;">
+                🚕 Đặt Xe Với Giá Này Ngay
+              </a>
             </div>
           </div>
         </div>
@@ -175,17 +248,23 @@
             <li><a href="index.html">Trang chủ</a></li>
             <li><a href="cars.html">Danh sách xe</a></li>
             <li><a href="booking.html">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html">Lịch sử chuyến xe</a></li>
           </ul>
         </div>
         <div class="footer-section">
           <h3>Liên hệ</h3>
           <p>Hotline: 1900 xxxx</p>
           <p>Email: info@taxibooking.com</p>
+          <p>Hotline: 1900 232389</p>
+          <p>Email: hotro@taxivinfast.com</p>
         </div>
       </div>
       <div class="footer-bottom">
         <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
       </div>
     </footer>
+
+    <!-- Script chạy bộ mô phỏng tính giá cước -->
+    <script type="module" src="/src/simulator-app.js"></script>
   </body>
 </html>

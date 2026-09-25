@@ -1,0 +1,142 @@
+{
+  "currency": "VND",
+  "unitDistance": "km",
+  "unitTime": "phút",
+  "lastUpdated": "2026-09-24",
+  "standardRates": [
+    {
+      "modelId": "vf3",
+      "modelName": "VinFast VF 3",
+      "seats": 2,
+      "baseFare": 10000,
+      "baseDistanceKm": 1,
+      "rateUnder25km": 8000,
+      "rateOver25km": 7000,
+      "waitingFeePer5Min": 2000
+    },
+    {
+      "modelId": "vf5",
+      "modelName": "VinFast VF 5 Plus",
+      "seats": 4,
+      "baseFare": 12000,
+      "baseDistanceKm": 1,
+      "rateUnder25km": 10000,
+      "rateOver25km": 8500,
+      "waitingFeePer5Min": 2500
+    },
+    {
+      "modelId": "vf6",
+      "modelName": "VinFast VF 6",
+      "seats": 5,
+      "baseFare": 15000,
+      "baseDistanceKm": 1,
+      "rateUnder25km": 12000,
+      "rateOver25km": 10000,
+      "waitingFeePer5Min": 3000
+    },
+    {
+      "modelId": "vf7",
+      "modelName": "VinFast VF 7",
+      "seats": 5,
+      "baseFare": 18000,
+      "baseDistanceKm": 1,
+      "rateUnder25km": 14000,
+      "rateOver25km": 11500,
+      "waitingFeePer5Min": 3500
+    },
+    {
+      "modelId": "vf8",
+      "modelName": "VinFast VF 8",
+      "seats": 5,
+      "baseFare": 22000,
+      "baseDistanceKm": 1,
+      "rateUnder25km": 16000,
+      "rateOver25km": 13000,
+      "waitingFeePer5Min": 4000
+    },
+    {
+      "modelId": "vf9",
+      "modelName": "VinFast VF 9",
+      "seats": 7,
+      "baseFare": 28000,
+      "baseDistanceKm": 1,
+      "rateUnder25km": 20000,
+      "rateOver25km": 16500,
+      "waitingFeePer5Min": 5000
+    }
+  ],
+  "hourlyRental": [
+    {
+      "durationHours": 4,
+      "maxDistanceKm": 50,
+      "rates": {
+        "VF 5 Plus": 450000,
+        "VF 6": 600000,
+        "VF 7": 750000,
+        "VF 8": 950000,
+        "VF 9": 1300000
+      },
+      "extraKmRate": 10000,
+      "extraHourRate": 100000
+    },
+    {
+      "durationHours": 8,
+      "maxDistanceKm": 100,
+      "rates": {
+        "VF 5 Plus": 850000,
+        "VF 6": 1100000,
+        "VF 7": 1400000,
+        "VF 8": 1800000,
+        "VF 9": 2400000
+      },
+      "extraKmRate": 10000,
+      "extraHourRate": 100000
+    }
+  ],
+  "airportFixedRates": [
+    {
+      "airport": "Sân bay Tân Sơn Nhất (SGN)",
+      "city": "TP. Hồ Chí Minh",
+      "destinations": [
+        { "zone": "Các quận Trung Tâm (Q1, Q3, Q5, Bình Thạnh)", "priceVF5": 160000, "priceVF8": 280000 },
+        { "zone": "Quận 2, Quận 7, Thủ Đức", "priceVF5": 220000, "priceVF8": 360000 }
+      ]
+    },
+    {
+      "airport": "Sân bay Nội Bài (HAN)",
+      "city": "Hà Nội",
+      "destinations": [
+        { "zone": "Nội thành Hà Nội (Hoàn Kiếm, Ba Đình, Cầu Giấy)", "priceVF5": 250000, "priceVF8": 400000 },
+        { "zone": "Hà Đông, Hoàng Mai, Gia Lâm", "priceVF5": 300000, "priceVF8": 480000 }
+      ]
+    }
+  ],
+  "surcharges": {
+    "nightSurcharge": {
+      "timeRange": "22:00 - 05:00",
+      "percentage": 10,
+      "description": "Phụ phí di chuyển ban đêm (+10% tổng cước)"
+    },
+    "holidaySurcharge": {
+      "percentage": 15,
+      "description": "Phụ phí Lễ / Tết (+15% tổng cước)"
+    },
+    "tollFee": "Theo chi phí thực tế trạm thu phí BOT"
+  },
+  "promotions": [
+    {
+      "code": "VINFAST20",
+      "discountType": "percentage",
+      "discountValue": 20,
+      "maxDiscount": 50000,
+      "description": "Giảm 20% cho khách hàng mới"
+    },
+    {
+      "code": "XEXANH",
+      "discountType": "fixed",
+      "discountValue": 30000,
+      "description": "Giảm ngay 30.000đ cho chuyến đi trên 10km"
+    }
+  ]
+}
+

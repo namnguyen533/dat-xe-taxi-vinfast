@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Danh sách chuyến xe đặt - TaxiVinFast</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <a href="index.html"><h1>TaxiVinFast</h1></a>
+        </div>
+        <nav class="nav-menu">
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html" class="nav-link active">Lịch sử chuyến</a></li>
+            <li><a href="index.html#pricing" class="nav-link">Bảng giá</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <button class="btn-login">Đăng nhập</button>
+          <button class="btn-register">Đăng ký</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="bookings-history-section">
+        <div class="history-container">
+          
+          <div class="section-header text-center">
+            <span class="hero-badge">📋 Dữ Liệu JSON (bookings.json)</span>
+            <h2 class="section-title">Danh Sách Chuyến Xe Đã Đặt</h2>
+            <p class="section-subtitle">Dữ liệu chuyến đi được nạp & quản lý động bằng JavaScript</p>
+          </div>
+
+          <!-- Stats Overview -->
+          <div class="bookings-stats-grid">
+            <div class="stat-card">
+              <span class="stat-icon">🚕</span>
+              <div>
+                <h4 id="stat-total-count">0</h4>
+                <p>Tổng số chuyến</p>
+              </div>
+            </div>
+            <div class="stat-card green">
+              <span class="stat-icon">✅</span>
+              <div>
+                <h4 id="stat-completed-count">0</h4>
+                <p>Chuyến hoàn thành</p>
+              </div>
+            </div>
+            <div class="stat-card blue">
+              <span class="stat-icon">🚘</span>
+              <div>
+                <h4 id="stat-moving-count">0</h4>
+                <p>Đang di chuyển</p>
+              </div>
+            </div>
+            <div class="stat-card orange">
+              <span class="stat-icon">💰</span>
+              <div>
+                <h4 id="stat-total-revenue">0 đ</h4>
+                <p>Tổng doanh thu</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="history-controls">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="booking-search-input" placeholder="Tìm theo Mã chuyến, Tên khách, SĐT, Địa chỉ..." />
+            </div>
+            <div class="filter-status">
+              <button class="btn-filter-status active" data-status="all">Tất cả</button>
+              <button class="btn-filter-status" data-status="completed">Hoàn thành</button>
+              <button class="btn-filter-status" data-status="in_progress">Đang di chuyển</button>
+              <button class="btn-filter-status" data-status="driver_assigned">Đang điều xe</button>
+            </div>
+          </div>
+
+          <!-- Bookings Table Container -->
+          <div class="table-responsive">
+            <table class="bookings-table">
+              <thead>
+                <tr>
+                  <th>Mã đơn</th>
+                  <th>Khách hàng</th>
+                  <th>Dòng xe</th>
+                  <th>Tài xế & Biển số</th>
+                  <th>Điểm đón ➔ Điểm đến</th>
+                  <th>Thanh toán</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-table-body">
+                <tr>
+                  <td colspan="8" class="text-center py-4">🔄 Đang tải dữ liệu chuyến xe từ bookings.json...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal Xem Chi Tiết Chuyến Xe -->
+    <div id="booking-detail-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card">
+        <button class="modal-close" id="btn-close-detail">&times;</button>
+        <h3 class="modal-title">Chi Tiết Chuyến Xe <span id="detail-id">#VF-000</span></h3>
+        <div id="modal-detail-content" class="booking-receipt" style="text-align: left;">
+          <!-- Nạp bằng JS -->
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-close-main" id="btn-done-detail">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>TaxiVinFast</h3>
+          <p>Dịch vụ taxi điện uy tín, chất lượng hàng đầu Việt Nam</p>
+        </div>
+        <div class="footer-section">
+          <h3>Liên kết</h3>
+          <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="cars.html">Danh sách xe</a></li>
+            <li><a href="booking.html">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html">Lịch sử chuyến xe</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Liên hệ</h3>
+          <p>Hotline: 1900 232389</p>
+          <p>Email: hotro@taxivinfast.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- JS load và hiển thị bookings.json -->
+    <script type="module" src="/src/bookings-loader.js"></script>
+  </body>
+</html>
+
