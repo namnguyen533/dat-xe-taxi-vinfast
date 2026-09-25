@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thông tin đặt xe - TaxiVinFast</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <h1>TaxiVinFast</h1>
+        </div>
+        <nav class="nav-menu">
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="thongtindatxe.html" class="nav-link active">Thông tin đặt xe</a></li>
+            <li><a href="index.html#pricing" class="nav-link">Bảng giá</a></li>
+            <li><a href="#" class="nav-link">Liên hệ</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <button class="btn-login">Đăng nhập</button>
+          <button class="btn-register">Đăng ký</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="booking-section">
+        <div class="booking-container">
+          <h2 class="section-title">Thông Tin Đặt Xe Điện VinFast</h2>
+          <p class="section-subtitle">Vui lòng nhập đầy đủ thông tin bên dưới để tiến hành đặt chuyến</p>
+
+          <form class="booking-form" id="bookingForm" novalidate>
+            <!-- Thông tin khách hàng -->
+            <div class="form-section">
+              <h3 class="form-section-title">1. Thông tin khách hàng</h3>
+              
+              <div class="form-group">
+                <label for="fullname" class="form-label">Họ và tên <span class="required-star">*</span></label>
+                <input type="text" id="fullname" name="fullname" class="form-input" placeholder="Nhập họ và tên (tối thiểu 2 ký tự)">
+                <span class="error-text" id="fullnameError"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="phone" class="form-label">Số điện thoại <span class="required-star">*</span></label>
+                <input type="tel" id="phone" name="phone" class="form-input" placeholder="Ví dụ: 0912345678">
+                <span class="error-text" id="phoneError"></span>
+              </div>
+            </div>
+
+            <!-- Thông tin hành trình -->
+            <div class="form-section">
+              <h3 class="form-section-title">2. Thông tin hành trình</h3>
+              
+              <div class="form-group">
+                <label for="pickup" class="form-label">Điểm đón <span class="required-star">*</span></label>
+                <input type="text" id="pickup" name="pickup" class="form-input" placeholder="Nhập điểm đón khách">
+                <span class="error-text" id="pickupError"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="dropoff" class="form-label">Điểm trả <span class="required-star">*</span></label>
+                <input type="text" id="dropoff" name="dropoff" class="form-input" placeholder="Nhập điểm trả khách">
+                <span class="error-text" id="dropoffError"></span>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="date" class="form-label">Ngày đi <span class="required-star">*</span></label>
+                  <input type="date" id="date" name="date" class="form-input">
+                  <span class="error-text" id="dateError"></span>
+                </div>
+
+                <div class="form-group">
+                  <label for="time" class="form-label">Giờ đi <span class="required-star">*</span></label>
+                  <input type="time" id="time" name="time" class="form-input">
+                  <span class="error-text" id="timeError"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loại xe & Hành khách -->
+            <div class="form-section">
+              <h3 class="form-section-title">3. Chọn xe & Số lượng khách</h3>
+
+              <div class="form-group">
+                <label class="form-label">Loại xe <span class="required-star">*</span></label>
+                <div class="car-selection">
+                  <div class="car-option">
+                    <input type="radio" id="vf3" name="car" value="vf3" class="car-radio">
+                    <label for="vf3" class="car-option-label">
+                      <div class="car-option-content">
+                        <img src="/src/assets/vf3.webp" alt="VinFast VF 3" class="car-option-img" onerror="this.style.display='none'">
+                        <div class="car-option-info">
+                          <h4>VinFast VF 3</h4>
+                          <p class="car-option-type">Mini EV - 2 chỗ</p>
+                          <p class="car-option-price">10.000đ/km</p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="car-option">
+                    <input type="radio" id="vf5" name="car" value="vf5" class="car-radio">
+                    <label for="vf5" class="car-option-label">
+                      <div class="car-option-content">
+                        <img src="/src/assets/vf5.jpg" alt="VinFast VF 5 Plus" class="car-option-img" onerror="this.style.display='none'">
+                        <div class="car-option-info">
+                          <h4>VinFast VF 5 Plus</h4>
+                          <p class="car-option-type">Hạng A - 4 chỗ</p>
+                          <p class="car-option-price">12.000đ/km</p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="car-option">
+                    <input type="radio" id="vf6" name="car" value="vf6" class="car-radio">
+                    <label for="vf6" class="car-option-label">
+                      <div class="car-option-content">
+                        <img src="/src/assets/vf6.jpg" alt="VinFast VF 6" class="car-option-img" onerror="this.style.display='none'">
+                        <div class="car-option-info">
+                          <h4>VinFast VF 6</h4>
+                          <p class="car-option-type">Hạng B - 5 chỗ</p>
+                          <p class="car-option-price">15.000đ/km</p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="car-option">
+                    <input type="radio" id="vf7" name="car" value="vf7" class="car-radio">
+                    <label for="vf7" class="car-option-label">
+                      <div class="car-option-content">
+                        <img src="/src/assets/vf7.jpg" alt="VinFast VF 7" class="car-option-img" onerror="this.style.display='none'">
+                        <div class="car-option-info">
+                          <h4>VinFast VF 7</h4>
+                          <p class="car-option-type">Hạng C - 5 chỗ</p>
+                          <p class="car-option-price">18.000đ/km</p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="car-option">
+                    <input type="radio" id="vf8" name="car" value="vf8" class="car-radio">
+                    <label for="vf8" class="car-option-label">
+                      <div class="car-option-content">
+                        <img src="/src/assets/vf8.jpg" alt="VinFast VF 8" class="car-option-img" onerror="this.style.display='none'">
+                        <div class="car-option-info">
+                          <h4>VinFast VF 8</h4>
+                          <p class="car-option-type">Hạng D - 5 chỗ</p>
+                          <p class="car-option-price">22.000đ/km</p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="car-option">
+                    <input type="radio" id="vf9" name="car" value="vf9" class="car-radio">
+                    <label for="vf9" class="car-option-label">
+                      <div class="car-option-content">
+                        <img src="/src/assets/vf9.png" alt="VinFast VF 9" class="car-option-img" onerror="this.style.display='none'">
+                        <div class="car-option-info">
+                          <h4>VinFast VF 9</h4>
+                          <p class="car-option-type">Hạng E - 7 chỗ</p>
+                          <p class="car-option-price">28.000đ/km</p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <span class="error-text" id="carError"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="passengers" class="form-label">Số lượng hành khách <span class="required-star">*</span></label>
+                <input type="number" id="passengers" name="passengers" class="form-input" min="1" step="1" value="1" placeholder="Nhập số lượng hành khách (≥ 1)">
+                <span class="error-text" id="passengersError"></span>
+              </div>
+            </div>
+
+            <!-- Ghi chú -->
+            <div class="form-section">
+              <h3 class="form-section-title">4. Ghi chú thêm</h3>
+              
+              <div class="form-group">
+                <label for="notes" class="form-label">Ghi chú (Tùy chọn)</label>
+                <textarea id="notes" name="notes" class="form-textarea" rows="3" placeholder="Nhập thêm yêu cầu hoặc ghi chú cho tài xế (nếu có)"></textarea>
+                <span class="form-hint">Có thể bỏ trống</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-submit">Xác Nhận Đặt Xe</button>
+              <button type="reset" class="btn-reset">Làm Mới</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>TaxiVinFast</h3>
+          <p>Dịch vụ taxi điện uy tín, chất lượng hàng đầu Việt Nam</p>
+        </div>
+        <div class="footer-section">
+          <h3>Liên kết</h3>
+          <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="cars.html">Danh sách xe</a></li>
+            <li><a href="thongtindatxe.html">Thông tin đặt xe</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Liên hệ</h3>
+          <p>Hotline: 1900 xxxx</p>
+          <p>Email: info@taxivinfast.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
