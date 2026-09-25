@@ -1,18 +1,24 @@
 import './style.css';
+import carsLocalData from './data/cars.json';
 
 // Hàm đọc dữ liệu JSON bằng JavaScript (async/await + fetch API)
+// Hàm đọc dữ liệu JSON bằng JavaScript an toàn (Tránh lỗi HTTP 500 / 404)
 async function fetchCarsData() {
   try {
     const response = await fetch('/data/cars.json');
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
+    if (response.ok) {
+      return await response.json();
     }
     const carsList = await response.json();
     return carsList;
   } catch (error) {
     console.error('Lỗi khi đọc file cars.json:', error);
     return [];
+    console.warn('Không thể fetch /data/cars.json, tự động dùng dữ liệu nạp sẵn:', error);
   }
+  return carsLocalData;
 }
 
 // Hàm hiển thị danh sách xe lên giao diện HTML
@@ -21,6 +27,7 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
   if (!container) return;
 
   if (cars.length === 0) {
+  if (!cars || cars.length === 0) {
     container.innerHTML = '<p class="no-data">Không có dữ liệu xe để hiển thị.</p>';
     return;
   }
@@ -43,15 +50,21 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
           <span class="spec">🔋 Pin: ${car.specs.battery}</span>
           <span class="spec">🛣️ Quãng đường: ${car.specs.range}</span>
           <span class="spec">⚡ Công suất: ${car.specs.power}</span>
+          <span class="spec">🔋 Pin: ${car.specs ? car.specs.battery : 'Lithium'}</span>
+          <span class="spec">🛣️ Quãng đường: ${car.specs ? car.specs.range : '300+ km'}</span>
+          <span class="spec">⚡ Công suất: ${car.specs ? car.specs.power : '100+ HP'}</span>
         </div>
 
         <div class="car-features-list">
           ${car.features.map(feat => `<span class="feat-item">✓ ${feat}</span>`).join('')}
+          ${(car.features || []).map(feat => `<span class="feat-item">✓ ${feat}</span>`).join('')}
         </div>
 
         <div class="car-price">
           <span class="price-label">Loại xe:</span>
           <span class="price-value">${car.seats} Chỗ Điển Hình</span>
+          <span class="price-label">Số chỗ ngồi:</span>
+          <span class="price-value">${car.seats} Chỗ Rộng Rãi</span>
         </div>
 
         <div class="car-actions">
@@ -84,6 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const filtered = carsData.filter(car => 
           car.seats === parseInt(filterVal, 10) || 
           car.category.toLowerCase().includes(filterVal.toLowerCase())
+          (car.category && car.category.toLowerCase().includes(filterVal.toLowerCase()))
         );
         renderCarsUI(filtered);
       }
