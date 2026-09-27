@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Validation Thời Gian Đón Xe - TaxiVinFast</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <style>
+      .validator-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        margin-bottom: 24px;
+      }
+      .rule-status-list {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0 0 0;
+      }
+      .rule-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        background: var(--accent-bg);
+        margin-bottom: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+      .rule-item.pass {
+        background: rgba(56, 161, 105, 0.1);
+        border-left: 4px solid #38a169;
+        color: #276749;
+      }
+      .rule-item.fail {
+        background: rgba(229, 62, 62, 0.1);
+        border-left: 4px solid #e53e3e;
+        color: #9b2c2c;
+      }
+      .rule-icon {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .preset-btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .btn-preset {
+        background: var(--social-bg);
+        border: 1px solid var(--border);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--text-h);
+      }
+      .btn-preset:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+      .explanation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 24px;
+      }
+      .explanation-box {
+        background: var(--bg);
+        border-left: 4px solid var(--primary);
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+      .explanation-box h4 {
+        margin: 0 0 8px 0;
+        color: var(--primary);
+        font-size: 16px;
+      }
+      .explanation-box p {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .code-snippet {
+        background: #1e1e2e;
+        color: #cdd6f4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        overflow-x: auto;
+        line-height: 1.5;
+        margin-top: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <a href="index.html"><h1>TaxiVinFast</h1></a>
+        </div>
+        <nav class="nav-menu">
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="thoigiandon.html" class="nav-link active">Validation Thời Gian</a></li>
+            <li><a href="danhsachchuyen.html" class="nav-link">Lịch sử chuyến</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <button class="btn-login">Đăng nhập</button>
+          <button class="btn-register">Đăng ký</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="booking-section">
+        <div class="booking-container">
+          <div class="section-header text-center">
+            <span class="hero-badge">⏰ Trình Kiểm Tra Thời Gian Đón Xe</span>
+            <h2 class="section-title">Validation Thời Gian Đón Xe Hợp Lệ</h2>
+            <p class="section-subtitle">Thử nghiệm trực quan & giải thích chi tiết 5 quy tắc kiểm tra thời gian đón xe taxi điện VinFast</p>
+          </div>
+
+          <!-- Component Test Trực Quan -->
+          <div class="validator-card">
+            <h3 class="form-section-title">1. Thử nghiệm Kiểm tra Thời Gian</h3>
+            
+            <form id="timeTestForm" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="test-date" class="form-label">Ngày đón khách <span class="required-star">*</span></label>
+                  <input type="date" id="test-date" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label for="test-time" class="form-label">Giờ đón khách <span class="required-star">*</span></label>
+                  <input type="time" id="test-time" class="form-input">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="test-lead-time" class="form-label">Yêu cầu báo trước tối thiểu (Phút)</label>
+                  <input type="number" id="test-lead-time" class="form-input" value="15" min="0">
+                </div>
+                <div class="form-group">
+                  <label for="test-service-start" class="form-label">Giờ bắt đầu dịch vụ</label>
+                  <input type="time" id="test-service-start" class="form-input" value="05:00">
+                </div>
+                <div class="form-group">
+                  <label for="test-service-end" class="form-label">Giờ kết thúc dịch vụ</label>
+                  <input type="time" id="test-service-end" class="form-input" value="23:00">
+                </div>
+              </div>
+
+              <!-- Presets -->
+              <div class="form-group">
+                <label class="form-label">💡 Thử nghiệm nhanh các kịch bản mẫu:</label>
+                <div class="preset-btn-group">
+                  <button type="button" class="btn-preset" id="preset-valid">✅ Hợp lệ (Sau 30 phút)</button>
+                  <button type="button" class="btn-preset" id="preset-past">❌ Thời gian quá khứ</button>
+                  <button type="button" class="btn-preset" id="preset-too-soon">❌ Quá sát hiện tại (&lt; 15 phút)</button>
+                  <button type="button" class="btn-preset" id="preset-out-hours">❌ Ngoài khung giờ (02:00 sáng)</button>
+                  <button type="button" class="btn-preset" id="preset-empty">❌ Để trống giờ</button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Kết quả kiểm tra -->
+            <div id="validation-result-container" style="margin-top: 24px;">
+              <h4 style="margin-bottom: 12px; color: var(--text-h);">📊 Kết quả kiểm tra chi tiết:</h4>
+              <div id="status-badge" style="padding: 12px 16px; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center; margin-bottom: 16px;"></div>
+              
+              <ul class="rule-status-list">
+                <li class="rule-item" id="rule1-item">
+                  <span class="rule-icon" id="rule1-icon">⏳</span>
+                  <span><strong>Quy tắc 1 (Không được rỗng):</strong> <span id="rule1-text">Chưa kiểm tra</span></span>
+                </li>
+                <li class="rule-item" id="rule2-item">
+                  <span class="rule-icon" id="rule2-icon">⏳</span>
+                  <span><strong>Quy tắc 2 (Đúng định dạng HH:mm):</strong> <span id="rule2-text">Chưa kiểm tra</span></span>
+                </li>
+                <li class="rule-item" id="rule3-item">
+                  <span class="rule-icon" id="rule3-icon">⏳</span>
+                  <span><strong>Quy tắc 3 (Không ở trong quá khứ):</strong> <span id="rule3-text">Chưa kiểm tra</span></span>
+                </li>
+                <li class="rule-item" id="rule4-item">
+                  <span class="rule-icon" id="rule4-icon">⏳</span>
+                  <span><strong>Quy tắc 4 (Cách hiện tại ≥ X phút):</strong> <span id="rule4-text">Chưa kiểm tra</span></span>
+                </li>
+                <li class="rule-item" id="rule5-item">
+                  <span class="rule-icon" id="rule5-icon">⏳</span>
+                  <span><strong>Quy tắc 5 (Trong khung giờ dịch vụ):</strong> <span id="rule5-text">Chưa kiểm tra</span></span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Chi tiết & Giải thích 5 Quy Tắc Validation -->
+          <div class="validator-card">
+            <h3 class="form-section-title">2. Giải Thích Chi Tiết 5 Quy Tắc Validation</h3>
+            
+            <div class="explanation-grid">
+              <div class="explanation-box">
+                <h4>1. Không được để trống</h4>
+                <p>Kiểm tra xem người dùng đã chọn cả Ngày đi (`date`) và Giờ đi (`time`) hay chưa. Tránh trường hợp gửi form với thông tin rỗng làm thất thoát thông tin tài xế.</p>
+              </div>
+
+              <div class="explanation-box">
+                <h4>2. Đúng định dạng thời gian</h4>
+                <p>Thời gian phải đúng định dạng chuẩn 24 giờ (`HH:mm` từ `00:00` đến `23:59`) thông qua biểu thức chính quy Regex `^([01]?\d|2[0-3]):([0-5]\d)$`.</p>
+              </div>
+
+              <div class="explanation-box">
+                <h4>3. Không được ở quá khứ</h4>
+                <p>Ghép Ngày đi + Giờ đi thành mốc thời gian `Date` chuẩn. Nếu mốc này nhỏ hơn `new Date()` (thời gian hiện tại của hệ thống), thông báo lỗi ngay lập tức.</p>
+              </div>
+
+              <div class="explanation-box">
+                <h4>4. Cách hiện tại ít nhất X phút (Ví dụ: 15-30 phút)</h4>
+                <p>Đảm bảo tài xế có đủ thời gian chuẩn bị và điều xe đến điểm đón. Mốc thời gian đặt phải lớn hơn hoặc bằng `Hiện tại + X phút` (mặc định 15 phút).</p>
+              </div>
+
+              <div class="explanation-box">
+                <h4>5. Khung giờ dịch vụ cho phép (Giờ bắt đầu - Giờ kết thúc)</h4>
+                <p>Hệ thống hỗ trợ cấu hình giờ hoạt động (Ví dụ: `05:00` đến `23:00`). Đơn đặt ngoài khung giờ này sẽ thông báo giờ phục vụ của tổng đài.</p>
+              </div>
+            </div>
+
+            <!-- Snippet code demo -->
+            <h4 style="margin-top: 24px; color: var(--text-h);">💻 Mã Nguồn Module Validation (JavaScript):</h4>
+            <div class="code-snippet">
+<pre>import { validatePickupTime } from '/src/time-validator.js';
+
+// Gọi hàm kiểm tra với tùy chọn custom:
+const result = validatePickupTime('2026-09-27', '18:30', {
+  leadTimeMinutes: 15,    // Yêu cầu đặt trước ít nhất 15 phút
+  serviceStart: '05:00',   // Giờ mở chuyến
+  serviceEnd: '23:00'      // Giờ đóng chuyến
+});
+
+if (!result.isValid) {
+  console.error("Lỗi thời gian đón:", result.error);
+} else {
+  console.log("Thời gian đón hợp lệ:", result.pickupDateTime);
+}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>TaxiVinFast</h3>
+          <p>Dịch vụ taxi điện uy tín, chất lượng hàng đầu Việt Nam</p>
+        </div>
+        <div class="footer-section">
+          <h3>Liên kết</h3>
+          <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="cars.html">Danh sách xe</a></li>
+            <li><a href="booking.html">Đặt xe</a></li>
+            <li><a href="thoigiandon.html">Validation Thời Gian</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Liên hệ</h3>
+          <p>Hotline: 1900 232389</p>
+          <p>Email: hotro@taxivinfast.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/thoigiandon-demo.js"></script>
+  </body>
+</html>
