@@ -8,6 +8,7 @@ import './style.css';
 import { CARS } from './data/catalog.js';
 import { escapeHtml } from './data/store.js';
 
+<<<<<<< HEAD
 const state = { filter: 'all' };
 
 /** Lọc danh sách xe theo số chỗ hoặc phân khúc */
@@ -22,6 +23,22 @@ function filterCars(cars, filterValue) {
       car.segment.toLowerCase().includes(keyword) ||
       car.name.toLowerCase().includes(keyword),
   );
+=======
+// Hàm đọc dữ liệu JSON bằng JavaScript (async/await + fetch API)
+// Hàm đọc dữ liệu JSON bằng JavaScript an toàn (Tránh lỗi HTTP 500 / 404)
+async function fetchCarsData() {
+  try {
+    const response = await fetch('/data/cars.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const carsList = await response.json();
+    return carsList;
+  } catch (error) {
+    console.warn('Không thể fetch /data/cars.json, tự động dùng dữ liệu nạp sẵn:', error);
+    return carsLocalData;
+  }
+>>>>>>> 7d61d14 (update lại giao diện và sửa lỗi)
 }
 
 /** Vẽ danh sách xe lên giao diện */
@@ -34,12 +51,33 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
     return;
   }
 
+<<<<<<< HEAD
   container.innerHTML = cars
     .map(
       (car) => `
       <div class="car-card" data-category="${escapeHtml(car.category)}">
         <div class="car-image">
           <img src="${escapeHtml(car.image)}" alt="${escapeHtml(car.name)}" class="car-img" loading="lazy" onerror="this.src='/src/assets/vf5.jpg'">
+=======
+  // Chuyển đổi mảng đối tượng JSON thành chuỗi HTML
+  const htmlContent = cars.map(car => `
+    <div class="car-card" data-category="${car.category}">
+      <div class="car-image">
+        <img src="${car.image}" alt="${car.name}" class="car-img" onerror="this.src='/src/assets/vf5.jpg'">
+      </div>
+      <div class="car-info">
+        <div class="car-badge-header">
+          <h3 class="car-name">${car.name}</h3>
+          ${car.badge ? `<span class="badge-tag">${car.badge}</span>` : ''}
+        </div>
+        <p class="car-type">${car.category} (${car.seats} chỗ) - ${car.segment}</p>
+        <p class="car-desc">${car.description}</p>
+        
+        <div class="car-specs">
+          <span class="spec">🔋 Pin: ${car.specs ? car.specs.battery : 'Lithium'}</span>
+          <span class="spec">🛣️ Quãng đường: ${car.specs ? car.specs.range : '300+ km'}</span>
+          <span class="spec">⚡ Công suất: ${car.specs ? car.specs.power : '100+ HP'}</span>
+>>>>>>> 7d61d14 (update lại giao diện và sửa lỗi)
         </div>
         <div class="car-info">
           <div class="car-badge-header">
@@ -49,6 +87,7 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
           <p class="car-type">${escapeHtml(car.category)} (${escapeHtml(car.seats)} chỗ) - ${escapeHtml(car.segment)}</p>
           <p class="car-desc">${escapeHtml(car.description)}</p>
 
+<<<<<<< HEAD
           <div class="car-specs">
             <span class="spec">🔋 Pin: ${escapeHtml(car.specs.battery)}</span>
             <span class="spec">🛣️ Quãng đường: ${escapeHtml(car.specs.range)}</span>
@@ -59,6 +98,16 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
           <div class="car-features-list">
             ${car.features.map((feature) => `<span class="feat-item">✓ ${escapeHtml(feature)}</span>`).join('')}
           </div>
+=======
+        <div class="car-features-list">
+          ${(car.features || []).map(feat => `<span class="feat-item">✓ ${feat}</span>`).join('')}
+        </div>
+
+        <div class="car-price">
+          <span class="price-label">Số chỗ ngồi:</span>
+          <span class="price-value">${car.seats} Chỗ Rộng Rãi</span>
+        </div>
+>>>>>>> 7d61d14 (update lại giao diện và sửa lỗi)
 
           <div class="car-price">
             <span class="price-label">Giá mở cửa:</span>
@@ -80,12 +129,25 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
 document.addEventListener('DOMContentLoaded', () => {
   const filterBtns = document.querySelectorAll('.car-filter-btn');
 
+<<<<<<< HEAD
   filterBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       filterBtns.forEach((item) => item.classList.remove('active'));
       btn.classList.add('active');
       state.filter = btn.dataset.filter || 'all';
       renderCarsUI(filterCars(CARS, state.filter));
+=======
+      const filterVal = btn.getAttribute('data-filter');
+      if (filterVal === 'all') {
+        renderCarsUI(carsData);
+      } else {
+        const filtered = carsData.filter(car => 
+          car.seats === parseInt(filterVal, 10) || 
+          (car.category && car.category.toLowerCase().includes(filterVal.toLowerCase()))
+        );
+        renderCarsUI(filtered);
+      }
+>>>>>>> 7d61d14 (update lại giao diện và sửa lỗi)
     });
   });
 
