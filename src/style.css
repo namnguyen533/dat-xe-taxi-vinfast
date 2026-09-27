@@ -194,12 +194,17 @@ button {
 .hero-content {
   max-width: 800px;
   margin: 0 auto;
+  padding: 0 16px;
 }
 
 .hero-title {
   color: white;
   font-size: 48px;
   margin-bottom: 16px;
+  line-height: 1.2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .hero-subtitle {
@@ -1171,6 +1176,9 @@ button {
 
   .hero-title {
     font-size: 32px;
+    line-height: 1.3;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .hero-subtitle {
