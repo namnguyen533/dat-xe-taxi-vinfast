@@ -8,17 +8,13 @@ async function fetchBookingsData() {
     const response = await fetch('/data/bookings.json');
     if (!response.ok) {
       throw new Error(`Lỗi HTTP: ${response.status}`);
-    if (response.ok) {
-      return await response.json();
     }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Không thể đọc dữ liệu từ file bookings.json:', error);
-    return [];
     console.warn('Không thể fetch /data/bookings.json, tự động dùng dữ liệu nạp sẵn:', error);
+    return bookingsLocalData;
   }
-  return bookingsLocalData;
 }
 
 // Format tiền tệ VND
@@ -51,13 +47,8 @@ function renderBookingsUI(bookings) {
   const totalCount = bookings.length;
   const completedCount = bookings.filter(b => b.status === 'completed').length;
   const movingCount = bookings.filter(b => b.status === 'in_progress' || b.status === 'driver_assigned').length;
-  const totalRevenue = bookings.reduce((sum, b) => sum + (b.fare.totalAmount || 0), 0);
   const totalRevenue = bookings.reduce((sum, b) => sum + (b.fare ? (b.fare.totalAmount || 0) : 0), 0);
 
-  document.getElementById('stat-total-count').textContent = totalCount;
-  document.getElementById('stat-completed-count').textContent = completedCount;
-  document.getElementById('stat-moving-count').textContent = movingCount;
-  document.getElementById('stat-total-revenue').textContent = formatVND(totalRevenue);
   const totalEl = document.getElementById('stat-total-count');
   const compEl = document.getElementById('stat-completed-count');
   const movEl = document.getElementById('stat-moving-count');
@@ -83,35 +74,26 @@ function renderBookingsUI(bookings) {
       <td><strong class="booking-id-tag">${b.bookingId}</strong></td>
       <td>
         <div class="user-info-cell">
-          <strong>${b.customer.name}</strong>
-          <span>📱 ${b.customer.phone}</span>
           <strong>${b.customer ? b.customer.name : 'Khách hàng'}</strong>
           <span>📱 ${b.customer ? b.customer.phone : 'N/A'}</span>
         </div>
       </td>
       <td>
-        <span class="car-badge-sm">${b.vehicle.model}</span>
         <span class="car-badge-sm">${b.vehicle ? b.vehicle.model : 'VF Car'}</span>
       </td>
       <td>
         <div class="driver-info-cell">
-          <strong>${b.driver.name}</strong>
-          <span class="plate">${b.vehicle.licensePlate}</span>
           <strong>${b.driver ? b.driver.name : 'Tài xế'}</strong>
           <span class="plate">${b.vehicle ? b.vehicle.licensePlate : ''}</span>
         </div>
       </td>
       <td>
         <div class="route-cell">
-          <span class="from">🟢 ${b.route.pickupLocation}</span>
-          <span class="to">🔴 ${b.route.destinationLocation}</span>
           <span class="from">🟢 ${b.route ? b.route.pickupLocation : ''}</span>
           <span class="to">🔴 ${b.route ? b.route.destinationLocation : ''}</span>
         </div>
       </td>
       <td>
-        <strong class="price-text">${formatVND(b.fare.totalAmount)}</strong>
-        <span class="pay-method">${b.payment.method.toUpperCase()}</span>
         <strong class="price-text">${formatVND(b.fare ? b.fare.totalAmount : 0)}</strong>
         <span class="pay-method">${b.payment ? b.payment.method.toUpperCase() : 'CASH'}</span>
       </td>
@@ -180,10 +162,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const keyword = e.target.value.toLowerCase().trim();
       const filtered = rawBookings.filter(b => 
         b.bookingId.toLowerCase().includes(keyword) ||
-        b.customer.name.toLowerCase().includes(keyword) ||
-        b.customer.phone.includes(keyword) ||
-        b.route.pickupLocation.toLowerCase().includes(keyword) ||
-        b.route.destinationLocation.toLowerCase().includes(keyword)
         (b.customer && b.customer.name.toLowerCase().includes(keyword)) ||
         (b.customer && b.customer.phone.includes(keyword)) ||
         (b.route && b.route.pickupLocation.toLowerCase().includes(keyword)) ||
