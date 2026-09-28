@@ -9,7 +9,15 @@
  * Mục 37: Tìm kiếm đơn theo tên hoặc số điện thoại
  */
 import './style.css';
-import { bookingStore, computeStats, escapeHtml, filterBookings, formatVND, STORAGE_KEY } from './data/booking-store.js';
+import {
+  BOOKING_STATUSES,
+  bookingStore,
+  computeStats,
+  escapeHtml,
+  filterBookings,
+  formatVND,
+  STORAGE_KEY,
+} from './data/booking-store.js';
 import {
   bindModalClose,
   bookingsTableRowsHtml,
@@ -30,6 +38,7 @@ const els = {};
 /** Khởi tạo trang quản trị */
 document.addEventListener('DOMContentLoaded', () => {
   els.statsGrid = document.getElementById('admin-stats-grid');
+  els.distribution = document.getElementById('admin-distribution');
   els.tableBody = document.getElementById('admin-bookings-body');
   els.listCount = document.getElementById('admin-list-count');
   els.searchInput = document.getElementById('admin-search-input');
@@ -40,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
   els.btnReset = document.getElementById('btn-admin-reset');
 
   checkStorageSupport();
+  buildFilterButtons();
   bindEvents();
   render();
 });
@@ -123,9 +133,35 @@ function bindEvents() {
 function render() {
   const bookings = bookingStore.getAll();
   renderStats(bookings);
+  renderDistribution(bookings);
+  renderFilterCounts(bookings);
   renderTable();
   updateTimestamp();
   if (els.storageNote) els.storageNote.title = `Khóa lưu trữ: ${STORAGE_KEY}`;
+}
+
+/** Dựng nút lọc kèm số đơn từ danh sách trạng thái */
+function buildFilterButtons() {
+  if (!els.statusFilter) return;
+
+  els.statusFilter.innerHTML = [
+    `<button type="button" class="btn-filter-status active" data-status="all">Tất cả<span class="btn-filter-count" data-count="all">0</span></button>`,
+    ...BOOKING_STATUSES.map(
+      (status) => `<button type="button" class="btn-filter-status" data-status="${status.value}">
+        ${status.icon} ${escapeHtml(status.text)}<span class="btn-filter-count ${status.tone}" data-count="${status.value}">0</span>
+      </button>`,
+    ),
+  ].join('');
+}
+
+/** Cập nhật số đơn hiển thị trên từng nút lọc */
+function renderFilterCounts(all) {
+  if (!els.statusFilter) return;
+  const counts = computeStats(all).byStatus;
+  els.statusFilter.querySelectorAll('.btn-filter-count').forEach((badge) => {
+    const key = badge.dataset.count;
+    badge.textContent = key === 'all' ? all.length : counts[key] || 0;
+  });
 }
 
 /** Mục 32: Dashboard tổng quan số lượng đơn */
@@ -158,6 +194,45 @@ function renderStats(bookings) {
     .join('');
 }
 
+/** Thanh phân bố tỷ lệ trạng thái đơn + chú giải */
+function renderDistribution(bookings) {
+  if (!els.distribution) return;
+
+  if (!bookings.length) {
+    els.distribution.innerHTML = '';
+    return;
+  }
+
+  const counts = computeStats(bookings).byStatus;
+  const segments = BOOKING_STATUSES.filter((status) => counts[status.value] > 0);
+
+  const bar = segments
+    .map((status) => {
+      const percent = (counts[status.value] / bookings.length) * 100;
+      return `<span class="admin-dist-seg ${status.tone}" style="width: ${percent.toFixed(2)}%" title="${escapeHtml(status.text)}: ${counts[status.value]} đơn"></span>`;
+    })
+    .join('');
+
+  const legend = BOOKING_STATUSES.map((status) => {
+    const count = counts[status.value] || 0;
+    const percent = bookings.length ? Math.round((count / bookings.length) * 100) : 0;
+    return `<span class="admin-dist-legend-item ${count ? '' : 'is-empty'}">
+        <i class="admin-dist-dot ${status.tone}"></i>
+        <span class="admin-dist-legend-text">${status.icon} ${escapeHtml(status.text)}</span>
+        <b>${count}</b>
+        <em>${percent}%</em>
+      </span>`;
+  }).join('');
+
+  els.distribution.innerHTML = `
+    <div class="admin-dist-head">
+      <h2 class="admin-dist-title">📈 Tỷ lệ trạng thái đơn</h2>
+      <span class="admin-dist-total">${bookings.length} đơn</span>
+    </div>
+    <div class="admin-dist-bar">${bar}</div>
+    <div class="admin-dist-legend">${legend}</div>`;
+}
+
 /** Mục 33 + 36 + 37: Vẽ bảng danh sách đơn đã lọc */
 function renderTable() {
   if (!els.tableBody) return;
@@ -177,6 +252,7 @@ function updateTimestamp() {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
   els.updatedAt.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  els.updatedAt.title = now.toLocaleString('vi-VN');
 }
 
 /** Mục 34: Xem chi tiết một đơn (kèm công cụ cập nhật trạng thái & xóa) */

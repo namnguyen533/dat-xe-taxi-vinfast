@@ -35,15 +35,15 @@
     <main class="admin-main">
       <!-- Tiêu đề trang -->
       <div class="admin-page-head">
-        <div>
-          <span class="hero-badge">📊 Trang quản trị hệ thống</span>
+        <div class="admin-page-head-text">
+          <span class="admin-eyebrow">📊 Trang quản trị hệ thống</span>
           <h1 class="admin-page-title">Dashboard Quản Lý Đơn Đặt Taxi</h1>
           <p class="admin-page-subtitle">
             Tổng quan số lượng đơn, cập nhật trạng thái xử lý, xem chi tiết và tìm kiếm đơn theo tên hoặc số điện thoại.
           </p>
         </div>
         <div class="admin-head-meta">
-          <span>Dữ liệu cập nhật lúc</span>
+          <span class="admin-head-meta-label">🕒 Dữ liệu cập nhật lúc</span>
           <strong id="admin-updated-at">—</strong>
         </div>
       </div>
@@ -53,10 +53,16 @@
         <p class="admin-loading">🔄 Đang tải dữ liệu đơn đặt taxi...</p>
       </section>
 
+      <!-- Thanh phân bố trạng thái đơn -->
+      <section class="admin-distribution" id="admin-distribution" aria-label="Tỷ lệ trạng thái đơn"></section>
+
       <!-- Mục 33 + 36 + 37: Danh sách đơn, tìm kiếm, lọc trạng thái -->
       <section class="admin-panel">
         <div class="admin-panel-head">
-          <h2 class="admin-panel-title">📋 Danh sách đơn đặt taxi</h2>
+          <div class="admin-panel-head-text">
+            <h2 class="admin-panel-title">📋 Danh sách đơn đặt taxi</h2>
+            <p class="admin-panel-desc">Cập nhật trạng thái ngay trên bảng hoặc xem chi tiết từng đơn.</p>
+          </div>
           <span class="admin-count-badge" id="admin-list-count">0 đơn</span>
         </div>
 
@@ -81,7 +87,7 @@
           <button type="button" id="btn-admin-refresh" class="btn-admin-outline">🔄 Làm mới</button>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive admin-table-wrap">
           <table class="bookings-table admin-table">
             <thead>
               <tr>
