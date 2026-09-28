@@ -15,8 +15,7 @@
     "driver": {
       "name": "Trần Thanh Sơn",
       "phone": "0903 112 233",
-      "rating": 4.9,
-      "avatar": "https://i.pravatar.cc/150?img=11"
+      "rating": 4.9
     },
     "route": {
       "pickupLocation": "Sân bay Tân Sơn Nhất, Phường 2, Tân Bình, TPHCM",
@@ -25,16 +24,16 @@
       "estimatedDurationMin": 25
     },
     "schedule": {
-      "pickupDate": "2026-09-24",
+      "pickupDate": "2026-09-28",
       "pickupTime": "08:30",
-      "createdDate": "2026-09-24T08:15:00Z"
+      "createdDate": "2026-09-28T08:15:00"
     },
     "fare": {
       "basePrice": 12000,
-      "distanceCost": 125000,
+      "distanceCost": 115000,
       "discountCode": "VINFAST20",
-      "discountAmount": 27400,
-      "totalAmount": 109600,
+      "discountAmount": 25400,
+      "totalAmount": 101600,
       "currency": "VND"
     },
     "payment": {
@@ -61,26 +60,25 @@
     "driver": {
       "name": "Lê Hoàng Nam",
       "phone": "0977 445 566",
-      "rating": 5.0,
-      "avatar": "https://i.pravatar.cc/150?img=12"
+      "rating": 5.0
     },
     "route": {
       "pickupLocation": "Khách sạn Metropole, 15 Phố Ngô Quyền, Hoàn Kiếm, Hà Nội",
       "destinationLocation": "Sân bay Quốc tế Nội Bài, Nhà ga T2, Hà Nội",
-      "distanceKm": 28.0,
+      "distanceKm": 28,
       "estimatedDurationMin": 40
     },
     "schedule": {
-      "pickupDate": "2026-09-24",
+      "pickupDate": "2026-09-28",
       "pickupTime": "10:15",
-      "createdDate": "2026-09-24T07:45:00Z"
+      "createdDate": "2026-09-28T09:45:00"
     },
     "fare": {
       "basePrice": 22000,
-      "distanceCost": 434000,
+      "distanceCost": 326100,
       "discountCode": null,
       "discountAmount": 0,
-      "totalAmount": 456000,
+      "totalAmount": 348100,
       "currency": "VND"
     },
     "payment": {
@@ -88,7 +86,7 @@
       "status": "paid"
     },
     "status": "in_progress",
-    "statusText": "Đang di chuyển",
+    "statusText": "Đang thực hiện",
     "note": "Đón đúng giờ đi chuyến bay quốc tế lúc 13:00."
   },
   {
@@ -107,8 +105,7 @@
     "driver": {
       "name": "Đặng Văn Hùng",
       "phone": "0918 887 766",
-      "rating": 4.8,
-      "avatar": "https://i.pravatar.cc/150?img=13"
+      "rating": 4.8
     },
     "route": {
       "pickupLocation": "Chợ Bến Thành, Lê Lợi, Phường Bến Thành, Quận 1, TPHCM",
@@ -117,24 +114,24 @@
       "estimatedDurationMin": 18
     },
     "schedule": {
-      "pickupDate": "2026-09-24",
+      "pickupDate": "2026-09-28",
       "pickupTime": "11:00",
-      "createdDate": "2026-09-24T08:00:00Z"
+      "createdDate": "2026-09-28T10:20:00"
     },
     "fare": {
       "basePrice": 10000,
-      "distanceCost": 54400,
+      "distanceCost": 46400,
       "discountCode": null,
       "discountAmount": 0,
-      "totalAmount": 64400,
+      "totalAmount": 56400,
       "currency": "VND"
     },
     "payment": {
       "method": "cash",
       "status": "pending"
     },
-    "status": "driver_assigned",
-    "statusText": "Đang điều xe",
+    "status": "confirmed",
+    "statusText": "Đã xác nhận",
     "note": "Xin xe có máy lạnh mát."
   },
   {
@@ -153,19 +150,18 @@
     "driver": {
       "name": "Nguyễn Hoàng Đức",
       "phone": "0933 665 544",
-      "rating": 5.0,
-      "avatar": "https://i.pravatar.cc/150?img=14"
+      "rating": 5.0
     },
     "route": {
       "pickupLocation": "Tòa nhà Bitexco Financial Tower, Quận 1, TPHCM",
       "destinationLocation": "Thuê 4 tiếng phục vụ đối tác ngoại giao (Quận 1 - Q2 - Q7)",
-      "distanceKm": 45.0,
+      "distanceKm": 45,
       "estimatedDurationMin": 240
     },
     "schedule": {
-      "pickupDate": "2026-09-24",
+      "pickupDate": "2026-09-29",
       "pickupTime": "14:00",
-      "createdDate": "2026-09-24T06:30:00Z"
+      "createdDate": "2026-09-28T11:05:00"
     },
     "fare": {
       "basePrice": 1300000,
@@ -177,10 +173,10 @@
     },
     "payment": {
       "method": "banking",
-      "status": "paid"
+      "status": "pending"
     },
-    "status": "confirmed",
-    "statusText": "Đã xác nhận",
+    "status": "pending",
+    "statusText": "Chờ xác nhận",
     "note": "Tài xế mặc trang phục lịch sự veston, hỗ trợ mở cửa xe cho khách VIP."
   },
   {
@@ -199,19 +195,18 @@
     "driver": {
       "name": "Phạm Quốc Huy",
       "phone": "0908 334 455",
-      "rating": 4.7,
-      "avatar": "https://i.pravatar.cc/150?img=15"
+      "rating": 4.7
     },
     "route": {
       "pickupLocation": "Quận 3, TPHCM",
       "destinationLocation": "Thành phố Vũng Tàu, Bà Rịa - Vũng Tàu",
-      "distanceKm": 95.0,
+      "distanceKm": 95,
       "estimatedDurationMin": 110
     },
     "schedule": {
-      "pickupDate": "2026-09-23",
+      "pickupDate": "2026-09-27",
       "pickupTime": "16:00",
-      "createdDate": "2026-09-23T14:20:00Z"
+      "createdDate": "2026-09-27T14:20:00"
     },
     "fare": {
       "basePrice": 18000,
@@ -228,6 +223,46 @@
     "status": "completed",
     "statusText": "Hoàn thành",
     "note": "Chuyến đi tỉnh Vũng Tàu khứ hồi."
+  },
+  {
+    "bookingId": "VF-2026-9826",
+    "customer": {
+      "name": "Bùi Khánh Linh",
+      "phone": "0968 246 135",
+      "email": "khanhlinh.bui@gmail.com"
+    },
+    "serviceType": "point-to-point",
+    "vehicle": {
+      "model": "VinFast VF 6",
+      "seats": 5,
+      "licensePlate": "51H-456.78"
+    },
+    "driver": null,
+    "route": {
+      "pickupLocation": "Bệnh viện Đa khoa Đồng Nai, Biên Hòa",
+      "destinationLocation": "Trường Đại học Bách Khoa, TP. Thủ Đức",
+      "distanceKm": 22.4,
+      "estimatedDurationMin": 45
+    },
+    "schedule": {
+      "pickupDate": "2026-09-28",
+      "pickupTime": "18:45",
+      "createdDate": "2026-09-28T16:30:00"
+    },
+    "fare": {
+      "basePrice": 15000,
+      "distanceCost": 256800,
+      "discountCode": null,
+      "discountAmount": 0,
+      "totalAmount": 271800,
+      "currency": "VND"
+    },
+    "payment": {
+      "method": "cash",
+      "status": "refunded"
+    },
+    "status": "cancelled",
+    "statusText": "Đã hủy",
+    "note": "Khách hủy vì thay đổi lịch hẹn, đã hoàn tiền cọc."
   }
 ]
-

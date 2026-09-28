@@ -1,5 +1,7 @@
 import './style.css';
 import { calculateTripFare } from './price-calculator.js';
+import { bookingStore, formatVND } from './data/booking-store.js';
+import { validateBookingForm } from './form-validation.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- DOM elements ---
@@ -34,17 +36,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const priceDiscEl = document.getElementById('price-discount');
   const rowDiscount = document.getElementById('row-discount');
   const priceTotalEl = document.getElementById('price-total');
+  const priceRowDist = document.getElementById('price-row-distance');
+  const priceRowSurcharge = document.getElementById('price-row-surcharge');
+  const priceSurchargeEl = document.getElementById('price-surcharge');
 
   const couponInput = document.getElementById('coupon-code');
   const btnApplyCoupon = document.getElementById('btn-apply-coupon');
   const couponMsg = document.getElementById('coupon-message');
 
   const btnConfirm = document.getElementById('btn-confirm-booking');
+  const formErrorSummary = document.getElementById('form-error-summary');
 
   // Modal elements
   const modal = document.getElementById('booking-success-modal');
   const btnModalClose = document.getElementById('btn-modal-close');
   const btnModalDone = document.getElementById('btn-modal-done');
+  const btnModalHistory = document.getElementById('btn-modal-history');
+  const receiptStatus = document.getElementById('receipt-status');
+
+  // Ô nhập liệu + thông báo lỗi tương ứng
+  const fieldInputs = {
+    name: customerName,
+    phone: customerPhone,
+    pickup: pickupInput,
+    destination: destInput,
+    date: dateInput,
+    time: timeInput,
+    note: customerNote,
+  };
 
   // --- Initial State ---
   let selectedService = 'point-to-point';
@@ -59,20 +78,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let distanceKm = 12.5;
   let durationMin = 25;
-  let activeDiscountPercent = 0;
-  let activeDiscountAmount = 0;
+  /** Mã giảm giá đã áp dụng thành công ('' = không dùng) */
+  let appliedCoupon = '';
 
   // Set default date & time
   const today = new Date();
-  if (dateInput) dateInput.value = today.toISOString().split('T')[0];
-  const hours = String(today.getHours()).padStart(2, '0');
-  const minutes = String(today.getMinutes()).padStart(2, '0');
-  if (timeInput) timeInput.value = `${hours}:${minutes}`;
+  const pad = (n) => String(n).padStart(2, '0');
+  const todayValue = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+  if (dateInput) {
+    dateInput.value = todayValue;
+    dateInput.min = todayValue;
+  }
+  if (timeInput) timeInput.value = `${pad(today.getHours())}:${pad(today.getMinutes())}`;
 
   // Format currency helper
-  function formatVND(amount) {
-    return new Intl.NumberFormat('vi-VN').format(Math.round(amount)) + ' đ';
-  }
+  const formatAmount = (amount) => formatVND(amount);
 
   // ==========================================================================
   // XỬ LÝ NHẬP ĐIỂM ĐÓN & ĐIỂM ĐẾN BẰNG JAVASCRIPT (LOCATION INPUT LOGIC)
@@ -265,12 +285,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================================================
 
-  // Calculate Price Breakdown bằng Module mô phỏng giá cước
+  // ==========================================================================
+  // Tính & lưu kết quả cước phí hiện tại
+  // ==========================================================================
+  let lastFareResult = calculateTripFare({ distanceKm: 0 });
+
   function calculatePrice() {
     if (!priceBaseEl || !priceDistEl || !priceTotalEl) return;
 
     const timeVal = timeInput ? timeInput.value : '12:00';
-    const couponVal = couponInput ? couponInput.value : '';
 
     // Gọi công cụ mô phỏng tính cước
     const result = calculateTripFare({
@@ -279,18 +302,25 @@ document.addEventListener('DOMContentLoaded', () => {
       perKmPrice: currentCar.perKmPrice,
       serviceType: selectedService,
       pickupTime: timeVal,
-      couponCode: couponVal
+      couponCode: appliedCoupon
     });
+    lastFareResult = result;
 
-    priceBaseEl.textContent = `${new Intl.NumberFormat('vi-VN').format(result.baseFare)} đ`;
-    priceDistEl.textContent = `${new Intl.NumberFormat('vi-VN').format(result.distanceCost)} đ (${distanceKm} km)`;
+    if (priceRowDist) priceRowDist.textContent = `Cước quãng đường (${distanceKm} km):`;
+    priceBaseEl.textContent = formatAmount(result.baseFare);
+    priceDistEl.textContent = formatAmount(result.distanceCost);
 
     if (result.discount > 0 && rowDiscount) {
       rowDiscount.style.display = 'flex';
-      if (priceDiscEl) priceDiscEl.textContent = `- ${new Intl.NumberFormat('vi-VN').format(result.discount)} đ`;
+      if (priceDiscEl) priceDiscEl.textContent = `- ${formatAmount(result.discount)}`;
     } else if (rowDiscount) {
       rowDiscount.style.display = 'none';
     }
+
+    // Phụ phí dịch vụ / đêm (thay cho dòng "Miễn phí" cố định)
+    const surcharge = (result.nightSurcharge || 0) + (result.serviceFee || 0);
+    if (priceRowSurcharge) priceRowSurcharge.style.display = surcharge > 0 ? 'flex' : 'none';
+    if (priceSurchargeEl) priceSurchargeEl.textContent = `+ ${formatAmount(surcharge)}`;
 
     priceTotalEl.textContent = result.formattedTotal;
   }
@@ -391,22 +421,23 @@ document.addEventListener('DOMContentLoaded', () => {
     btnApplyCoupon.addEventListener('click', () => {
       const code = couponInput.value.trim().toUpperCase();
       if (!code) {
+        appliedCoupon = '';
         couponMsg.textContent = 'Vui lòng nhập mã giảm giá!';
         couponMsg.className = 'coupon-msg error';
+        calculatePrice();
         return;
       }
 
       if (code === 'VINFAST20') {
-        activeDiscountPercent = 20;
-        activeDiscountAmount = 0;
-        couponMsg.textContent = '✓ Đã áp dụng mã VINFAST20 (Giảm 20%)!';
+        appliedCoupon = code;
+        couponMsg.textContent = '✓ Đã áp dụng mã VINFAST20 (Giảm 20%, tối đa 50.000đ)!';
         couponMsg.className = 'coupon-msg success';
       } else if (code === 'XEXANH') {
-        activeDiscountAmount = 30000;
-        activeDiscountPercent = 0;
+        appliedCoupon = code;
         couponMsg.textContent = '✓ Đã áp dụng mã XEXANH (Giảm 30.000đ)!';
         couponMsg.className = 'coupon-msg success';
       } else {
+        appliedCoupon = '';
         couponMsg.textContent = 'Mã giảm giá không hợp lệ hoặc đã hết hạn.';
         couponMsg.className = 'coupon-msg error';
       }
@@ -414,50 +445,140 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Submit & Modal Confirmation
+  // ==========================================================================
+  // HIỂN THỊ / XÓA THÔNG BÁO LỖI CỦA FORM
+  // ==========================================================================
+  function showErrors(errors = {}) {
+    Object.entries(fieldInputs).forEach(([field, input]) => {
+      const errorEl = document.getElementById(`error-${field}`);
+      const message = errors[field] || '';
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = message ? 'block' : 'none';
+      }
+      if (input) input.classList.toggle('invalid', Boolean(message));
+    });
+
+    if (formErrorSummary) {
+      const list = Object.values(errors);
+      formErrorSummary.textContent = list.length ? `Vui lòng kiểm tra lại ${list.length} thông tin còn thiếu hoặc chưa đúng.` : '';
+      formErrorSummary.style.display = list.length ? 'block' : 'none';
+    }
+  }
+
+  function focusFirstError(errors = {}) {
+    const firstField = Object.keys(fieldInputs).find((field) => errors[field]);
+    if (firstField && fieldInputs[firstField]) fieldInputs[firstField].focus();
+  }
+
+  // Gỡ cảnh báo của một trường khi người dùng sửa lại dữ liệu
+  Object.entries(fieldInputs).forEach(([field, input]) => {
+    input?.addEventListener('input', () => {
+      const errorEl = document.getElementById(`error-${field}`);
+      if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.style.display = 'none';
+      }
+      input.classList.remove('invalid');
+
+      const remaining = validateBookingForm(readFormData()).errors;
+      if (formErrorSummary) {
+        formErrorSummary.textContent = Object.keys(remaining).length
+          ? `Vui lòng kiểm tra lại ${Object.keys(remaining).length} thông tin còn thiếu hoặc chưa đúng.`
+          : '';
+        formErrorSummary.style.display = Object.keys(remaining).length ? 'block' : 'none';
+      }
+    });
+  });
+
+  function readFormData() {
+    return {
+      name: customerName ? customerName.value : '',
+      phone: customerPhone ? customerPhone.value : '',
+      pickup: pickupInput ? pickupInput.value : '',
+      destination: destInput ? destInput.value : '',
+      date: dateInput ? dateInput.value : '',
+      time: timeInput ? timeInput.value : '',
+      note: customerNote ? customerNote.value : '',
+    };
+  }
+
+  /** Tài xế được hệ thống điều ngẫu nhiên (mô phỏng) */
+  const demoDrivers = [
+    { name: 'Trần Thanh Sơn', phone: '0903 112 233', rating: 4.9 },
+    { name: 'Lê Hoàng Nam', phone: '0977 445 566', rating: 5.0 },
+    { name: 'Đặng Văn Hùng', phone: '0918 887 766', rating: 4.8 },
+    { name: 'Nguyễn Hoàng Đức', phone: '0933 665 544', rating: 5.0 },
+    { name: 'Phạm Quốc Huy', phone: '0908 334 455', rating: 4.7 },
+  ];
+
+  // Submit: kiểm tra dữ liệu rồi lưu đơn vào LocalStorage (mục 37 & 38)
   if (btnConfirm) {
     btnConfirm.addEventListener('click', () => {
-      const name = customerName ? customerName.value.trim() : '';
-      const phone = customerPhone ? customerPhone.value.trim() : '';
-      const pickup = pickupInput ? pickupInput.value.trim() : '';
-      const dest = destInput ? destInput.value.trim() : '';
+      const { valid, errors, values } = validateBookingForm(readFormData());
+      showErrors(errors);
 
-      if (!pickup || !dest) {
-        alert('Vui lòng nhập đầy đủ điểm đón và điểm đến!');
-        if (pickupInput) pickupInput.focus();
+      if (!valid) {
+        focusFirstError(errors);
         return;
       }
 
-      if (!name) {
-        alert('Vui lòng nhập họ và tên của bạn!');
-        if (customerName) customerName.focus();
-        return;
-      }
+      const driver = demoDrivers[Math.floor(Math.random() * demoDrivers.length)];
 
-      if (!phone) {
-        alert('Vui lòng nhập số điện thoại để tài xế liên hệ!');
-        if (customerPhone) customerPhone.focus();
-        return;
-      }
+      const savedBooking = bookingStore.add({
+        customer: { name: values.name, phone: values.phone },
+        serviceType: selectedService,
+        vehicle: {
+          model: `VinFast ${currentCar.model}`,
+          seats: Number(currentCar.seats) || 4,
+          licensePlate: `${randPlatePrefix()}-${Math.floor(100 + Math.random() * 900)}.${Math.floor(10 + Math.random() * 89)}`,
+        },
+        driver,
+        route: {
+          pickupLocation: values.pickup,
+          destinationLocation: values.destination,
+          distanceKm,
+          estimatedDurationMin: durationMin,
+        },
+        schedule: {
+          pickupDate: values.date,
+          pickupTime: values.time,
+        },
+        fare: {
+          basePrice: lastFareResult.baseFare,
+          distanceCost: lastFareResult.distanceCost,
+          discountCode: appliedCoupon || null,
+          discountAmount: lastFareResult.discount,
+          totalAmount: lastFareResult.totalFare,
+          currency: 'VND',
+        },
+        payment: {
+          method: document.querySelector('input[name="payment_method"]:checked')?.value || 'cash',
+          status: 'pending',
+        },
+        status: 'pending',
+        note: values.note || '',
+      });
 
       // Populate Receipt Modal
-      const randomID = '#VF' + Math.floor(1000 + Math.random() * 9000);
-      document.getElementById('receipt-id').textContent = randomID;
-      document.getElementById('receipt-name').textContent = name;
-      document.getElementById('receipt-phone').textContent = phone;
-      document.getElementById('receipt-car').textContent = `VinFast ${currentCar.model}`;
-      document.getElementById('receipt-pickup').textContent = pickup;
-      document.getElementById('receipt-dest').textContent = dest;
-
-      const dateVal = dateInput ? dateInput.value : '';
-      const timeVal = timeInput ? timeInput.value : '';
-      document.getElementById('receipt-time').textContent = `${timeVal} - ${dateVal}`;
-
-      document.getElementById('receipt-total').textContent = priceTotalEl.textContent;
+      document.getElementById('receipt-id').textContent = savedBooking.bookingId;
+      document.getElementById('receipt-name').textContent = savedBooking.customer.name;
+      document.getElementById('receipt-phone').textContent = savedBooking.customer.phone;
+      document.getElementById('receipt-car').textContent = savedBooking.vehicle.model;
+      document.getElementById('receipt-pickup').textContent = savedBooking.route.pickupLocation;
+      document.getElementById('receipt-dest').textContent = savedBooking.route.destinationLocation;
+      document.getElementById('receipt-time').textContent = `${savedBooking.schedule.pickupTime} - ${savedBooking.schedule.pickupDate}`;
+      document.getElementById('receipt-total').textContent = formatVND(savedBooking.fare.totalAmount);
+      if (receiptStatus) receiptStatus.textContent = savedBooking.statusText;
 
       // Show Modal
       if (modal) modal.style.display = 'flex';
     });
+  }
+
+  function randPlatePrefix() {
+    const provinces = ['51H', '51K', '51L', '30H', '60A', '29B'];
+    return provinces[Math.floor(Math.random() * provinces.length)];
   }
 
   // Close Modal
@@ -467,6 +588,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnModalClose) btnModalClose.addEventListener('click', closeModal);
   if (btnModalDone) btnModalDone.addEventListener('click', closeModal);
+  if (btnModalHistory) btnModalHistory.addEventListener('click', () => { window.location.href = 'danhsachchuyen.html'; });
+  modal?.addEventListener('click', (event) => {
+    if (event.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeModal();
+  });
 
   // Initial Calculation Run
   updateDistance();

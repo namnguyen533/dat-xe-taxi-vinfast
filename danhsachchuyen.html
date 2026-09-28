@@ -7,7 +7,7 @@
     <title>Danh sách chuyến xe đặt - TaxiVinFast</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
-  
+
   <body>
     <header class="header">
       <div class="header-container">
@@ -24,8 +24,7 @@
           </ul>
         </nav>
         <div class="header-actions">
-          <button class="btn-login">Đăng nhập</button>
-          <button class="btn-register">Đăng ký</button>
+          <a href="admin.html" class="btn-register">Quản trị</a>
         </div>
       </div>
     </header>
@@ -33,14 +32,14 @@
     <main class="main-content">
       <section class="bookings-history-section">
         <div class="history-container">
-          
+
           <div class="section-header text-center">
-            <span class="hero-badge">📋 Dữ Liệu JSON (bookings.json)</span>
+            <span class="hero-badge">📋 Dữ liệu đơn đặt taxi (LocalStorage)</span>
             <h2 class="section-title">Danh Sách Chuyến Xe Đã Đặt</h2>
-            <p class="section-subtitle">Dữ liệu chuyến đi được nạp & quản lý động bằng JavaScript</p>
+            <p class="section-subtitle">Dữ liệu được ghi nhận khi bạn đặt xe và quản lý bởi quản trị viên</p>
           </div>
 
-          <!-- Stats Overview -->
+          <!-- Thống kê nhanh -->
           <div class="bookings-stats-grid">
             <div class="stat-card">
               <span class="stat-icon">🚕</span>
@@ -57,10 +56,17 @@
               </div>
             </div>
             <div class="stat-card blue">
-              <span class="stat-icon">🚘</span>
+              <span class="stat-icon">🚗</span>
               <div>
                 <h4 id="stat-moving-count">0</h4>
-                <p>Đang di chuyển</p>
+                <p>Đang thực hiện</p>
+              </div>
+            </div>
+            <div class="stat-card orange">
+              <span class="stat-icon">⏳</span>
+              <div>
+                <h4 id="stat-pending-count">0</h4>
+                <p>Chờ xác nhận</p>
               </div>
             </div>
             <div class="stat-card orange">
@@ -72,21 +78,32 @@
             </div>
           </div>
 
-          <!-- Search & Filter Controls -->
+          <!-- Ô tìm kiếm & lọc trạng thái -->
           <div class="history-controls">
             <div class="search-box">
               <span class="search-icon">🔍</span>
-              <input type="text" id="booking-search-input" placeholder="Tìm theo Mã chuyến, Tên khách, SĐT, Địa chỉ..." />
+              <input
+                type="search"
+                id="booking-search-input"
+                placeholder="Tìm theo tên khách, số điện thoại hoặc mã đơn..."
+                autocomplete="off"
+              />
             </div>
-            <div class="filter-status">
-              <button class="btn-filter-status active" data-status="all">Tất cả</button>
-              <button class="btn-filter-status" data-status="completed">Hoàn thành</button>
-              <button class="btn-filter-status" data-status="in_progress">Đang di chuyển</button>
-              <button class="btn-filter-status" data-status="driver_assigned">Đang điều xe</button>
+            <div class="filter-status" id="booking-status-filter">
+              <button type="button" class="btn-filter-status active" data-status="all">Tất cả</button>
+              <button type="button" class="btn-filter-status" data-status="pending">Chờ xác nhận</button>
+              <button type="button" class="btn-filter-status" data-status="confirmed">Đã xác nhận</button>
+              <button type="button" class="btn-filter-status" data-status="in_progress">Đang thực hiện</button>
+              <button type="button" class="btn-filter-status" data-status="completed">Hoàn thành</button>
+              <button type="button" class="btn-filter-status" data-status="cancelled">Đã hủy</button>
             </div>
           </div>
 
-          <!-- Bookings Table Container -->
+          <p class="table-empty-message" id="history-empty-message" style="display: none;">
+            🔍 Không tìm thấy chuyến xe nào phù hợp. Hãy thử từ khóa khác hoặc <a href="booking.html">đặt xe mới</a>.
+          </p>
+
+          <!-- Bảng danh sách chuyến xe -->
           <div class="table-responsive">
             <table class="bookings-table">
               <thead>
@@ -94,7 +111,7 @@
                   <th>Mã đơn</th>
                   <th>Khách hàng</th>
                   <th>Dòng xe</th>
-                  <th>Tài xế & Biển số</th>
+                  <th>Tài xế &amp; Biển số</th>
                   <th>Điểm đón ➔ Điểm đến</th>
                   <th>Thanh toán</th>
                   <th>Trạng thái</th>
@@ -103,7 +120,7 @@
               </thead>
               <tbody id="bookings-table-body">
                 <tr>
-                  <td colspan="8" class="text-center py-4">🔄 Đang tải dữ liệu chuyến xe từ bookings.json...</td>
+                  <td colspan="8" class="table-empty">🔄 Đang tải dữ liệu chuyến xe...</td>
                 </tr>
               </tbody>
             </table>
@@ -113,14 +130,12 @@
       </section>
     </main>
 
-    <!-- Modal Xem Chi Tiết Chuyến Xe -->
+    <!-- Popup xem chi tiết chuyến xe -->
     <div id="booking-detail-modal" class="modal-overlay" style="display: none;">
-      <div class="modal-card">
-        <button class="modal-close" id="btn-close-detail">&times;</button>
+      <div class="modal-card modal-card-wide">
+        <button type="button" class="modal-close" id="btn-close-detail" aria-label="Đóng">&times;</button>
         <h3 class="modal-title">Chi Tiết Chuyến Xe <span id="detail-id">#VF-000</span></h3>
-        <div id="modal-detail-content" class="booking-receipt" style="text-align: left;">
-          <!-- Nạp bằng JS -->
-        </div>
+        <div id="modal-detail-content" class="booking-receipt"></div>
         <div class="modal-actions">
           <button type="button" class="btn-modal-close-main" id="btn-done-detail">Đóng</button>
         </div>
@@ -141,6 +156,7 @@
             <li><a href="cars.html">Danh sách xe</a></li>
             <li><a href="booking.html">Đặt xe</a></li>
             <li><a href="danhsachchuyen.html">Lịch sử chuyến xe</a></li>
+            <li><a href="admin.html">Trang quản trị</a></li>
           </ul>
         </div>
         <div class="footer-section">
@@ -154,8 +170,7 @@
       </div>
     </footer>
 
-    <!-- JS load và hiển thị bookings.json -->
+    <!-- JS nạp & quản lý danh sách chuyến xe -->
     <script type="module" src="/src/bookings-loader.js"></script>
   </body>
 </html>
-

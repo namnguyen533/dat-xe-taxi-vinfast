@@ -11,20 +11,19 @@
     <header class="header">
       <div class="header-container">
         <div class="logo">
-          <h1>TaxiVinFast</h1>
+          <a href="index.html"><h1>TaxiVinFast</h1></a>
         </div>
         <nav class="nav-menu">
           <ul class="nav-list">
             <li><a href="index.html" class="nav-link">Trang chủ</a></li>
-            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="cars.html" class="nav-link active">Danh sách xe</a></li>
             <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html" class="nav-link">Lịch sử chuyến</a></li>
             <li><a href="index.html#pricing" class="nav-link">Bảng giá</a></li>
-            <li><a href="#" class="nav-link">Liên hệ</a></li>
           </ul>
         </nav>
         <div class="header-actions">
-          <button class="btn-login">Đăng nhập</button>
-          <button class="btn-register">Đăng ký</button>
+          <a href="admin.html" class="btn-register">Quản trị</a>
         </div>
       </div>
     </header>
@@ -33,41 +32,43 @@
       <section class="car-detail-section">
         <div class="detail-container">
           <div class="breadcrumb">
-            <a href="index.html">Trang chủ</a> / 
-            <a href="cars.html">Danh sách xe</a> / 
-            <span>VinFast VF 8</span>
+            <a href="index.html">Trang chủ</a> /
+            <a href="cars.html">Danh sách xe</a> /
+            <span id="detail-breadcrumb-name">Chi tiết xe</span>
           </div>
+
+          <p class="detail-notice" id="detail-notice" style="display: none;"></p>
 
           <div class="car-detail-content">
             <div class="car-gallery">
               <div class="main-image">
-                <img src="/src/assets/vf8.jpg" alt="VinFast VF 8" class="detail-main-img">
+                <img id="detail-main-img" src="/src/assets/vf5.jpg" alt="Ảnh xe" class="detail-main-img" onerror="this.src='/src/assets/vf5.jpg'">
               </div>
               <div class="thumbnail-gallery">
-                <img src="/src/assets/vf8.jpg" alt="VinFast VF 8" class="thumbnail active">
-                <img src="/src/assets/vf8.jpg" alt="VinFast VF 8 nội thất" class="thumbnail">
-                <img src="/src/assets/vf8.jpg" alt="VinFast VF 8 góc nghiêng" class="thumbnail">
+                <img src="/src/assets/vf5.jpg" alt="Ảnh xe" class="thumbnail active">
+                <img src="/src/assets/vf5.jpg" alt="Ảnh xe" class="thumbnail">
+                <img src="/src/assets/vf5.jpg" alt="Ảnh xe" class="thumbnail">
               </div>
             </div>
 
             <div class="car-info-detail">
-              <h1 class="detail-title">VinFast VF 8</h1>
-              <p class="detail-subtitle">Taxi điện hạng D - 5 chỗ</p>
-              
+              <h1 class="detail-title" id="detail-title">Chi tiết xe</h1>
+              <p class="detail-subtitle" id="detail-subtitle">-</p>
+              <p class="detail-description" id="detail-description">-</p>
+
               <div class="detail-price">
-                <span class="price-label">Giá khởi điểm:</span>
-                <span class="price-value">22.000đ/km</span>
+                <span class="price-label">Giá mở cửa:</span>
+                <span class="price-value" id="detail-base-fare">-</span>
+                <span class="price-label">Giá theo km:</span>
+                <span class="price-value" id="detail-per-km">-</span>
+                <span class="price-label">Phí chờ:</span>
+                <span class="price-value" id="detail-waiting-fee">-</span>
               </div>
 
               <div class="detail-features">
                 <h3>Tính năng nổi bật</h3>
-                <ul class="features-list">
-                  <li>✓ Động cơ điện mạnh mẽ, êm ái</li>
-                  <li>✓ Pin lithium dung lượng lớn</li>
-                  <li>✓ Thiết kế hiện đại, sang trọng</li>
-                  <li>✓ Không gian nội thất rộng rãi</li>
-                  <li>✓ Hệ thống giải trí tiên tiến</li>
-                  <li>✓ An toàn 5 sao ASEAN NCAP</li>
+                <ul class="features-list" id="detail-features-list">
+                  <!-- Nạp bằng JavaScript -->
                 </ul>
               </div>
 
@@ -76,33 +77,41 @@
                 <div class="specs-grid">
                   <div class="spec-item">
                     <span class="spec-label">Số chỗ ngồi:</span>
-                    <span class="spec-value">5 chỗ</span>
+                    <span class="spec-value" id="detail-seats">-</span>
+                  </div>
+                  <div class="spec-item">
+                    <span class="spec-label">Phân khúc:</span>
+                    <span class="spec-value" id="detail-segment">-</span>
                   </div>
                   <div class="spec-item">
                     <span class="spec-label">Loại nhiên liệu:</span>
                     <span class="spec-value">Điện 100%</span>
                   </div>
                   <div class="spec-item">
-                    <span class="spec-label">Quãng đường:</span>
-                    <span class="spec-value">~400km</span>
+                    <span class="spec-label">Dung lượng pin:</span>
+                    <span class="spec-value" id="detail-battery">-</span>
                   </div>
                   <div class="spec-item">
-                    <span class="spec-label">Thời gian sạc:</span>
-                    <span class="spec-value">~30 phút (80%)</span>
+                    <span class="spec-label">Quãng đường:</span>
+                    <span class="spec-value" id="detail-range">-</span>
                   </div>
                   <div class="spec-item">
                     <span class="spec-label">Công suất:</span>
-                    <span class="spec-value">260 kW</span>
+                    <span class="spec-value" id="detail-power">-</span>
                   </div>
                   <div class="spec-item">
-                    <span class="spec-label">Mô-men xoắn:</span>
-                    <span class="spec-value">500 Nm</span>
+                    <span class="spec-label">Tiện ích:</span>
+                    <span class="spec-value" id="detail-air-conditioning">-</span>
+                  </div>
+                  <div class="spec-item">
+                    <span class="spec-label">Sức chứa hành lý:</span>
+                    <span class="spec-value" id="detail-luggage">-</span>
                   </div>
                 </div>
               </div>
 
               <div class="detail-actions">
-                <a href="booking.html" class="btn-book-detail">Đặt xe ngay</a>
+                <a href="booking.html" class="btn-book-detail" data-booking-model>Đặt xe ngay</a>
                 <a href="cars.html" class="btn-back">Quay lại danh sách</a>
               </div>
             </div>
@@ -123,17 +132,21 @@
             <li><a href="index.html">Trang chủ</a></li>
             <li><a href="cars.html">Danh sách xe</a></li>
             <li><a href="booking.html">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html">Lịch sử chuyến xe</a></li>
+            <li><a href="admin.html">Trang quản trị</a></li>
           </ul>
         </div>
         <div class="footer-section">
           <h3>Liên hệ</h3>
-          <p>Hotline: 1900 xxxx</p>
-          <p>Email: info@taxivinfast.com</p>
+          <p>Hotline: 1900 232389</p>
+          <p>Email: hotro@taxivinfast.com</p>
         </div>
       </div>
       <div class="footer-bottom">
         <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
       </div>
     </footer>
+
+    <script type="module" src="/src/car-detail.js"></script>
   </body>
 </html>

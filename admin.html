@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản trị đơn đặt taxi - TaxiVinFast Admin</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+
+  <body class="admin-body">
+    <!-- Thanh điều hướng quản trị -->
+    <header class="admin-header">
+      <div class="admin-header-inner">
+        <a href="admin.html" class="admin-brand">
+          <span class="admin-brand-icon">🛡️</span>
+          <span class="admin-brand-text">TaxiVinFast <em>Admin</em></span>
+        </a>
+
+        <nav class="admin-nav">
+          <a href="admin.html" class="admin-nav-link active">Dashboard</a>
+          <a href="index.html" class="admin-nav-link">Trang chủ</a>
+          <a href="booking.html" class="admin-nav-link">Đặt xe</a>
+          <a href="cars.html" class="admin-nav-link">Danh sách xe</a>
+          <a href="danhsachchuyen.html" class="admin-nav-link">Lịch sử chuyến</a>
+        </nav>
+
+        <div class="admin-header-actions">
+          <span class="admin-storage-note" id="admin-storage-note">💾 Dữ liệu lưu trên trình duyệt</span>
+          <button type="button" id="btn-admin-reset" class="btn-admin-outline">♻️ Khôi phục dữ liệu mẫu</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <!-- Tiêu đề trang -->
+      <div class="admin-page-head">
+        <div>
+          <span class="hero-badge">📊 Trang quản trị hệ thống</span>
+          <h1 class="admin-page-title">Dashboard Quản Lý Đơn Đặt Taxi</h1>
+          <p class="admin-page-subtitle">
+            Tổng quan số lượng đơn, cập nhật trạng thái xử lý, xem chi tiết và tìm kiếm đơn theo tên hoặc số điện thoại.
+          </p>
+        </div>
+        <div class="admin-head-meta">
+          <span>Dữ liệu cập nhật lúc</span>
+          <strong id="admin-updated-at">—</strong>
+        </div>
+      </div>
+
+      <!-- Mục 32: Tổng quan số lượng đơn -->
+      <section class="admin-stats-grid" id="admin-stats-grid" aria-label="Tổng quan số lượng đơn">
+        <p class="admin-loading">🔄 Đang tải dữ liệu đơn đặt taxi...</p>
+      </section>
+
+      <!-- Mục 33 + 36 + 37: Danh sách đơn, tìm kiếm, lọc trạng thái -->
+      <section class="admin-panel">
+        <div class="admin-panel-head">
+          <h2 class="admin-panel-title">📋 Danh sách đơn đặt taxi</h2>
+          <span class="admin-count-badge" id="admin-list-count">0 đơn</span>
+        </div>
+
+        <div class="admin-toolbar">
+          <div class="search-box admin-search-box">
+            <span class="search-icon">🔍</span>
+            <input
+              type="search"
+              id="admin-search-input"
+              placeholder="Tìm theo tên khách, số điện thoại hoặc mã đơn..."
+              autocomplete="off"
+            />
+          </div>
+          <div class="filter-status admin-filter-status" id="admin-status-filter">
+            <button type="button" class="btn-filter-status active" data-status="all">Tất cả</button>
+            <button type="button" class="btn-filter-status" data-status="pending">Chờ xác nhận</button>
+            <button type="button" class="btn-filter-status" data-status="confirmed">Đã xác nhận</button>
+            <button type="button" class="btn-filter-status" data-status="in_progress">Đang thực hiện</button>
+            <button type="button" class="btn-filter-status" data-status="completed">Hoàn thành</button>
+            <button type="button" class="btn-filter-status" data-status="cancelled">Đã hủy</button>
+          </div>
+          <button type="button" id="btn-admin-refresh" class="btn-admin-outline">🔄 Làm mới</button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="bookings-table admin-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Dòng xe</th>
+                <th>Tài xế &amp; Biển số</th>
+                <th>Điểm đón ➔ Điểm đến</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="admin-bookings-body">
+              <tr>
+                <td colspan="8" class="table-empty">🔄 Đang tải dữ liệu đơn đặt taxi...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="admin-footnote">
+        💡 Mẹo demo: đặt xe mới ở trang <a href="booking.html">Đặt xe</a> rồi quay lại Dashboard, đơn mới sẽ hiển thị ở trạng thái
+        <strong>Chờ xác nhận</strong>. Dữ liệu được lưu bằng <code>localStorage</code> nên vẫn còn sau khi tải lại trang.
+      </p>
+    </main>
+
+    <!-- Mục 34 + 35: Popup chi tiết & cập nhật trạng thái -->
+    <div id="booking-detail-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card modal-card-wide">
+        <button type="button" class="modal-close" id="btn-close-detail" aria-label="Đóng">&times;</button>
+        <h3 class="modal-title">Chi Tiết Đơn Đặt Taxi <span id="detail-id">#VF-000</span></h3>
+        <div id="modal-detail-content" class="booking-receipt admin-detail-content"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-close-main" id="btn-done-detail">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

@@ -1,5 +1,6 @@
 import './style.css';
 import { calculateTripFare } from './price-calculator.js';
+import { STANDARD_RATES } from './data/catalog.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const modelSelect = document.getElementById('sim-model-select');
@@ -9,14 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const couponInput = document.getElementById('sim-coupon-input');
   
   // Output Elements
-  const outBase = document.getElementById('sim-out-base');
-  const outDistance = document.getElementById('sim-out-distance');
-  const outNight = document.getElementById('sim-out-night');
-  const outDiscount = document.getElementById('sim-out-discount');
   const outTotal = document.getElementById('sim-out-total');
   const breakdownList = document.getElementById('sim-breakdown-list');
 
   if (!modelSelect || !distanceSlider) return;
+
+  // Nạp danh sách dòng xe & đơn giá từ pricing.json
+  const formatPerKm = (amount) => new Intl.NumberFormat('vi-VN').format(amount) + 'đ/km';
+  modelSelect.innerHTML = STANDARD_RATES.map(
+    (rate, index) => `
+      <option value="${rate.modelName}" data-base="${rate.baseFare}" data-per-km="${rate.rateUnder25km}"${index === 1 ? ' selected' : ''}>
+        ${rate.modelName} (${rate.seats} chỗ - ${formatPerKm(rate.rateUnder25km)})
+      </option>`,
+  ).join('');
 
   function runSimulation() {
     const selectedOption = modelSelect.options[modelSelect.selectedIndex];
@@ -38,32 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
       pickupTime,
       couponCode
     });
-
-    // Format VND
-    const fmt = (amt) => new Intl.NumberFormat('vi-VN').format(amt) + ' đ';
-
-    if (outBase) outBase.textContent = fmt(result.baseFare);
-    if (outDistance) outDistance.textContent = `${fmt(result.distanceCost)} (${distanceKm} km)`;
-    
-    if (outNight) {
-      const nightRow = outNight.parentElement;
-      if (result.nightSurcharge > 0) {
-        nightRow.style.display = 'flex';
-        outNight.textContent = `+ ${fmt(result.nightSurcharge)}`;
-      } else {
-        nightRow.style.display = 'none';
-      }
-    }
-
-    if (outDiscount) {
-      const discRow = outDiscount.parentElement;
-      if (result.discount > 0) {
-        discRow.style.display = 'flex';
-        outDiscount.textContent = `- ${fmt(result.discount)}`;
-      } else {
-        discRow.style.display = 'none';
-      }
-    }
 
     if (outTotal) outTotal.textContent = result.formattedTotal;
 
