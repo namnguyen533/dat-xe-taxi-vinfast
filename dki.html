@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký tài khoản - TaxiVinFast</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <style>
+      .auth-section {
+        min-height: calc(100vh - 160px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(44, 62, 80, 0.05) 100%);
+      }
+      .auth-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 40px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      }
+      .auth-header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      .auth-icon {
+        font-size: 42px;
+        display: block;
+        margin-bottom: 8px;
+      }
+      .auth-header h2 {
+        color: var(--primary);
+        font-size: 26px;
+        margin-bottom: 6px;
+      }
+      .auth-header p {
+        color: var(--text);
+        font-size: 14px;
+      }
+      .btn-auth-submit {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 12px;
+      }
+      .btn-auth-submit:hover {
+        background: var(--primary-dark);
+        box-shadow: var(--shadow);
+      }
+      .auth-footer-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+        color: var(--text);
+      }
+      .auth-footer-link a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .auth-footer-link a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <a href="index.html"><h1>TaxiVinFast</h1></a>
+        </div>
+        <nav class="nav-menu">
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html" class="nav-link">Lịch sử chuyến</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <a href="dangnhap.html" class="btn-login" style="text-decoration: none;">Đăng nhập</a>
+          <a href="dki.html" class="btn-register active" style="text-decoration: none;">Đăng ký</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="auth-section">
+        <div class="auth-card">
+          <div class="auth-header">
+            <span class="auth-icon">📝</span>
+            <h2>Đăng Ký Tài Khoản</h2>
+            <p>Tạo tài khoản TaxiVinFast để trải nghiệm dịch vụ xe điện cao cấp</p>
+          </div>
+
+          <form id="registerForm" novalidate>
+            <div class="form-group">
+              <label for="register-fullname" class="form-label">Họ và tên <span class="required-star">*</span></label>
+              <input type="text" id="register-fullname" class="form-input" placeholder="Ví dụ: Nguyễn Văn A" />
+              <span class="error-text" id="reg-fullname-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="register-phone" class="form-label">Số điện thoại <span class="required-star">*</span></label>
+              <input type="tel" id="register-phone" class="form-input" placeholder="Ví dụ: 0912345678" />
+              <span class="error-text" id="reg-phone-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="register-email" class="form-label">Email <span class="required-star">*</span></label>
+              <input type="email" id="register-email" class="form-input" placeholder="Ví dụ: nguyenvana@gmail.com" />
+              <span class="error-text" id="reg-email-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="register-password" class="form-label">Mật khẩu <span class="required-star">*</span></label>
+              <input type="password" id="register-password" class="form-input" placeholder="Tối thiểu 6 ký tự" />
+              <span class="error-text" id="reg-password-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="register-confirm-password" class="form-label">Nhập lại mật khẩu <span class="required-star">*</span></label>
+              <input type="password" id="register-confirm-password" class="form-input" placeholder="Nhập lại mật khẩu của bạn" />
+              <span class="error-text" id="reg-confirm-error"></span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 8px;">
+              <span class="error-text" id="reg-global-error" style="text-align: center; font-size: 14px;"></span>
+            </div>
+
+            <button type="submit" class="btn-auth-submit">Đăng Ký Tài Khoản</button>
+          </form>
+
+          <div class="auth-footer-link">
+            Đã có tài khoản? <a href="dangnhap.html">Đăng nhập ngay</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>TaxiVinFast</h3>
+          <p>Dịch vụ taxi điện uy tín, chất lượng hàng đầu Việt Nam</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/auth.js"></script>
+  </body>
+</html>
