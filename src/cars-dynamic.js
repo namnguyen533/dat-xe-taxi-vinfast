@@ -99,6 +99,7 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
       </div>`,
     )
     .join('');
+  container.innerHTML = htmlContent;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

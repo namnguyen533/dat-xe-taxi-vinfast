@@ -401,12 +401,8 @@ button {
 .car-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.3s;
-}
-
-.car-card:hover .car-img {
-  transform: scale(1.05);
 }
 
 .car-info {
@@ -4300,7 +4296,6 @@ button {
       padding: 14px;
     }
   }
-
 
 
 
