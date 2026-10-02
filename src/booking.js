@@ -4,6 +4,15 @@ import { bookingStore, formatVND } from './data/booking-store.js';
 import { validateBookingForm } from './form-validation.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const authToken = sessionStorage.getItem('taxi-vinfast-auth-token') || localStorage.getItem('taxi-vinfast-auth-token');
+  const userSession = JSON.parse(localStorage.getItem('taxi-current-user') || 'null');
+
+  if (!authToken || !userSession) {
+    const nextUrl = encodeURIComponent('booking.html');
+    window.location.href = `dangnhap.html?next=${nextUrl}`;
+    return;
+  }
+
   // --- DOM elements ---
   const pickupInput = document.getElementById('pickup-location');
   const destInput = document.getElementById('destination-location');

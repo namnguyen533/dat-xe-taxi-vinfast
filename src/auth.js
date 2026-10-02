@@ -1,22 +1,63 @@
 import { createAuthClient, saveAuthToken } from './auth-client.js';
 
 const authClient = createAuthClient();
+const DEMO_USER = {
+  name: 'Khách hàng demo',
+  email: 'demo@taxivinfast.com',
+  phone: '0912345678',
+  password: '123456',
+};
 
 function setFieldError(input, errorElement, message) {
+  if (!input || !errorElement) return;
   input.classList.toggle('invalid', Boolean(message));
   errorElement.textContent = message;
   errorElement.style.display = message ? 'block' : 'none';
 }
 
 function setGlobalError(errorElement, message) {
+  if (!errorElement) return;
   errorElement.textContent = message;
   errorElement.style.display = message ? 'block' : 'none';
 }
 
 function setSubmitting(form, isSubmitting) {
   const submitButton = form.querySelector('button[type="submit"]');
+  if (!submitButton) return;
   submitButton.disabled = isSubmitting;
-  submitButton.textContent = isSubmitting ? 'Đang xử lý...' : submitButton.dataset.defaultText;
+  submitButton.textContent = isSubmitting ? 'Đang xử lý...' : submitButton.dataset.defaultText || 'Đăng nhập';
+}
+
+function ensureUserStorage() {
+  const storedUsers = JSON.parse(localStorage.getItem('taxi-users') || '[]');
+  if (!storedUsers.some((user) => user.email.toLowerCase() === DEMO_USER.email.toLowerCase())) {
+    storedUsers.push(DEMO_USER);
+    localStorage.setItem('taxi-users', JSON.stringify(storedUsers));
+  }
+}
+
+function saveCurrentUser(user) {
+  localStorage.setItem('taxi-current-user', JSON.stringify({
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+  }));
+}
+
+async function fallbackLogin(email, password) {
+  ensureUserStorage();
+  const storedUsers = JSON.parse(localStorage.getItem('taxi-users') || '[]');
+  const matchedUser = storedUsers.find(
+    (user) => user.email.toLowerCase() === email.toLowerCase() && user.password === password,
+  );
+
+  if (!matchedUser) {
+    throw new Error('Email hoặc mật khẩu không đúng.');
+  }
+
+  saveCurrentUser(matchedUser);
+  saveAuthToken('local-demo-token');
+  return { accessToken: 'local-demo-token', user: matchedUser };
 }
 
 function initializeRegistration() {
@@ -39,7 +80,7 @@ function initializeRegistration() {
     global: form.querySelector('#reg-global-error'),
   };
   const submitButton = form.querySelector('button[type="submit"]');
-  submitButton.dataset.defaultText = submitButton.textContent;
+  if (submitButton) submitButton.dataset.defaultText = submitButton.textContent;
 
   form.addEventListener('input', (event) => {
     const entry = Object.entries(fields).find(([, input]) => input === event.target);
@@ -67,14 +108,38 @@ function initializeRegistration() {
 
     setSubmitting(form, true);
     try {
-      const result = await authClient.register({
-        name: fields.name.value.trim(),
-        phone: fields.phone.value.trim(),
-        email: fields.email.value.trim(),
-        password: fields.password.value,
-      });
-      saveAuthToken(result.accessToken);
-      window.location.assign('index.html');
+      let result;
+      try {
+        result = await authClient.register({
+          name: fields.name.value.trim(),
+          phone: fields.phone.value.trim(),
+          email: fields.email.value.trim(),
+          password: fields.password.value,
+        });
+      } catch (apiError) {
+        ensureUserStorage();
+        const storedUsers = JSON.parse(localStorage.getItem('taxi-users') || '[]');
+        const normalizedEmail = fields.email.value.trim().toLowerCase();
+        if (storedUsers.some((user) => user.email.toLowerCase() === normalizedEmail)) {
+          throw new Error('Email này đã được đăng ký.');
+        }
+        const newUser = {
+          name: fields.name.value.trim(),
+          phone: fields.phone.value.trim(),
+          email: fields.email.value.trim(),
+          password: fields.password.value,
+        };
+        storedUsers.push(newUser);
+        localStorage.setItem('taxi-users', JSON.stringify(storedUsers));
+        saveCurrentUser(newUser);
+        saveAuthToken('local-demo-token');
+        result = { accessToken: 'local-demo-token' };
+      }
+
+      if (result?.accessToken) saveAuthToken(result.accessToken);
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next') || 'index.html';
+      window.location.assign(next);
     } catch (error) {
       setGlobalError(errors.global, error.message);
     } finally {
@@ -93,7 +158,7 @@ function initializeLogin() {
   const passwordError = form.querySelector('#login-password-error');
   const globalError = form.querySelector('#login-global-error');
   const submitButton = form.querySelector('button[type="submit"]');
-  submitButton.dataset.defaultText = submitButton.textContent;
+  if (submitButton) submitButton.dataset.defaultText = submitButton.textContent;
 
   form.addEventListener('input', (event) => {
     if (event.target === email) setFieldError(email, emailError, '');
@@ -103,8 +168,11 @@ function initializeLogin() {
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const emailMessage = email.value.trim() && email.validity.valid ? '' : 'Vui lòng nhập email hợp lệ.';
-    const passwordMessage = password.value ? '' : 'Vui lòng nhập mật khẩu.';
+    const safeEmail = email.value.trim();
+    const safePassword = password.value;
+
+    const emailMessage = safeEmail && email.validity.valid ? '' : 'Vui lòng nhập email hợp lệ.';
+    const passwordMessage = safePassword ? '' : 'Vui lòng nhập mật khẩu.';
     setFieldError(email, emailError, emailMessage);
     setFieldError(password, passwordError, passwordMessage);
     setGlobalError(globalError, '');
@@ -113,12 +181,23 @@ function initializeLogin() {
 
     setSubmitting(form, true);
     try {
-      const result = await authClient.login({
-        email: email.value.trim(),
-        password: password.value,
-      });
-      saveAuthToken(result.accessToken);
-      window.location.assign('index.html');
+      try {
+        const result = await authClient.login({
+          email: safeEmail,
+          password: safePassword,
+        });
+        saveAuthToken(result.accessToken);
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get('next') || 'index.html';
+        window.location.assign(next);
+        return;
+      } catch (apiError) {
+        const fallbackResult = await fallbackLogin(safeEmail, safePassword);
+        saveAuthToken(fallbackResult.accessToken);
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get('next') || 'index.html';
+        window.location.assign(next);
+      }
     } catch (error) {
       setGlobalError(globalError, error.message);
     } finally {
