@@ -1,0 +1,152 @@
+[
+  {
+    "id": "vf3",
+    "name": "VinFast VF 3",
+    "category": "Mini SUV",
+    "seats": 2,
+    "segment": "A-Mini",
+    "description": "Dòng xe điện Mini SUV nhỏ gọn, linh hoạt di chuyển trong thành phố, chi phí siêu tiết kiệm.",
+    "specs": {
+      "battery": "18.6 kWh",
+      "range": "210 km/lần sạc",
+      "power": "43 HP",
+      "airConditioning": true,
+      "luggageCapacity": "Nhỏ (1-2 vali nhỏ)"
+    },
+    "features": [
+      "100% Xe điện xanh",
+      "Nhỏ gọn dễ luồn lách",
+      "Điều hòa 2 chiều",
+      "Kết nối Bluetooth/USB"
+    ],
+    "image": "/src/assets/vf3.webp",
+    "status": "available",
+    "badge": "Tiết kiệm nhất"
+  },
+  {
+    "id": "vf5",
+    "name": "VinFast VF 5 Plus",
+    "category": "Compact SUV",
+    "seats": 4,
+    "segment": "Hạng A",
+    "description": "Mẫu taxi điện phổ biến nhất Việt Nam, không gian cabin thoải mái, vận hành êm ái.",
+    "specs": {
+      "battery": "37.23 kWh",
+      "range": "326.4 km/lần sạc",
+      "power": "134 HP",
+      "airConditioning": true,
+      "luggageCapacity": "Vừa (2 vali vừa)"
+    },
+    "features": [
+      "100% Xe điện xanh",
+      "Trợ lý ảo tiếng Việt",
+      "Điều hòa làm lạnh nhanh",
+      "Cảnh báo điểm mù",
+      "6 Túi khí an toàn"
+    ],
+    "image": "/src/assets/vf5.jpg",
+    "status": "available",
+    "badge": "Phổ biến nhất 🔥"
+  },
+  {
+    "id": "vf6",
+    "name": "VinFast VF 6",
+    "category": "Crossover B-SUV",
+    "seats": 5,
+    "segment": "Hạng B",
+    "description": "Crossover điện phong cách thể thao, nội thất tinh tế, mang đến hành trình êm ái vượt trội.",
+    "specs": {
+      "battery": "59.6 kWh",
+      "range": "399 km/lần sạc",
+      "power": "201 HP",
+      "airConditioning": true,
+      "luggageCapacity": "Rộng rãi (3-4 vali)"
+    },
+    "features": [
+      "Nội thất bọc da cao cấp",
+      "Màn hình cảm ứng 12.9 inch",
+      "Hệ thống ADAS hỗ trợ lái",
+      "Sạc không dây",
+      "Hệ thống âm thanh 8 loa"
+    ],
+    "image": "/src/assets/vf6.jpg",
+    "status": "available",
+    "badge": "Hiện đại & Rộng rãi"
+  },
+  {
+    "id": "vf7",
+    "name": "VinFast VF 7",
+    "category": "C-SUV Thể thao",
+    "seats": 5,
+    "segment": "Hạng C",
+    "description": "SUV điện thiết kế phi thuyền cá tính, tăng tốc ấn tượng, trải nghiệm di chuyển sang trọng.",
+    "specs": {
+      "battery": "75.3 kWh",
+      "range": "431 km/lần sạc",
+      "power": "349 HP",
+      "airConditioning": true,
+      "luggageCapacity": "Rộng rãi (4-5 vali)"
+    },
+    "features": [
+      "Động cơ 2 cầu AWD mạnh mẽ",
+      "Cửa sổ trời toàn cảnh",
+      "Màn hình hiển thị kính lái HUD",
+      "Ghế chỉnh điện 8 hướng",
+      "Thông gió làm mát ghế"
+    ],
+    "image": "/src/assets/vf7.jpg",
+    "status": "available",
+    "badge": "Thể thao đẳng cấp"
+  },
+  {
+    "id": "vf8",
+    "name": "VinFast VF 8",
+    "category": "D-SUV Hạng sang",
+    "seats": 5,
+    "segment": "Hạng D",
+    "description": "SUV điện cỡ trung đẳng cấp quốc tế, phục vụ khách thương gia, VIP với tiện nghi chuẩn 5 sao.",
+    "specs": {
+      "battery": "87.7 kWh",
+      "range": "471 km/lần sạc",
+      "power": "402 HP",
+      "airConditioning": true,
+      "luggageCapacity": "Rất lớn (5-6 vali)"
+    },
+    "features": [
+      "Hạng Thương Gia / VIP",
+      "Tự động lái thông minh ADAS level 2",
+      "Ghế sưởi & massage cao cấp",
+      "Hệ thống 10 loa Premium",
+      "Cách âm chống ồn vượt trội"
+    ],
+    "image": "/src/assets/vf8.jpg",
+    "status": "available",
+    "badge": "Hạng thương gia 👑"
+  },
+  {
+    "id": "vf9",
+    "name": "VinFast VF 9",
+    "category": "E-SUV Full Size 7 Chỗ",
+    "seats": 7,
+    "segment": "Hạng E",
+    "description": "SUV điện 7 chỗ cỡ lớn tối tân, không gian khoang khách siêu rộng, đỉnh cao của sự sang trọng.",
+    "specs": {
+      "battery": "123 kWh",
+      "range": "626 km/lần sạc",
+      "power": "402 HP",
+      "airConditioning": true,
+      "luggageCapacity": "Cực lớn (7-8 vali)"
+    },
+    "features": [
+      "7 Chỗ ngồi rộng rãi gia đình / đoàn đông",
+      "Ghế cơ trưởng Captain Seat",
+      "Trần kính toàn cảnh Panorama",
+      "Màn hình giải trí hàng ghế sau",
+      "An toàn 5 sao ASEAN NCAP / EURO NCAP"
+    ],
+    "image": "/src/assets/vf9.png",
+    "status": "available",
+    "badge": "Luxury 7 chỗ 💎"
+  }
+]
+

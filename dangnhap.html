@@ -4,150 +4,69 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đăng nhập - TaxiVinFast</title>
+    <title>Đăng Nhập Quản Trị Viên - TaxiVinFast Admin</title>
     <link rel="stylesheet" href="/src/style.css" />
-    <style>
-      .auth-section {
-        min-height: calc(100vh - 160px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-        background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(44, 62, 80, 0.05) 100%);
-      }
-      .auth-card {
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 40px;
-        width: 100%;
-        max-width: 480px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      }
-      .auth-header {
-        text-align: center;
-        margin-bottom: 28px;
-      }
-      .auth-icon {
-        font-size: 42px;
-        display: block;
-        margin-bottom: 8px;
-      }
-      .auth-header h2 {
-        color: var(--primary);
-        font-size: 26px;
-        margin-bottom: 6px;
-      }
-      .auth-header p {
-        color: var(--text);
-        font-size: 14px;
-      }
-      .btn-auth-submit {
-        width: 100%;
-        padding: 14px;
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-top: 12px;
-      }
-      .btn-auth-submit:hover {
-        background: var(--primary-dark);
-        box-shadow: var(--shadow);
-      }
-      .btn-auth-submit:disabled {
-        cursor: wait;
-        opacity: 0.7;
-      }
-      .auth-footer-link {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 14px;
-        color: var(--text);
-      }
-      .auth-footer-link a {
-        color: var(--primary);
-        font-weight: 600;
-        text-decoration: none;
-      }
-      .auth-footer-link a:hover {
-        text-decoration: underline;
-      }
-    </style>
   </head>
-  <body>
-    <header class="header">
-      <div class="header-container">
-        <div class="logo">
-          <a href="index.html"><h1>TaxiVinFast</h1></a>
+  <body class="admin-login-body">
+    <div class="admin-login-wrapper">
+      <div class="admin-login-card">
+        
+        <!-- Header Brand -->
+        <div class="login-brand">
+          <div class="brand-icon">⚡</div>
+          <h2>TaxiVinFast Admin</h2>
+          <p>Hệ Thống Quản Trị Đội Xe Taxi Điện VinFast</p>
         </div>
-        <nav class="nav-menu">
-          <ul class="nav-list">
-            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
-            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
-            <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
-            <li><a href="danhsachchuyen.html" class="nav-link">Lịch sử chuyến</a></li>
-          </ul>
-        </nav>
-        <div class="header-actions">
-          <a href="dangnhap.html" class="btn-login active" style="text-decoration: none;">Đăng nhập</a>
-          <a href="dki.html" class="btn-register" style="text-decoration: none;">Đăng ký</a>
-        </div>
-      </div>
-    </header>
 
-    <main class="main-content">
-      <section class="auth-section">
-        <div class="auth-card">
-          <div class="auth-header">
-            <span class="auth-icon">🔐</span>
-            <h2>Đăng Nhập</h2>
-            <p>Đăng nhập tài khoản TaxiVinFast của bạn</p>
+        <!-- Login Form -->
+        <form id="admin-login-form" class="login-form">
+          <div id="login-error-msg" class="login-error-alert" style="display: none;"></div>
+
+          <div class="form-group">
+            <label for="admin-username" class="form-label">Tên đăng nhập / Email Admin</label>
+            <div class="input-with-icon">
+              <span class="input-icon">👤</span>
+              <input type="text" id="admin-username" class="form-input" placeholder="Nhập admin hoặc email..." value="admin" required />
+            </div>
           </div>
 
-          <form id="loginForm" novalidate>
-            <div class="form-group">
-              <label for="login-email" class="form-label">Email <span class="required-star">*</span></label>
-              <input id="login-email" class="form-input" type="email" autocomplete="email" required aria-describedby="login-email-error" />
-              <span class="form-error" id="login-email-error" aria-live="polite"></span>
+          <div class="form-group">
+            <label for="admin-password" class="form-label">Mật khẩu</label>
+            <div class="input-with-icon">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="admin-password" class="form-input" placeholder="Nhập mật khẩu..." value="123456" required />
+              <button type="button" id="btn-toggle-pwd" class="btn-pwd-toggle" title="Hiện/Ẩn mật khẩu">👁️</button>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label for="login-password" class="form-label">Mật khẩu <span class="required-star">*</span></label>
-              <input id="login-password" class="form-input" type="password" autocomplete="current-password" required aria-describedby="login-password-error" />
-              <span class="form-error" id="login-password-error" aria-live="polite"></span>
-            </div>
+          <div class="login-options">
+            <label class="remember-me">
+              <input type="checkbox" id="remember-admin" checked />
+              <span>Ghi nhớ đăng nhập</span>
+            </label>
+            <a href="#" class="forgot-link" onclick="alert('Vui lòng liên hệ Quản trị viên hệ thống để khôi phục mật khẩu!'); return false;">Quên mật khẩu?</a>
+          </div>
 
-            <div class="form-group" style="margin-bottom: 8px;">
-              <span class="form-error" id="login-global-error" role="alert" style="text-align: center; font-size: 14px;"></span>
-            </div>
+          <button type="submit" id="btn-admin-submit" class="btn-login-submit">
+            🔐 Đăng Nhập Quản Trị
+          </button>
+        </form>
 
-            <button type="submit" class="btn-auth-submit">Đăng Nhập</button>
-          </form>
-
-          <div class="auth-footer-link">
-            Chưa có tài khoản? <a href="dki.html">Đăng ký ngay</a>
+        <div class="demo-credentials-box">
+          <span class="demo-title">💡 Tài khoản Admin thử nghiệm:</span>
+          <div class="credentials-info">
+            <span>Tài khoản: <strong>admin</strong></span>
+            <span>Mật khẩu: <strong>123456</strong></span>
           </div>
         </div>
-      </section>
-    </main>
 
-    <footer class="footer">
-      <div class="footer-container">
-        <div class="footer-section">
-          <h3>TaxiVinFast</h3>
-          <p>Dịch vụ taxi điện uy tín, chất lượng hàng đầu Việt Nam</p>
+        <div class="login-footer-link">
+          <a href="index.html">← Quay lại trang chủ TaxiVinFast</a>
         </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2024 TaxiVinFast. All rights reserved.</p>
-      </div>
-    </footer>
 
-    <script type="module" src="/src/auth.js"></script>
+      </div>
+    </div>
+
+    <script type="module" src="/src/admin-login.js"></script>
   </body>
 </html>
