@@ -1,7 +1,28 @@
+/**
+ * TRANG DANH SÁCH XE ĐIỆN VINFAST
+ * ------------------------------------------------------------
+ * Dữ liệu xe được nạp từ file cars.json và gộp với pricing.json
+ * (xem src/data/catalog.js) rồi hiển thị động bằng JavaScript.
+ */
 import './style.css';
-import carsLocalData from './data/cars.json';
+import { CARS } from './data/catalog.js';
+import { escapeHtml } from './data/store.js';
 
-// Hàm đọc dữ liệu JSON bằng JavaScript (async/await + fetch API)
+const state = { filter: 'all' };
+
+/** Lọc danh sách xe theo số chỗ hoặc phân khúc */
+function filterCars(cars, filterValue) {
+  if (filterValue === 'all') return cars;
+  const seats = parseInt(filterValue, 10);
+  if (Number.isFinite(seats)) return cars.filter((car) => car.seats === seats);
+  const keyword = String(filterValue).toLowerCase();
+  return cars.filter(
+    (car) =>
+      car.category.toLowerCase().includes(keyword) ||
+      car.segment.toLowerCase().includes(keyword) ||
+      car.name.toLowerCase().includes(keyword),
+  );
+}
 // Hàm đọc dữ liệu JSON bằng JavaScript an toàn (Tránh lỗi HTTP 500 / 404)
 async function fetchCarsData() {
   try {
@@ -17,13 +38,13 @@ async function fetchCarsData() {
   }
 }
 
-// Hàm hiển thị danh sách xe lên giao diện HTML
+/** Vẽ danh sách xe lên giao diện */
 function renderCarsUI(cars, containerId = 'cars-grid-container') {
   const container = document.getElementById(containerId);
   if (!container) return;
 
   if (!cars || cars.length === 0) {
-    container.innerHTML = '<p class="no-data">Không có dữ liệu xe để hiển thị.</p>';
+    container.innerHTML = '<p class="no-data">Không có dữ liệu xe phù hợp với bộ lọc hiện tại.</p>';
     return;
   }
 
@@ -46,6 +67,13 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
           <span class="spec">🛣️ Quãng đường: ${car.specs ? car.specs.range : '300+ km'}</span>
           <span class="spec">⚡ Công suất: ${car.specs ? car.specs.power : '100+ HP'}</span>
         </div>
+        <div class="car-info">
+          <div class="car-badge-header">
+            <h3 class="car-name">${escapeHtml(car.name)}</h3>
+            ${car.badge ? `<span class="badge-tag">${escapeHtml(car.badge)}</span>` : ''}
+          </div>
+          <p class="car-type">${escapeHtml(car.category)} (${escapeHtml(car.seats)} chỗ) - ${escapeHtml(car.segment)}</p>
+          <p class="car-desc">${escapeHtml(car.description)}</p>
 
         <div class="car-features-list">
           ${(car.features || []).map(feat => `<span class="feat-item">✓ ${feat}</span>`).join('')}
@@ -56,40 +84,35 @@ function renderCarsUI(cars, containerId = 'cars-grid-container') {
           <span class="price-value">${car.seats} Chỗ Rộng Rãi</span>
         </div>
 
-        <div class="car-actions">
-          <a href="car-detail.html?id=${car.id}" class="btn-view">Xem chi tiết</a>
-          <a href="booking.html?model=${encodeURIComponent(car.name)}" class="btn-book">Đặt xe ngay</a>
-        </div>
-      </div>
-    </div>
-  `).join('');
+          <div class="car-price">
+            <span class="price-label">Giá mở cửa:</span>
+            <span class="price-value">${new Intl.NumberFormat('vi-VN').format(car.price?.baseFare ?? 0)}đ</span>
+            <span class="price-label">Giá theo km:</span>
+            <span class="price-value">${new Intl.NumberFormat('vi-VN').format(car.price?.perKm ?? 0)}đ/km</span>
+          </div>
 
+          <div class="car-actions">
+            <a href="car-detail.html?id=${encodeURIComponent(car.id)}" class="btn-view">Xem chi tiết</a>
+            <a href="booking.html?model=${encodeURIComponent(car.name)}" class="btn-book">Đặt xe ngay</a>
+          </div>
+        </div>
+      </div>`,
+    )
+    .join('');
   container.innerHTML = htmlContent;
 }
 
-// Chạy hàm sau khi DOM đã tải xong
-document.addEventListener('DOMContentLoaded', async () => {
-  const carsData = await fetchCarsData();
-  renderCarsUI(carsData);
-
-  // Bộ lọc danh sách xe
+document.addEventListener('DOMContentLoaded', () => {
   const filterBtns = document.querySelectorAll('.car-filter-btn');
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
 
-      const filterVal = btn.getAttribute('data-filter');
-      if (filterVal === 'all') {
-        renderCarsUI(carsData);
-      } else {
-        const filtered = carsData.filter(car => 
-          car.seats === parseInt(filterVal, 10) || 
-          (car.category && car.category.toLowerCase().includes(filterVal.toLowerCase()))
-        );
-        renderCarsUI(filtered);
-      }
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach((item) => item.classList.remove('active'));
+      btn.classList.add('active');
+      state.filter = btn.dataset.filter || 'all';
+      renderCarsUI(filterCars(CARS, state.filter));
     });
   });
-});
 
+  renderCarsUI(filterCars(CARS, state.filter));
+});

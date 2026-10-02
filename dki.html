@@ -108,36 +108,36 @@
           <form id="registerForm" novalidate>
             <div class="form-group">
               <label for="register-fullname" class="form-label">Họ và tên <span class="required-star">*</span></label>
-              <input type="text" id="register-fullname" class="form-input" placeholder="Ví dụ: Nguyễn Văn A" />
-              <span class="error-text" id="reg-fullname-error"></span>
+              <input type="text" id="register-fullname" class="form-input" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="name" required aria-describedby="reg-fullname-error" />
+              <span class="form-error" id="reg-fullname-error" aria-live="polite"></span>
             </div>
 
             <div class="form-group">
               <label for="register-phone" class="form-label">Số điện thoại <span class="required-star">*</span></label>
-              <input type="tel" id="register-phone" class="form-input" placeholder="Ví dụ: 0912345678" />
-              <span class="error-text" id="reg-phone-error"></span>
+              <input type="tel" id="register-phone" class="form-input" placeholder="Ví dụ: 0912345678" autocomplete="tel" required aria-describedby="reg-phone-error" />
+              <span class="form-error" id="reg-phone-error" aria-live="polite"></span>
             </div>
 
             <div class="form-group">
               <label for="register-email" class="form-label">Email <span class="required-star">*</span></label>
-              <input type="email" id="register-email" class="form-input" placeholder="Ví dụ: nguyenvana@gmail.com" />
-              <span class="error-text" id="reg-email-error"></span>
+              <input type="email" id="register-email" class="form-input" placeholder="Ví dụ: nguyenvana@gmail.com" autocomplete="email" required aria-describedby="reg-email-error" />
+              <span class="form-error" id="reg-email-error" aria-live="polite"></span>
             </div>
 
             <div class="form-group">
               <label for="register-password" class="form-label">Mật khẩu <span class="required-star">*</span></label>
-              <input type="password" id="register-password" class="form-input" placeholder="Tối thiểu 6 ký tự" />
-              <span class="error-text" id="reg-password-error"></span>
+              <input type="password" id="register-password" class="form-input" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" required aria-describedby="reg-password-error" />
+              <span class="form-error" id="reg-password-error" aria-live="polite"></span>
             </div>
 
             <div class="form-group">
               <label for="register-confirm-password" class="form-label">Nhập lại mật khẩu <span class="required-star">*</span></label>
-              <input type="password" id="register-confirm-password" class="form-input" placeholder="Nhập lại mật khẩu của bạn" />
-              <span class="error-text" id="reg-confirm-error"></span>
+              <input type="password" id="register-confirm-password" class="form-input" placeholder="Nhập lại mật khẩu của bạn" autocomplete="new-password" required aria-describedby="reg-confirm-error" />
+              <span class="form-error" id="reg-confirm-error" aria-live="polite"></span>
             </div>
 
             <div class="form-group" style="margin-bottom: 8px;">
-              <span class="error-text" id="reg-global-error" style="text-align: center; font-size: 14px;"></span>
+              <span class="form-error" id="reg-global-error" role="alert" style="text-align: center; font-size: 14px;"></span>
             </div>
 
             <button type="submit" class="btn-auth-submit">Đăng Ký Tài Khoản</button>

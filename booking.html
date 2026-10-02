@@ -19,13 +19,15 @@
             <li><a href="index.html" class="nav-link">Trang chủ</a></li>
             <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
             <li><a href="booking.html" class="nav-link active">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html" class="nav-link">Lịch sử chuyến</a></li>
             <li><a href="index.html#pricing" class="nav-link">Bảng giá</a></li>
-            <li><a href="#" class="nav-link">Liên hệ</a></li>
           </ul>
         </nav>
         <div class="header-actions">
-          <button class="btn-login">Đăng nhập</button>
-          <button class="btn-register">Đăng ký</button>
+          <a href="dangnhap.html" class="btn-login">Đăng nhập</a>
+          <a href="dki.html" class="btn-register">Đăng ký</a>
+          <a href="danhsachchuyen.html" class="btn-login">Lịch sử chuyến</a>
+          <a href="admin.html" class="btn-register">Quản trị</a>
         </div>
       </div>
     </header>
@@ -74,7 +76,7 @@
             <div class="booking-card">
               <h3 class="card-section-title"><span class="icon">🗺️</span> Lộ Trình & Thời Gian</h3>
               
-              <!-- Pickup & Destination -->
+                <!-- Pickup & Destination -->
               <div class="route-inputs-group">
                 <div class="form-group">
                   <label for="pickup-location" class="form-label">Điểm đón khách <span class="required">*</span></label>
@@ -83,6 +85,7 @@
                     <input type="text" id="pickup-location" class="form-input" placeholder="Nhập địa chỉ đón (ví dụ: 123 Nguyễn Huệ, Q.1)" value="Sân bay Tân Sơn Nhất, TPHCM" required />
                     <button type="button" class="btn-location-geo" title="Lấy vị trí hiện tại của tôi">📍</button>
                   </div>
+                  <p class="form-error" id="error-pickup"></p>
                 </div>
 
                 <div class="swap-locations-wrapper">
@@ -95,6 +98,7 @@
                     <span class="input-icon dest-marker">🔴</span>
                     <input type="text" id="destination-location" class="form-input" placeholder="Nhập địa chỉ đến (ví dụ: Landmark 81, Bình Thạnh)" value="Landmark 81, 720A Điện Biên Phủ, Bình Thạnh" required />
                   </div>
+                  <p class="form-error" id="error-destination"></p>
                 </div>
               </div>
 
@@ -112,12 +116,14 @@
               <!-- Schedule Date & Time -->
               <div class="form-row-2">
                 <div class="form-group">
-                  <label for="booking-date" class="form-label">Ngày đón</label>
+                  <label for="booking-date" class="form-label">Ngày đón <span class="required">*</span></label>
                   <input type="date" id="booking-date" class="form-input" />
+                  <p class="form-error" id="error-date"></p>
                 </div>
                 <div class="form-group">
-                  <label for="booking-time" class="form-label">Giờ đón</label>
+                  <label for="booking-time" class="form-label">Giờ đón <span class="required">*</span></label>
                   <input type="time" id="booking-time" class="form-input" />
+                  <p class="form-error" id="error-time"></p>
                 </div>
               </div>
             </div>
@@ -261,16 +267,19 @@
                 <div class="form-group">
                   <label for="customer-name" class="form-label">Họ và tên <span class="required">*</span></label>
                   <input type="text" id="customer-name" class="form-input" placeholder="Ví dụ: Nguyễn Văn A" required />
+                  <p class="form-error" id="error-name"></p>
                 </div>
                 <div class="form-group">
                   <label for="customer-phone" class="form-label">Số điện thoại <span class="required">*</span></label>
-                  <input type="tel" id="customer-phone" class="form-input" placeholder="Ví dụ: 0912 345 678" required />
+                  <input type="tel" id="customer-phone" class="form-input" placeholder="Ví dụ: 0912 345 678" maxlength="15" required />
+                  <p class="form-error" id="error-phone"></p>
                 </div>
               </div>
 
               <div class="form-group">
                 <label for="customer-note" class="form-label">Ghi chú cho tài xế (không bắt buộc)</label>
-                <textarea id="customer-note" class="form-textarea" rows="2" placeholder="Ví dụ: Chở nhiều hành lý, đón tại sảnh A, xin gọi trước khi đến..."></textarea>
+                <textarea id="customer-note" class="form-textarea" rows="2" maxlength="300" placeholder="Ví dụ: Chở nhiều hành lý, đón tại sảnh A, xin gọi trước khi đến..."></textarea>
+                <p class="form-error" id="error-note"></p>
               </div>
 
               <!-- Payment Option -->
@@ -376,28 +385,29 @@
                 <div class="price-breakdown">
                   <div class="price-row">
                     <span>Giá mở cửa:</span>
-                    <span id="price-base">12.000 đ</span>
+                    <span id="price-base">0 đ</span>
                   </div>
                   <div class="price-row">
-                    <span>Cước quãng đường (12.5 km):</span>
-                    <span id="price-distance">125.000 đ</span>
+                    <span id="price-row-distance">Cước quãng đường (0 km):</span>
+                    <span id="price-distance">0 đ</span>
                   </div>
                   <div class="price-row text-success" id="row-discount" style="display: none;">
                     <span>Giảm giá khuyến mãi:</span>
                     <span id="price-discount">-0 đ</span>
                   </div>
-                  <div class="price-row">
+                  <div class="price-row" id="price-row-surcharge" style="display: none;">
                     <span>Phụ phí sân bay / Đêm:</span>
-                    <span class="text-free">Miễn phí ⚡</span>
+                    <span id="price-surcharge">+0 đ</span>
                   </div>
 
                   <div class="price-total-row">
                     <span>Tổng tiền ước tính:</span>
-                    <strong id="price-total" class="total-amount">137.000 đ</strong>
+                    <strong id="price-total" class="total-amount">0 đ</strong>
                   </div>
                 </div>
 
                 <!-- Submit Button -->
+                <p class="form-error-summary" id="form-error-summary" style="display: none;"></p>
                 <button type="button" id="btn-confirm-booking" class="btn-submit-booking">
                   🚀 Xác Nhận Đặt Xe Ngay
                 </button>
@@ -454,8 +464,8 @@
         
         <div class="booking-receipt">
           <div class="receipt-header">
-            <span>Mã chuyến xe: <strong id="receipt-id">#VF8924</strong></span>
-            <span class="receipt-status">Đang điều xe...</span>
+            <span>Mã chuyến xe: <strong id="receipt-id">#VF0000</strong></span>
+            <span class="receipt-status" id="receipt-status">Chờ xác nhận</span>
           </div>
           <div class="receipt-body">
             <div class="receipt-item">
@@ -490,6 +500,7 @@
         </div>
 
         <div class="modal-actions">
+          <button type="button" class="btn-modal-home" id="btn-modal-history">📋 Xem danh sách đơn</button>
           <button type="button" class="btn-modal-home" onclick="window.location.href='index.html'">Trang chủ</button>
           <button type="button" class="btn-modal-close-main" id="btn-modal-done">Hoàn tất</button>
         </div>
@@ -509,6 +520,8 @@
             <li><a href="index.html">Trang chủ</a></li>
             <li><a href="cars.html">Danh sách xe</a></li>
             <li><a href="booking.html">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html">Lịch sử chuyến xe</a></li>
+            <li><a href="admin.html">Trang quản trị</a></li>
           </ul>
         </div>
         <div class="footer-section">
@@ -525,4 +538,3 @@
     <script type="module" src="/src/booking.js"></script>
   </body>
 </html>
-
