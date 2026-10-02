@@ -4573,62 +4573,33 @@ button {
 
 /* Trang chủ */
 body.home-page {
-  --text: #65727d;
-  --text-h: #172a35;
+  --text: #6b6375;
+  --text-h: #08060d;
   --bg: #fff;
-  --border: #e8e9e6;
-  --primary: #e85d2a;
-  --primary-dark: #ca461c;
-  --secondary: #172a35;
-  --social-bg: #f4f5f2;
+  --border: #e5e4e7;
+  --primary: #ff6b35;
+  --primary-dark: #e55a2b;
+  --secondary: #2c3e50;
+  --social-bg: rgba(244, 243, 236, 0.5);
   color-scheme: light;
   color: var(--text);
   background: #fff;
-  font-size: 16px;
-  letter-spacing: 0;
 }
 
 body.home-page .header {
-  background: rgba(255, 255, 255, 0.96);
-  border-bottom-color: #eeefec;
-  backdrop-filter: blur(14px);
+  background: var(--bg);
+  border-bottom-color: var(--border);
 }
 
 body.home-page .header-container {
-  max-width: 1280px;
-  min-height: 76px;
-  padding: 12px 28px;
-  gap: 24px;
-}
-
-body.home-page .logo a {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-body.home-page .logo-mark {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border-radius: 12px;
-  background: var(--primary);
-  color: #fff;
-  font-size: 17px;
-  font-weight: 800;
-  box-shadow: 0 6px 14px rgba(232, 93, 42, 0.2);
+  max-width: 1200px;
+  padding: 16px 24px;
+  gap: 32px;
 }
 
 body.home-page .logo h1 {
-  color: #172a35;
-  font-size: 20px;
-  font-weight: 750;
-  letter-spacing: -0.06em;
-}
-
-body.home-page .logo h1 span {
   color: var(--primary);
+  font-size: 24px;
 }
 
 body.home-page .nav-menu {
@@ -4636,16 +4607,15 @@ body.home-page .nav-menu {
 }
 
 body.home-page .nav-list {
-  gap: clamp(14px, 2vw, 28px);
+  gap: 32px;
   align-items: center;
 }
 
 body.home-page .nav-link {
   display: inline-block;
   padding: 10px 0;
-  color: #52616b;
-  font-size: 13px;
-  font-weight: 600;
+  color: var(--text);
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -4657,31 +4627,24 @@ body.home-page .nav-link.active {
 body.home-page .header-actions {
   flex-shrink: 0;
   align-items: center;
-  gap: 9px;
+  gap: 12px;
 }
 
 body.home-page .btn-login,
 body.home-page .btn-register {
-  padding: 10px 15px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
   white-space: nowrap;
 }
 
 body.home-page .btn-login {
-  border: 1px solid transparent;
-  color: #344650;
-}
-
-body.home-page .btn-login:hover {
-  border-color: #e9ece8;
-  background: #f7f8f5;
-  color: #172a35;
+  border: 2px solid var(--primary);
+  color: var(--primary);
 }
 
 body.home-page .btn-register {
-  border: 1px solid var(--primary);
+  border: 2px solid var(--primary);
   background: var(--primary);
 }
 
@@ -4706,9 +4669,9 @@ body.home-page .hero-section::after {
   bottom: -280px;
   width: 560px;
   height: 560px;
-  border: 1px solid rgba(232, 93, 42, 0.1);
+  border: 1px solid rgba(255, 107, 53, 0.1);
   border-radius: 50%;
-  box-shadow: 0 0 0 55px rgba(232, 93, 42, 0.025), 0 0 0 110px rgba(232, 93, 42, 0.02);
+  box-shadow: 0 0 0 55px rgba(255, 107, 53, 0.025), 0 0 0 110px rgba(255, 107, 53, 0.02);
   content: "";
   pointer-events: none;
 }
@@ -4736,7 +4699,7 @@ body.home-page .section-kicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #b94b23;
+  color: var(--primary);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -4744,7 +4707,7 @@ body.home-page .section-kicker {
 
 body.home-page .hero-eyebrow {
   padding: 9px 12px;
-  border: 1px solid rgba(232, 93, 42, 0.15);
+  border: 1px solid rgba(255, 107, 53, 0.15);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.68);
   font-size: 11px;
@@ -4761,7 +4724,7 @@ body.home-page .status-dot {
 
 body.home-page .hero-title {
   margin: 21px 0 15px;
-  color: #172a35;
+  color: var(--text-h);
   font-size: clamp(44px, 5.2vw, 68px);
   font-weight: 760;
   letter-spacing: -0.065em;
@@ -4797,13 +4760,13 @@ body.home-page .btn-booking {
   color: #fff;
   font-size: 13px;
   font-weight: 750;
-  box-shadow: 0 9px 20px rgba(232, 93, 42, 0.2);
+  box-shadow: 0 9px 20px rgba(255, 107, 53, 0.2);
 }
 
 body.home-page .btn-booking:hover {
   transform: translateY(-2px);
   background: var(--primary-dark);
-  box-shadow: 0 12px 22px rgba(232, 93, 42, 0.25);
+  box-shadow: 0 12px 22px rgba(255, 107, 53, 0.25);
 }
 
 body.home-page .hero-secondary-link {
@@ -4844,10 +4807,10 @@ body.home-page .hero-image-glow {
   position: absolute;
   width: min(90%, 490px);
   aspect-ratio: 1;
-  border: 1px solid rgba(232, 93, 42, 0.13);
+  border: 1px solid rgba(255, 107, 53, 0.13);
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.35) 57%, transparent 70%);
-  box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.25), 0 0 0 70px rgba(232, 93, 42, 0.025);
+  box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.25), 0 0 0 70px rgba(255, 107, 53, 0.025);
 }
 
 body.home-page .hero-car-image {
@@ -4979,7 +4942,7 @@ body.home-page .section-kicker {
 body.home-page .home-section-heading .section-title,
 body.home-page .about-intro .section-title {
   margin: 11px 0 10px;
-  color: #1b303b;
+  color: var(--text-h);
   font-size: clamp(30px, 3.5vw, 42px);
   font-weight: 740;
   letter-spacing: -0.055em;
@@ -5018,7 +4981,7 @@ body.home-page .service-card:hover {
 
 body.home-page .service-card-featured {
   border-color: #f0c8b5;
-  box-shadow: 0 12px 28px rgba(232, 93, 42, 0.08);
+  box-shadow: 0 12px 28px rgba(255, 107, 53, 0.08);
 }
 
 body.home-page .service-image {
@@ -5069,7 +5032,7 @@ body.home-page .service-card-content {
 }
 
 body.home-page .service-overline {
-  color: #bd5b34;
+  color: var(--primary);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -5113,14 +5076,14 @@ body.home-page .btn-service {
   gap: 8px;
   padding: 0;
   background: transparent;
-  color: #b94b23;
+  color: var(--primary);
   font-size: 11px;
   font-weight: 750;
 }
 
 body.home-page .btn-service:hover {
   background: transparent;
-  color: #883315;
+  color: var(--primary-dark);
 }
 
 body.home-page .about-section {
@@ -5181,7 +5144,7 @@ body.home-page .step-number {
 
 body.home-page .about-step h3 {
   margin: 0 0 5px;
-  color: #263b45;
+  color: var(--secondary);
   font-size: 12px;
 }
 
@@ -5198,14 +5161,14 @@ body.home-page .about-cta {
   justify-self: start;
   padding: 12px 16px;
   border-radius: 9px;
-  background: #1c303a;
+  background: var(--secondary);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
 }
 
 body.home-page .about-cta:hover {
-  background: #2d4551;
+  background: #1f2c38;
 }
 
 body.home-page .simulator-section {
@@ -5255,7 +5218,7 @@ body.home-page .sim-group .form-input {
 
 body.home-page .form-select:focus,
 body.home-page .sim-group .form-input:focus {
-  outline: 3px solid rgba(232, 93, 42, 0.12);
+  outline: 3px solid rgba(255, 107, 53, 0.12);
   border-color: var(--primary);
 }
 
@@ -5266,7 +5229,7 @@ body.home-page .sim-result-col {
 }
 
 body.home-page .result-title {
-  color: #263b45;
+  color: var(--secondary);
   font-size: 14px;
 }
 
@@ -5319,7 +5282,7 @@ body.home-page .pricing-table {
 }
 
 body.home-page .pricing-table th {
-  background: #203640;
+  background: var(--secondary);
   font-size: 11px;
 }
 
@@ -5333,16 +5296,16 @@ body.home-page .pricing-table tr:hover {
 }
 
 body.home-page .price-cell {
-  color: #bd512a;
+  color: var(--primary-dark);
   font-size: 12px;
 }
 
 body.home-page .footer {
-  background: #172a35;
+  background: var(--secondary);
 }
 
 body.home-page :is(a, button, input, select):focus-visible {
-  outline: 3px solid rgba(232, 93, 42, 0.55);
+  outline: 3px solid rgba(255, 107, 53, 0.55);
   outline-offset: 3px;
 }
 
@@ -5392,6 +5355,7 @@ body.home-page :is(a, button, input, select):focus-visible {
   body.home-page .nav-menu {
     order: 3;
     width: 100%;
+    flex: 0 0 100%;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -5404,7 +5368,7 @@ body.home-page :is(a, button, input, select):focus-visible {
     width: max-content;
     flex-direction: row;
     justify-content: flex-start;
-    gap: 23px;
+    gap: 16px;
     text-align: left;
   }
 
