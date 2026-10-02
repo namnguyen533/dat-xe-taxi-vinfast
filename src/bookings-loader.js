@@ -32,11 +32,6 @@ async function fetchBookingsData() {
   }
 }
 
-// Format tiền tệ VND
-function formatVND(amount) {
-  return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
-}
-
 // Mapping badge trạng thái
 function getStatusBadge(status, text) {
   switch (status) {
