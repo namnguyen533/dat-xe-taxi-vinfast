@@ -1746,8 +1746,23 @@ button {
 #booking-map {
   height: 340px;
   width: 100%;
-  background: #e8edf0;
+  background:
+    linear-gradient(135deg, transparent 48%, rgba(119, 143, 154, 0.13) 49%, rgba(119, 143, 154, 0.13) 51%, transparent 52%),
+    linear-gradient(45deg, transparent 48%, rgba(119, 143, 154, 0.1) 49%, rgba(119, 143, 154, 0.1) 51%, transparent 52%),
+    #e8edf0;
+  background-size: 72px 72px, 96px 96px, auto;
   z-index: 1;
+}
+
+.map-status {
+  margin: 0;
+  padding: 5px 16px 0;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.map-status[data-state="error"] {
+  color: #8a5b13;
 }
 
 .route-status {
@@ -1764,6 +1779,50 @@ button {
 
 .route-status[data-state="error"] {
   color: #c0392b;
+}
+
+.route-status[data-state="map-error"] {
+  color: #8a5b13;
+  background: #fff7e5;
+}
+
+.booking-map-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 16px 14px;
+}
+
+.btn-map-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-map-action:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-map-action:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.btn-map-external {
+  background: var(--primary);
+  color: white;
 }
 
 .swap-locations-wrapper {
@@ -2602,6 +2661,10 @@ button {
 
   .booking-map-heading span {
     text-align: left;
+  }
+
+  .booking-map-actions {
+    flex-direction: column;
   }
 
   .vehicle-selection-grid {

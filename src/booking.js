@@ -42,7 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const metricDistance = document.getElementById('metric-distance');
   const metricDuration = document.getElementById('metric-duration');
   const mapElement = document.getElementById('booking-map');
+  const mapStatus = document.getElementById('map-status');
+  const mapViewLabel = document.getElementById('map-view-label');
   const routeStatus = document.getElementById('route-status');
+  const mapLocateButton = document.getElementById('btn-map-locate');
+  const mapCountryButton = document.getElementById('btn-map-country');
+  const googleMapsLink = document.getElementById('btn-open-google-maps');
 
   const priceBaseEl = document.getElementById('price-base');
   const priceDistEl = document.getElementById('price-distance');
@@ -111,9 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
   let routeRequestId = 0;
   let routeDebounce;
   let routeMap;
+  let baseTileLayer;
+  let tileProviderIndex = 0;
+  let tileErrorCount = 0;
+  let tileLoaded = false;
   let routeLine;
   let pickupMarker;
   let destinationMarker;
+  let currentLocationMarker;
+  let currentLocationAccuracy;
+  let isVietnamOverviewVisible = true;
   let pickupLocation;
   let destinationLocation;
   /** Mã giảm giá đã áp dụng thành công ('' = không dùng) */
@@ -142,6 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
     routeStatus.dataset.state = state;
   }
 
+  function setMapStatus(message, state = '') {
+    if (!mapStatus) return;
+    mapStatus.textContent = message;
+    mapStatus.dataset.state = state;
+  }
+
   function clearDisplayedRoute() {
     routeLine?.remove();
     pickupMarker?.remove();
@@ -151,16 +169,91 @@ document.addEventListener('DOMContentLoaded', () => {
     destinationMarker = null;
   }
 
+  const tileProviders = [
+    {
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      options: { maxZoom: 19, subdomains: 'abc', attribution: '&copy; OpenStreetMap contributors' },
+    },
+    {
+      url: 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+      options: { maxZoom: 20, subdomains: 'abc', attribution: '&copy; OpenStreetMap France contributors' },
+    },
+    {
+      url: 'https://tile.openstreetmap.de/{z}/{x}/{y}.png',
+      options: { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' },
+    },
+    {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      options: { maxZoom: 19, attribution: 'Tiles &copy; Esri' },
+    },
+  ];
+
+  const vietnamBounds = [[5, 101.5], [24.5, 115]];
+  const majorVietnamCities = [
+    { name: 'Hà Nội', coordinates: [21.0285, 105.8542] },
+    { name: 'Điện Biên Phủ', coordinates: [21.386, 103.023] },
+    { name: 'Hải Phòng', coordinates: [20.8449, 106.6881] },
+    { name: 'Huế', coordinates: [16.4637, 107.5909] },
+    { name: 'Đà Nẵng', coordinates: [16.0544, 108.2022] },
+    { name: 'Nha Trang', coordinates: [12.2388, 109.1967] },
+    { name: 'TP. Hồ Chí Minh', coordinates: [10.8231, 106.6297] },
+    { name: 'Cần Thơ', coordinates: [10.0452, 105.7469] },
+    { name: 'Quần đảo Hoàng Sa', coordinates: [16.5, 112] },
+    { name: 'Quần đảo Trường Sa', coordinates: [8.64, 111.92] },
+  ];
+
+  function showVietnamOverview() {
+    if (!routeMap) return;
+    isVietnamOverviewVisible = true;
+    routeMap.fitBounds(vietnamBounds, { padding: [14, 14] });
+    if (mapViewLabel) mapViewLabel.textContent = 'Toàn Việt Nam · đánh dấu các thành phố lớn';
+  }
+
+  function loadTileProvider(index) {
+    if (!routeMap || index >= tileProviders.length) {
+      setMapStatus('Không tải được ảnh nền bản đồ. Hãy bật Internet; vị trí GPS vẫn được hiển thị trên bản đồ.', 'error');
+      return;
+    }
+
+    tileProviderIndex = index;
+    tileErrorCount = 0;
+    tileLoaded = false;
+    const provider = tileProviders[index];
+    baseTileLayer = globalThis.L.tileLayer(provider.url, provider.options).addTo(routeMap);
+    baseTileLayer.on('tileerror', () => {
+      tileErrorCount += 1;
+      if (tileErrorCount >= 6 && !tileLoaded && tileProviderIndex === index) {
+        baseTileLayer.remove();
+        loadTileProvider(index + 1);
+      }
+    });
+    baseTileLayer.on('tileload', () => {
+      tileLoaded = true;
+      setMapStatus('');
+    });
+  }
+
   function initializeMap() {
     if (!mapElement || !globalThis.L) {
       setRouteStatus('Không tải được bản đồ. Vui lòng kiểm tra kết nối mạng và tải lại trang.', 'error');
       return;
     }
-    routeMap = globalThis.L.map(mapElement).setView([10.7769, 106.7009], 12);
-    globalThis.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(routeMap);
+    routeMap = globalThis.L.map(mapElement);
+    routeMap.setMaxBounds(globalThis.L.latLngBounds(vietnamBounds).pad(0.12));
+    routeMap.setMinZoom(4);
+    majorVietnamCities.forEach(({ name, coordinates }) => {
+      const marker = globalThis.L.circleMarker(coordinates, {
+        radius: 4,
+        color: '#fff',
+        weight: 1,
+        fillColor: '#fa7045',
+        fillOpacity: 1,
+      }).addTo(routeMap).bindPopup(name);
+    });
+    showVietnamOverview();
+    setMapStatus('Đang tải bản đồ đường phố...');
+    loadTileProvider(0);
+    setTimeout(() => routeMap?.invalidateSize(), 0);
   }
 
   initializeMap();
@@ -229,6 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     clearDisplayedRoute();
     const pickupVal = pickupInput ? pickupInput.value.trim() : '';
     const destVal = destInput ? destInput.value.trim() : '';
+    updateGoogleMapsLink(pickupLocation, destinationLocation);
     hasRoute = false;
     distanceKm = 0;
     durationMin = 0;
@@ -258,6 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (requestId !== routeRequestId) return;
       pickupLocation = pickup;
       destinationLocation = destination;
+      renderRouteMarkers(pickup, destination);
       const route = await getDrivingRoute(pickup, destination);
       if (requestId !== routeRequestId) return;
 
@@ -267,35 +362,68 @@ document.addEventListener('DOMContentLoaded', () => {
       if (metricDistance) metricDistance.textContent = `${distanceKm.toFixed(1)} km`;
       if (metricDuration) metricDuration.textContent = `~${durationMin} phút`;
       if (routeMap) {
-        if (routeLine) routeLine.remove();
-        if (pickupMarker) pickupMarker.remove();
-        if (destinationMarker) destinationMarker.remove();
-        pickupMarker = globalThis.L.marker([pickup.lat, pickup.lng]).addTo(routeMap).bindPopup('Điểm đón');
-        destinationMarker = globalThis.L.marker([destination.lat, destination.lng]).addTo(routeMap).bindPopup('Điểm đến');
         routeLine = globalThis.L.polyline(route.coordinates, { color: '#ff6b35', weight: 5 }).addTo(routeMap);
-        routeMap.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+        if (!isVietnamOverviewVisible) {
+          routeMap.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+          if (mapViewLabel) mapViewLabel.textContent = 'Đang xem chi tiết tuyến đường';
+        }
       }
       setRouteStatus(`Tuyến đường ô tô: ${distanceKm.toFixed(1)} km · khoảng ${durationMin} phút.`, 'success');
+      updateGoogleMapsLink(pickup, destination);
       calculatePrice();
     } catch (error) {
       if (requestId !== routeRequestId) return;
       hasRoute = false;
       distanceKm = 0;
       durationMin = 0;
-      pickupLocation = null;
-      destinationLocation = null;
-      clearDisplayedRoute();
       if (metricDistance) metricDistance.textContent = 'Chưa có tuyến';
       if (metricDuration) metricDuration.textContent = '---';
-      setRouteStatus(error.message || 'Không thể tính tuyến đường. Vui lòng thử lại.', 'error');
+      if (pickupLocation && destinationLocation) {
+        renderRouteMarkers(pickupLocation, destinationLocation);
+        updateGoogleMapsLink(pickupLocation, destinationLocation);
+      }
+      setRouteStatus(`${error.message || 'Không thể tính tuyến đường.'} Kiểm tra kết nối Internet hoặc mở Google Maps để xem chỉ đường.`, 'error');
       calculatePrice();
     }
+  }
+
+  function renderRouteMarkers(pickup, destination) {
+    if (!routeMap) return;
+    pickupMarker?.remove();
+    destinationMarker?.remove();
+    pickupMarker = globalThis.L.marker([pickup.lat, pickup.lng]).addTo(routeMap).bindPopup('Điểm đón');
+    destinationMarker = globalThis.L.marker([destination.lat, destination.lng]).addTo(routeMap).bindPopup('Điểm đến');
+    if (!isVietnamOverviewVisible) {
+      routeMap.fitBounds(globalThis.L.latLngBounds(
+        [pickup.lat, pickup.lng],
+        [destination.lat, destination.lng],
+      ), { padding: [30, 30], maxZoom: 15 });
+    }
+  }
+
+  function updateGoogleMapsLink(pickup, destination) {
+    if (!googleMapsLink) return;
+    const origin = pickup
+      ? `${pickup.lat},${pickup.lng}`
+      : pickupInput?.value.trim();
+    const target = destination
+      ? `${destination.lat},${destination.lng}`
+      : destInput?.value.trim();
+    if (!origin || !target) return;
+    const params = new URLSearchParams({
+      api: '1',
+      origin,
+      destination: target,
+      travelmode: 'driving',
+    });
+    googleMapsLink.href = `https://www.google.com/maps/dir/?${params}`;
   }
 
   [pickupInput, destInput].forEach((input) => {
     input?.addEventListener('input', () => {
       if (input === pickupInput) pickupLocation = null;
       else destinationLocation = null;
+      isVietnamOverviewVisible = false;
       routeRequestId += 1;
       hasRoute = false;
       distanceKm = 0;
@@ -328,32 +456,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Nút lấy vị trí hiện tại bằng Geolocation API
-  if (btnGeo) {
-    btnGeo.addEventListener('click', () => {
-      btnGeo.textContent = '⌛';
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            pickupInput.value = `${lat}, ${lng}`;
-            pickupLocation = { label: pickupInput.value, lat, lng };
-            btnGeo.textContent = '📍';
-            updateDistance();
-          },
-          (error) => {
-            console.warn('Geolocation Error:', error);
-            btnGeo.textContent = '📍';
-            setRouteStatus(`Không lấy được vị trí: ${error.message}`, 'error');
-          }
-        );
-      } else {
-        btnGeo.textContent = '📍';
-        setRouteStatus('Trình duyệt này không hỗ trợ định vị.', 'error');
-      }
-    });
+  function locateCurrentUser() {
+    if (!navigator.geolocation) {
+      setRouteStatus('Trình duyệt không hỗ trợ GPS. Mở trang bằng HTTPS hoặc localhost và bật quyền vị trí.', 'error');
+      return;
+    }
+
+    if (btnGeo) btnGeo.textContent = '⌛';
+    if (mapLocateButton) {
+      mapLocateButton.disabled = true;
+      mapLocateButton.textContent = 'Đang lấy vị trí...';
+    }
+    setRouteStatus('Đang yêu cầu quyền truy cập vị trí GPS...');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        isVietnamOverviewVisible = false;
+        const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+        const coordinateLabel = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        pickupInput.value = coordinateLabel;
+        pickupLocation = { label: coordinateLabel, lat, lng };
+
+        currentLocationMarker?.remove();
+        currentLocationAccuracy?.remove();
+        currentLocationAccuracy = globalThis.L.circle([lat, lng], {
+          radius: accuracy,
+          color: '#2878ff',
+          fillColor: '#2878ff',
+          fillOpacity: 0.12,
+          weight: 1,
+        }).addTo(routeMap);
+        currentLocationMarker = globalThis.L.circleMarker([lat, lng], {
+          radius: 9,
+          color: '#fff',
+          weight: 3,
+          fillColor: '#2878ff',
+          fillOpacity: 1,
+        }).addTo(routeMap).bindPopup(`Vị trí GPS của bạn (độ chính xác khoảng ${Math.round(accuracy)} m)`).openPopup();
+        routeMap.setView([lat, lng], 16);
+        if (mapViewLabel) mapViewLabel.textContent = 'Đang xem vị trí GPS của bạn';
+        if (btnGeo) btnGeo.textContent = '📍';
+        if (mapLocateButton) {
+          mapLocateButton.disabled = false;
+          mapLocateButton.textContent = '◎ Vị trí của tôi';
+        }
+        setRouteStatus(`Đã xác định vị trí GPS (sai số khoảng ${Math.round(accuracy)} m). Đang tính tuyến đường...`, 'success');
+        updateDistance();
+      },
+      (error) => {
+        if (btnGeo) btnGeo.textContent = '📍';
+        if (mapLocateButton) {
+          mapLocateButton.disabled = false;
+          mapLocateButton.textContent = '◎ Thử lấy vị trí lại';
+        }
+        const reason = error.code === error.PERMISSION_DENIED
+          ? 'Bạn chưa cho phép truy cập vị trí. Hãy bật quyền Location cho trang trong cài đặt trình duyệt.'
+          : error.code === error.POSITION_UNAVAILABLE
+            ? 'Thiết bị chưa xác định được GPS. Bật dịch vụ vị trí và thử lại.'
+            : 'Lấy vị trí quá thời gian chờ. Hãy thử lại ở nơi có tín hiệu GPS tốt hơn.';
+        setRouteStatus(reason, 'error');
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+    );
   }
+
+  btnGeo?.addEventListener('click', locateCurrentUser);
+  mapLocateButton?.addEventListener('click', locateCurrentUser);
+  mapCountryButton?.addEventListener('click', showVietnamOverview);
 
   // Nút chọn gợi ý địa điểm nhanh (Quick Tags)
   quickTags.forEach(tag => {

@@ -86,8 +86,8 @@
                   <label for="pickup-location" class="form-label">Điểm đón khách <span class="required">*</span></label>
                   <div class="input-with-icon">
                     <span class="input-icon pickup-marker">🟢</span>
-                    <input type="text" id="pickup-location" class="form-input" placeholder="Nhập địa chỉ đón (ví dụ: 123 Nguyễn Huệ, Q.1)" value="Sân bay Tân Sơn Nhất, TPHCM" required />
-                    <button type="button" class="btn-location-geo" title="Lấy vị trí hiện tại của tôi">📍</button>
+                    <input type="text" id="pickup-location" class="form-input" placeholder="Nhập địa chỉ đón tại Việt Nam" value="Sân bay Nội Bài, Hà Nội" required />
+                    <button type="button" class="btn-location-geo" title="Dùng vị trí GPS hiện tại của tôi" aria-label="Dùng vị trí GPS hiện tại">📍</button>
                   </div>
                   <p class="form-error" id="error-pickup"></p>
                 </div>
@@ -100,7 +100,7 @@
                   <label for="destination-location" class="form-label">Điểm đến <span class="required">*</span></label>
                   <div class="input-with-icon">
                     <span class="input-icon dest-marker">🔴</span>
-                    <input type="text" id="destination-location" class="form-input" placeholder="Nhập địa chỉ đến (ví dụ: Landmark 81, Bình Thạnh)" value="Landmark 81, 720A Điện Biên Phủ, Bình Thạnh" required />
+                    <input type="text" id="destination-location" class="form-input" placeholder="Nhập địa chỉ đến tại Việt Nam" value="Hồ Hoàn Kiếm, Hà Nội" required />
                   </div>
                   <p class="form-error" id="error-destination"></p>
                 </div>
@@ -108,23 +108,31 @@
 
               <div class="booking-map-panel">
                 <div class="booking-map-heading">
-                  <strong>Bản đồ lộ trình thực tế</strong>
-                  <span>Quãng đường theo tuyến đường ô tô</span>
+                  <strong>Bản đồ giao thông Việt Nam</strong>
+                  <span id="map-view-label">Toàn Việt Nam · đánh dấu các thành phố lớn</span>
                 </div>
                 <div id="booking-map" aria-label="Bản đồ lộ trình chuyến xe"></div>
+                <p id="map-status" class="map-status" role="status" aria-live="polite"></p>
                 <p id="route-status" class="route-status" role="status" aria-live="polite">
                   Đang xác định lộ trình...
                 </p>
+                <div class="booking-map-actions">
+                  <button type="button" id="btn-map-country" class="btn-map-action">Bản đồ toàn Việt Nam</button>
+                  <button type="button" id="btn-map-locate" class="btn-map-action">◎ Vị trí của tôi</button>
+                  <a id="btn-open-google-maps" class="btn-map-action btn-map-external" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                    Mở Google Maps
+                  </a>
+                </div>
               </div>
 
               <!-- Quick Location Tags -->
               <div class="quick-locations-container">
                 <span class="quick-title">Gợi ý nhanh:</span>
                 <div class="quick-tags">
-                  <button type="button" class="quick-tag" data-dest="Sân bay Tân Sơn Nhất">✈️ Sân bay TSN</button>
-                  <button type="button" class="quick-tag" data-dest="Chợ Bến Thành, Quận 1">🏢 Chợ Bến Thành</button>
-                  <button type="button" class="quick-tag" data-dest="Landmark 81, Bình Thạnh">🏙️ Landmark 81</button>
-                  <button type="button" class="quick-tag" data-dest="Bến xe Miền Đông mới">🚌 Bến xe Miền Đông</button>
+                  <button type="button" class="quick-tag" data-dest="Sân bay Nội Bài, Hà Nội">✈️ Sân bay Nội Bài</button>
+                  <button type="button" class="quick-tag" data-dest="Hồ Hoàn Kiếm, Hà Nội">🏞️ Hồ Hoàn Kiếm</button>
+                  <button type="button" class="quick-tag" data-dest="Văn Miếu Quốc Tử Giám, Hà Nội">🏛️ Văn Miếu</button>
+                  <button type="button" class="quick-tag" data-dest="Lăng Chủ tịch Hồ Chí Minh, Hà Nội">🏛️ Lăng Bác</button>
                 </div>
               </div>
 
@@ -360,7 +368,7 @@
                     <span class="dot green"></span>
                     <div class="route-text">
                       <span class="route-label">Điểm đón</span>
-                      <strong id="summary-pickup">Sân bay Tân Sơn Nhất, TPHCM</strong>
+                      <strong id="summary-pickup">Sân bay Nội Bài, Hà Nội</strong>
                     </div>
                   </div>
                   <div class="route-line"></div>
@@ -368,7 +376,7 @@
                     <span class="dot red"></span>
                     <div class="route-text">
                       <span class="route-label">Điểm đến</span>
-                      <strong id="summary-dest">Landmark 81, Bình Thạnh</strong>
+                      <strong id="summary-dest">Hồ Hoàn Kiếm, Hà Nội</strong>
                     </div>
                   </div>
                 </div>

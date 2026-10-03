@@ -20,7 +20,7 @@ JSON Server Auth is intended here for local development and demos, not productio
 
 ## Booking map and route estimates
 
-The booking page uses Leaflet with OpenStreetMap tiles, Nominatim address search, and the OSRM public demo routing service. The displayed distance and duration come from the returned driving route and are used in the fare estimate; a booking cannot be submitted until a route is available. These public services have usage limits and availability requirements, so configure a hosted or commercial geocoding/routing provider before production use.
+The booking page opens to a nationwide Vietnam map (including Hoang Sa and Truong Sa) with major city markers and Hanoi pickup/destination defaults. Use the country overview button to return to all of Vietnam after zooming into a route or GPS location. It uses Leaflet with OpenStreetMap street tiles (and alternate public tile sources), Nominatim/Photon address search, and public OSRM-compatible driving routers. GPS is requested only after the customer chooses their current location; the browser must allow location access and the page must use HTTPS or localhost. Distance and duration come from the returned driving route and are used in the fare estimate; a booking cannot be submitted until a route is available. Public services require Internet access and have usage limits/availability requirements, so configure hosted or commercial map, geocoding, and routing providers before production use. Google Maps directions are also available as an external link and do not require an API key.
 
 ## Admin operations demo
 
