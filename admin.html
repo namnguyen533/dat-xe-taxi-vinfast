@@ -21,7 +21,7 @@
         </div>
 
         <div class="admin-profile-card">
-          <img src="https://i.pravatar.cc/150?img=68" alt="Admin Avatar" class="admin-avatar" />
+          <div class="admin-avatar" aria-hidden="true">QT</div>
           <div class="profile-info">
             <h4 id="admin-display-name">Nguyễn Quản Trị</h4>
             <span class="role-badge">Super Admin</span>
@@ -44,6 +44,12 @@
               </button>
             </li>
             <li>
+              <button class="sidebar-tab-btn" data-tab="dispatch">
+                <span class="tab-icon">🛰️</span>
+                <span class="tab-label">Điều hành real-time</span>
+              </button>
+            </li>
+            <li>
               <button class="sidebar-tab-btn" data-tab="fleet">
                 <span class="tab-icon">🚗</span>
                 <span class="tab-label">Quản Lý Đội Xe VinFast</span>
@@ -59,6 +65,18 @@
               <button class="sidebar-tab-btn" data-tab="vouchers">
                 <span class="tab-icon">🏷️</span>
                 <span class="tab-label">Mã Giảm Giá & Bảng Giá</span>
+              </button>
+            </li>
+            <li>
+              <button class="sidebar-tab-btn" data-tab="customers">
+                <span class="tab-icon">🧑‍🤝‍🧑</span>
+                <span class="tab-label">Khách hàng & CSKH</span>
+              </button>
+            </li>
+            <li>
+              <button class="sidebar-tab-btn" data-tab="finance">
+                <span class="tab-icon">💹</span>
+                <span class="tab-label">Tài chính & phân tích</span>
               </button>
             </li>
             <li>
@@ -82,8 +100,9 @@
         <!-- Top Admin Header -->
         <header class="admin-topbar">
           <div class="topbar-left">
-            <h2 id="page-heading-title">📊 Bảng Điều Khiển Tổng Quan</h2>
-            <span class="system-status-pill">🟢 Trạm Sạc & Đội Xe 100% Hoạt Động</span>
+            <p class="admin-eyebrow">KHÔNG GIAN QUẢN TRỊ</p>
+            <h2 id="page-heading-title">Tổng quan</h2>
+            <span class="system-status-pill"><span class="status-dot"></span> Đơn xe đồng bộ với website</span>
           </div>
 
           <div class="topbar-right">
@@ -93,9 +112,6 @@
             </div>
 
             <div class="topbar-actions">
-              <button class="btn-icon-topbar" id="btn-notifications" title="Thông báo mới">
-                🔔 <span class="notif-badge">3</span>
-              </button>
               <div class="live-clock" id="live-clock">00:00:00</div>
             </div>
           </div>
@@ -115,8 +131,8 @@
                   <span class="kpi-title">Tổng Doanh Thu</span>
                   <span class="kpi-icon">💰</span>
                 </div>
-                <div class="kpi-value" id="kpi-revenue">1.840.200.000 đ</div>
-                <div class="kpi-trend positive">▲ +14.5% so với tháng trước</div>
+                <div class="kpi-value" id="kpi-revenue">0 đ</div>
+                <div class="kpi-trend">Tổng giá trị đơn chưa hủy</div>
               </div>
 
               <div class="kpi-card bookings">
@@ -124,26 +140,26 @@
                   <span class="kpi-title">Tổng Chuyến Xe</span>
                   <span class="kpi-icon">🚕</span>
                 </div>
-                <div class="kpi-value" id="kpi-total-bookings">1.248 Chuyến</div>
-                <div class="kpi-trend positive">▲ 96.8% hoàn thành xuất sắc</div>
+                <div class="kpi-value" id="kpi-total-bookings">0 chuyến</div>
+                <div class="kpi-trend">Toàn bộ đơn trong kho dùng chung</div>
               </div>
 
               <div class="kpi-card fleet">
                 <div class="kpi-header">
-                  <span class="kpi-title">Đội Xe VinFast</span>
+                  <span class="kpi-title">Dòng xe</span>
                   <span class="kpi-icon">⚡</span>
                 </div>
-                <div class="kpi-value" id="kpi-fleet-count">38 / 48 Xe</div>
-                <div class="kpi-trend neutral">⚡ 10 xe đang sạc pin & bảo dưỡng</div>
+                <div class="kpi-value" id="kpi-fleet-count">0 dòng xe</div>
+                <div class="kpi-trend">Danh mục xe đang cung cấp</div>
               </div>
 
               <div class="kpi-card rating">
                 <div class="kpi-header">
-                  <span class="kpi-title">Đánh Giá Khách Hàng</span>
-                  <span class="kpi-icon">⭐</span>
+                  <span class="kpi-title">Đơn trong ngày</span>
+                  <span class="kpi-icon">📅</span>
                 </div>
-                <div class="kpi-value">4.9 / 5.0</div>
-                <div class="kpi-trend positive">★ 98.2% phản hồi 5 sao</div>
+                <div class="kpi-value" id="kpi-today-count">0 chuyến</div>
+                <div class="kpi-trend">Theo ngày tạo đơn trong hệ thống</div>
               </div>
 
             </div>
@@ -154,8 +170,11 @@
               <!-- Recent Orders Preview -->
               <div class="admin-card">
                 <div class="card-header-flex">
-                  <h3>🚕 Chuyến Xe Mới Đặt Trong Ngày</h3>
-                  <button class="btn-sm-primary" id="btn-view-all-orders">Xem tất cả đơn</button>
+                  <div>
+                    <h3>🚕 Đơn đặt xe mới nhất</h3>
+                    <p class="subtitle" id="dashboard-booking-summary">Đang tải dữ liệu...</p>
+                  </div>
+                  <button type="button" class="btn-sm-primary" id="btn-view-all-orders">Xem tất cả đơn</button>
                 </div>
                 <div class="table-responsive">
                   <table class="admin-table">
@@ -176,45 +195,51 @@
                 </div>
               </div>
 
-              <!-- Fleet Battery & Status Summary -->
+              <!-- Status summary from the shared booking store -->
               <div class="admin-card">
-                <h3>🔋 Trạng Thái Đội Xe VinFast</h3>
-                <ul class="fleet-status-list">
-                  <li class="fleet-status-item">
-                    <span class="model-tag vf3">VinFast VF 3 (Mini)</span>
-                    <strong class="count">8 Xe</strong>
-                    <span class="status-pill ready">100% Sẵn sàng</span>
-                  </li>
-                  <li class="fleet-status-item">
-                    <span class="model-tag vf5">VinFast VF 5 Plus</span>
-                    <strong class="count">18 Xe</strong>
-                    <span class="status-pill busy">14 Đang chạy</span>
-                  </li>
-                  <li class="fleet-status-item">
-                    <span class="model-tag vf6">VinFast VF 6</span>
-                    <strong class="count">8 Xe</strong>
-                    <span class="status-pill ready">6 Đang chạy</span>
-                  </li>
-                  <li class="fleet-status-item">
-                    <span class="model-tag vf7">VinFast VF 7</span>
-                    <strong class="count">6 Xe</strong>
-                    <span class="status-pill charging">⚡ 2 Đang sạc</span>
-                  </li>
-                  <li class="fleet-status-item">
-                    <span class="model-tag vf8">VinFast VF 8 (VIP)</span>
-                    <strong class="count">5 Xe</strong>
-                    <span class="status-pill busy">5 Đang chạy</span>
-                  </li>
-                  <li class="fleet-status-item">
-                    <span class="model-tag vf9">VinFast VF 9 (7 chỗ)</span>
-                    <strong class="count">3 Xe</strong>
-                    <span class="status-pill ready">3 Sẵn sàng</span>
-                  </li>
-                </ul>
+                <h3>📊 Phân bổ trạng thái đơn</h3>
+                <p class="subtitle">Cập nhật từ cùng kho dữ liệu đặt xe</p>
+                <ul class="admin-status-breakdown" id="dashboard-status-breakdown"></ul>
               </div>
 
             </div>
 
+          </section>
+
+          <section id="tab-view-dispatch" class="admin-tab-content">
+            <div class="admin-module-heading">
+              <div>
+                <h3>🛰️ Điều hành chuyến đi</h3>
+                <p class="subtitle">Theo dõi trạng thái đơn, phân công tài xế và tiếp nhận sự cố trên một màn hình.</p>
+              </div>
+              <span class="demo-data-label">Vị trí xe minh họa · không phải GPS trực tiếp</span>
+            </div>
+            <div class="dispatch-layout">
+              <div class="admin-card dispatch-map-card">
+                <div class="dispatch-map-header">
+                  <div><h3>Bản đồ đội xe</h3><p class="subtitle">Khu vực mẫu: TP. Hồ Chí Minh · tọa độ mô phỏng</p></div>
+                  <span class="badge-status warning">DEMO GPS</span>
+                </div>
+                <div class="dispatch-map" id="dispatch-map" role="img" aria-label="Sơ đồ vị trí xe mô phỏng"></div>
+                <div class="dispatch-map-legend">
+                  <span><i class="legend-dot driving"></i>Đang có chuyến</span>
+                  <span><i class="legend-dot available"></i>Sẵn sàng</span>
+                  <span><i class="legend-dot charging"></i>Đang sạc</span>
+                </div>
+              </div>
+              <div class="admin-card dispatch-side-card">
+                <h3>Chuyến cần điều phối</h3>
+                <p class="subtitle">Đơn chờ xác nhận hoặc đang thực hiện</p>
+                <div id="dispatch-active-trips" class="dispatch-active-trips"></div>
+              </div>
+            </div>
+            <div class="admin-card section-gap">
+              <div class="card-header-flex"><div><h3>🚨 Sự cố vận hành</h3><p class="subtitle">Ghi nhận và theo dõi xử lý sự cố theo mã đơn.</p></div><button type="button" class="btn-create-new" id="btn-add-incident">＋ Ghi nhận sự cố</button></div>
+              <div class="table-responsive"><table class="admin-table">
+                <thead><tr><th>Mã sự cố</th><th>Mã đơn</th><th>Nội dung</th><th>Mức độ</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                <tbody id="admin-incidents-table"></tbody>
+              </table></div>
+            </div>
           </section>
 
           <!-- SECTION 2: BOOKINGS MANAGEMENT TAB -->
@@ -223,7 +248,7 @@
               <div class="card-header-actions">
                 <div>
                   <h3>🚕 Quản Lý Danh Sách Đơn Đặt Xe</h3>
-                  <p class="subtitle">Thêm, xem chi tiết, phân công tài xế hoặc duyệt hủy đơn hàng</p>
+                  <p class="subtitle">Theo dõi lộ trình, thanh toán và cập nhật trạng thái cho toàn bộ đơn</p>
                 </div>
                 <button type="button" class="btn-create-new" id="btn-open-create-booking-modal">
                   ➕ Tạo Đơn Đặt Xe Mới
@@ -234,10 +259,11 @@
               <div class="admin-filter-bar">
                 <div class="filter-group">
                   <button class="btn-admin-filter active" data-status-filter="all">Tất cả đơn</button>
-                  <button class="btn-admin-filter" data-status-filter="driver_assigned">Đang điều xe</button>
-                  <button class="btn-admin-filter" data-status-filter="in_progress">Đang di chuyển</button>
-                  <button class="btn-admin-filter" data-status-filter="completed">Hoàn thành</button>
+                  <button class="btn-admin-filter" data-status-filter="pending">Chờ xác nhận</button>
                   <button class="btn-admin-filter" data-status-filter="confirmed">Đã xác nhận</button>
+                  <button class="btn-admin-filter" data-status-filter="in_progress">Đang thực hiện</button>
+                  <button class="btn-admin-filter" data-status-filter="completed">Hoàn thành</button>
+                  <button class="btn-admin-filter" data-status-filter="cancelled">Đã hủy</button>
                 </div>
 
                 <div class="search-input-wrapper">
@@ -274,13 +300,18 @@
               <div class="card-header-actions">
                 <div>
                   <h3>🚗 Đội Xe Điện VinFast</h3>
-                  <p class="subtitle">Danh sách 6 dòng xe VinFast đang quản lý trong hệ thống</p>
+                  <p class="subtitle">Danh mục dòng xe và thông số tham khảo đang dùng trên website</p>
                 </div>
-                <button type="button" class="btn-create-new" id="btn-add-vehicle-modal">
-                  ⚡ Thêm Xe Mới Vào Đội
-                </button>
               </div>
 
+              <div class="fleet-ops-summary" id="fleet-ops-summary"></div>
+              <div class="table-responsive fleet-ops-table-wrap">
+                <table class="admin-table">
+                  <thead><tr><th>Xe / Biển số</th><th>Pin SoC</th><th>Trạng thái</th><th>Km vận hành</th><th>Bảo dưỡng</th><th>Đăng kiểm</th><th>Bảo hiểm</th><th>Thao tác</th></tr></thead>
+                  <tbody id="admin-fleet-ops-table"></tbody>
+                </table>
+              </div>
+              <h3 class="fleet-catalog-heading">Danh mục dòng xe VinFast</h3>
               <div class="fleet-grid-admin" id="admin-fleet-grid">
                 <!-- Rendered dynamically by JS from cars.json -->
               </div>
@@ -293,12 +324,15 @@
               <div class="card-header-actions">
                 <div>
                   <h3>👨‍✈️ Danh Sách Đội Ngũ Tài Xế</h3>
-                  <p class="subtitle">Quản lý hồ sơ tài xế, biển số xe và đánh giá sao</p>
+                  <p class="subtitle">Tổng hợp tài xế, phương tiện và số chuyến từ dữ liệu đặt xe</p>
                 </div>
-                <button type="button" class="btn-create-new" onclick="alert('Tính năng thêm tài xế mới đang phát triển!');">
-                  👤 Thêm Tài Xế Mới
-                </button>
+                <span class="badge-status info">Dữ liệu đơn + hồ sơ demo</span>
               </div>
+              <form class="admin-inline-form driver-form" id="driver-form">
+                <input id="driver-name" class="form-input" placeholder="Họ tên tài xế" required />
+                <input id="driver-phone" class="form-input" type="tel" placeholder="Số điện thoại" required />
+                <button class="btn-sm-primary" type="submit">Thêm hồ sơ chờ duyệt</button>
+              </form>
 
               <div class="table-responsive">
                 <table class="admin-table">
@@ -310,7 +344,9 @@
                       <th>Biển Số Xe</th>
                       <th>Đánh Giá</th>
                       <th>Số Chuyến</th>
-                      <th>Trạng Thái</th>
+                      <th>Hồ Sơ</th>
+                      <th>Ca Trực</th>
+                      <th>Ví Thu Nhập</th>
                       <th>Thao Tác</th>
                     </tr>
                   </thead>
@@ -327,12 +363,10 @@
             <div class="admin-card">
               <div class="card-header-actions">
                 <div>
-                  <h3>🏷️ Quản Lý Mã Khuyến Mãi & Mã Giảm Giá</h3>
-                  <p class="subtitle">Tạo mã ưu đãi cho khách hàng đặt xe</p>
+                  <h3>🏷️ Mã ưu đãi trên trang đặt xe</h3>
+                  <p class="subtitle">Dữ liệu lấy từ cùng cấu hình giá mà khách hàng đang sử dụng</p>
                 </div>
-                <button type="button" class="btn-create-new" id="btn-add-voucher-modal">
-                  🎟️ Tạo Mã Giảm Giá Mới
-                </button>
+                <button type="button" class="btn-create-new" id="btn-add-promotion">＋ Phát hành voucher</button>
               </div>
 
               <div class="table-responsive">
@@ -343,56 +377,176 @@
                       <th>Loại Giảm Giá</th>
                       <th>Mức Giảm</th>
                       <th>Mô Tả</th>
-                      <th>Trạng Thái</th>
-                      <th>Thao Tác</th>
+                      <th>Trạng Thái áp dụng</th>
+                      <th>Lượt dùng</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong class="voucher-code-tag">VINFAST20</strong></td>
-                      <td>Phần trăm (20%)</td>
-                      <td>Tối đa 50.000 đ</td>
-                      <td>Giảm 20% cho khách hàng đặt xe VinFast mới</td>
-                      <td><span class="badge-status success">Hoạt động</span></td>
-                      <td><button class="btn-sm-danger" onclick="alert('Đã vô hiệu hóa mã VINFAST20');">Tắt</button></td>
-                    </tr>
-                    <tr>
-                      <td><strong class="voucher-code-tag">XEXANH</strong></td>
-                      <td>Số tiền cố định</td>
-                      <td>30.000 đ</td>
-                      <td>Giảm ngay 30k cho chuyên đi trên 10km</td>
-                      <td><span class="badge-status success">Hoạt động</span></td>
-                      <td><button class="btn-sm-danger" onclick="alert('Đã vô hiệu hóa mã XEXANH');">Tắt</button></td>
-                    </tr>
-                  </tbody>
+                  <tbody id="admin-promotions-table"></tbody>
                 </table>
               </div>
+              <form class="admin-inline-form" id="promotion-form">
+                <input id="promotion-code" class="form-input" placeholder="Mã voucher (VD: CHAOXE)" required maxlength="20" />
+                <select id="promotion-type" class="form-select"><option value="fixed">Giảm số tiền</option><option value="percentage">Giảm phần trăm</option></select>
+                <input id="promotion-value" class="form-input" type="number" min="1" placeholder="Mức giảm" required />
+                <input id="promotion-cap" class="form-input" type="number" min="0" placeholder="Giới hạn giảm (nếu có)" />
+                <input id="promotion-description" class="form-input" placeholder="Điều kiện / mô tả" required />
+                <button class="btn-sm-primary" type="submit">Lưu voucher</button>
+              </form>
+            </div>
+
+            <div class="admin-card pricing-card">
+              <div class="card-header-actions">
+                <div>
+                  <h3>💳 Giá cước theo dòng xe</h3>
+                  <p class="subtitle">Điều chỉnh cơ sở giá đồng bộ sang bộ tính cước trên trang đặt xe</p>
+                </div>
+                <button type="button" class="btn-sm-primary" id="btn-save-pricing">Lưu bảng giá</button>
+              </div>
+              <div class="table-responsive">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Dòng xe</th>
+                      <th>Số chỗ</th>
+                      <th>Giá mở cửa</th>
+                      <th>Dưới 25 km</th>
+                      <th>Từ 25 km</th>
+                      <th>Thời gian chờ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-pricing-table"></tbody>
+                </table>
+              </div>
+              <div class="dynamic-pricing-controls">
+                <label><input type="checkbox" id="pricing-peak-enabled" /> Áp dụng giá cao điểm</label>
+                <label>Khung giờ <input id="pricing-peak-hours" class="form-input" placeholder="07:00-09:00,17:00-20:00" /></label>
+                <label>Tăng giá (%) <input id="pricing-peak-percent" class="form-input" type="number" min="0" max="300" /></label>
+                <label><input type="checkbox" id="pricing-rain-enabled" /> Phụ phí thời tiết</label>
+                <label>Tăng giá (%) <input id="pricing-rain-percent" class="form-input" type="number" min="0" max="300" /></label>
+                <label>Phụ phí ban đêm (%) <input id="pricing-night-percent" class="form-input" type="number" min="0" max="300" /></label>
+                <label>Thuê theo giờ (đ) <input id="pricing-hourly-fee" class="form-input" type="number" min="0" /></label>
+                <label>Sân bay (đ) <input id="pricing-airport-fee" class="form-input" type="number" min="0" /></label>
+                <label>Ngày lễ (YYYY-MM-DD, phân cách dấu phẩy) <input id="pricing-holiday-dates" class="form-input holiday-dates-input" placeholder="2026-12-25,2027-01-01" /></label>
+              </div>
+            </div>
+          </section>
+
+          <section id="tab-view-customers" class="admin-tab-content">
+            <div class="admin-card">
+              <div class="card-header-actions">
+                <div><h3>🧑‍🤝‍🧑 Hồ sơ khách hàng</h3><p class="subtitle">Tổng hợp thông tin và lịch sử từ các chuyến xe dùng chung.</p></div>
+                <input id="crm-customer-search" class="form-input crm-search" placeholder="Tìm tên, điện thoại, email..." />
+              </div>
+              <div class="table-responsive"><table class="admin-table">
+                <thead><tr><th>Khách hàng</th><th>Liên hệ</th><th>Số chuyến</th><th>Chi tiêu</th><th>Gần nhất</th><th>Tài khoản</th><th>Thao tác</th></tr></thead>
+                <tbody id="admin-customers-table"></tbody>
+              </table></div>
+            </div>
+            <div class="admin-card section-gap">
+              <div class="card-header-flex"><div><h3>🎧 Khiếu nại & chăm sóc khách hàng</h3><p class="subtitle">Theo dõi yêu cầu gắn với đơn, cập nhật trạng thái xử lý.</p></div><button class="btn-create-new" type="button" id="btn-add-complaint">＋ Tiếp nhận khiếu nại</button></div>
+              <div class="table-responsive"><table class="admin-table">
+                <thead><tr><th>Mã tiếp nhận</th><th>Khách hàng</th><th>Mã đơn</th><th>Chủ đề / nội dung</th><th>Thời gian</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                <tbody id="admin-complaints-table"></tbody>
+              </table></div>
+            </div>
+            <div class="admin-card section-gap">
+              <div class="card-header-flex"><div><h3>⛔ Danh sách hạn chế</h3><p class="subtitle">Ghi nhận khách hàng bị hạn chế, lưu lý do và cho phép gỡ hạn chế.</p></div><button class="btn-sm-primary" type="button" id="btn-add-blacklist">＋ Hạn chế tài khoản</button></div>
+              <div class="table-responsive"><table class="admin-table">
+                <thead><tr><th>Khách hàng</th><th>Điện thoại</th><th>Lý do</th><th>Ngày áp dụng</th><th>Thao tác</th></tr></thead>
+                <tbody id="admin-blacklist-table"></tbody>
+              </table></div>
+            </div>
+          </section>
+
+          <section id="tab-view-finance" class="admin-tab-content">
+            <div class="kpi-cards-grid finance-kpis">
+              <div class="kpi-card revenue"><div class="kpi-title">Doanh thu ghi nhận</div><div class="kpi-value" id="finance-revenue">0 đ</div><div class="kpi-trend">Từ đơn chưa hủy</div></div>
+              <div class="kpi-card bookings"><div class="kpi-title">Chờ đối soát</div><div class="kpi-value" id="finance-unreconciled">0 đ</div><div class="kpi-trend">Giao dịch chưa xác nhận</div></div>
+              <div class="kpi-card fleet"><div class="kpi-title">Hoa hồng tài xế dự kiến</div><div class="kpi-value" id="finance-driver-payout">0 đ</div><div class="kpi-trend">Tạm tính 80% đơn hoàn thành</div></div>
+              <div class="kpi-card rating"><div class="kpi-title">Giao dịch</div><div class="kpi-value" id="finance-transaction-count">0</div><div class="kpi-trend">Theo lịch sử đặt xe</div></div>
+            </div>
+            <div class="admin-card">
+              <div class="card-header-flex"><div><h3>💳 Đối soát giao dịch</h3><p class="subtitle">Phân loại theo phương thức thanh toán; đánh dấu thủ công chỉ là dữ liệu demo.</p></div><span class="demo-data-label">Chưa kết nối MoMo / ZaloPay / VNPAY / ngân hàng</span></div>
+              <div class="table-responsive"><table class="admin-table">
+                <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Cổng / phương thức</th><th>Giá trị</th><th>Trạng thái đối soát</th><th>Thao tác</th></tr></thead>
+                <tbody id="admin-payments-table"></tbody>
+              </table></div>
+            </div>
+            <div class="dashboard-grid-2 section-gap">
+              <div class="admin-card"><h3>🧾 Chi trả tài xế</h3><p class="subtitle">Ước tính theo chuyến đã hoàn thành; xác nhận chi trả cập nhật ví demo.</p>
+                <div class="table-responsive"><table class="admin-table"><thead><tr><th>Tài xế</th><th>Chuyến hoàn tất</th><th>Thu nhập</th><th>Đã chi</th><th>Thao tác</th></tr></thead><tbody id="admin-payroll-table"></tbody></table></div>
+              </div>
+              <div class="admin-card"><h3>🔥 Nhu cầu theo khu vực</h3><p class="subtitle">Heatmap mô phỏng từ địa chỉ đón trong đơn; không dùng vị trí trực tiếp.</p><div id="admin-demand-heatmap" class="demand-heatmap"></div></div>
             </div>
           </section>
 
           <!-- SECTION 6: SETTINGS TAB -->
           <section id="tab-view-settings" class="admin-tab-content">
             <div class="admin-card">
-              <h3>⚙️ Cài Đặt Hệ Thống & Tài Khoản</h3>
-              <div class="settings-form-grid">
-                <div class="form-group">
-                  <label class="form-label">Tên Quản Trị Viên</label>
-                  <input type="text" class="form-input" value="Nguyễn Quản Trị" />
+              <h3>⚙️ Tài khoản và đồng bộ dữ liệu</h3>
+              <p class="subtitle">Thông tin tài khoản hiện tại và phạm vi đồng bộ của hệ thống</p>
+              <div class="settings-form-grid admin-system-grid">
+                <div class="admin-system-item">
+                  <span>Tên quản trị viên</span>
+                  <strong id="admin-account-name">Quản trị viên</strong>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">Email Hệ Thống</label>
-                  <input type="email" class="form-input" value="admin@taxivinfast.com" />
+                <div class="admin-system-item">
+                  <span>Email đăng nhập</span>
+                  <strong id="admin-account-email">admin@taxivinfast.com</strong>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">Chế độ giao diện</label>
-                  <select class="form-select">
-                    <option selected>Sáng / Tối Theo Hệ Thống</option>
-                    <option>Chế độ Tối (Dark Mode)</option>
-                    <option>Chế độ Sáng (Light Mode)</option>
-                  </select>
+                <div class="admin-system-item">
+                  <span>Vai trò</span>
+                  <strong id="admin-account-role">Quản trị viên</strong>
+                </div>
+                <div class="admin-system-item">
+                  <span>Đơn đặt xe đang đồng bộ</span>
+                  <strong id="admin-system-booking-count">0 đơn</strong>
+                </div>
+                <div class="admin-system-item">
+                  <span>Ngưỡng cảnh báo pin thấp</span>
+                  <label class="settings-inline"><input type="number" min="5" max="50" id="setting-low-battery" /> % SoC</label>
+                </div>
+                <div class="admin-system-item">
+                  <span>Chế độ mưa / phụ phí</span>
+                  <label class="settings-inline"><input type="checkbox" id="setting-rain-mode" /> Đang mưa</label>
                 </div>
               </div>
-              <button class="btn-create-new mt-4" onclick="alert('Đã lưu cấu hình cài đặt hệ thống!');">💾 Lưu Cấu Hình</button>
+              <button type="button" class="btn-sm-primary" id="btn-save-operations-settings">Lưu thông số vận hành</button>
+              <div class="admin-sync-note">
+                <strong>Phạm vi hiện tại</strong>
+                <span>Đơn đặt xe, cấu hình giá/voucher và dữ liệu demo quản trị lưu trên cùng trình duyệt. GPS trực tiếp, đăng nhập/phân quyền thật, cổng thanh toán và chuyển tiền chưa được kết nối backend.</span>
+              </div>
+            </div>
+            <div class="admin-card section-gap">
+              <div class="card-header-flex"><div><h3>🛡️ Vai trò nhân viên</h3><p class="subtitle">Ma trận tham khảo cho bản demo; không thay thế quyền kiểm soát ở máy chủ.</p></div></div>
+              <form class="admin-inline-form staff-form" id="staff-form">
+                <input id="staff-name" class="form-input" placeholder="Họ tên nhân viên" required />
+                <input id="staff-email" class="form-input" type="email" placeholder="Email công việc" required />
+                <select id="staff-role" class="form-select"><option value="operator">Điều hành</option><option value="accountant">Kế toán</option><option value="support">CSKH</option><option value="admin">Quản trị viên</option></select>
+                <button type="submit" class="btn-sm-primary">Thêm nhân viên</button>
+              </form>
+              <div class="table-responsive">
+                <table class="admin-table">
+                  <thead><tr><th>Nhân viên</th><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                  <tbody id="admin-staff-table"></tbody>
+                </table>
+              </div>
+              <div class="table-responsive"><table class="admin-table">
+                <thead><tr><th>Vai trò</th><th>Điều hành</th><th>Tài xế / xe</th><th>CSKH</th><th>Tài chính</th><th>Cài đặt / phân quyền</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Điều hành</strong></td><td>Đọc / cập nhật</td><td>Đọc</td><td>—</td><td>Đọc</td><td>—</td></tr>
+                  <tr><td><strong>Kế toán</strong></td><td>Đọc</td><td>Đọc</td><td>—</td><td>Đối soát / chi trả</td><td>—</td></tr>
+                  <tr><td><strong>CSKH</strong></td><td>Đọc</td><td>—</td><td>Đọc / cập nhật</td><td>—</td><td>—</td></tr>
+                  <tr><td><strong>Quản trị viên</strong></td><td>Toàn quyền demo</td><td>Toàn quyền demo</td><td>Toàn quyền demo</td><td>Toàn quyền demo</td><td>Toàn quyền demo</td></tr>
+                </tbody>
+              </table></div>
+            </div>
+            <div class="admin-card section-gap">
+              <div class="card-header-flex"><div><h3>📋 Nhật ký thao tác</h3><p class="subtitle">Ghi nhận hành động trong trình duyệt hiện tại; có thể xóa khi xóa dữ liệu trình duyệt.</p></div><button type="button" class="btn-sm-primary" id="btn-clear-audit">Xóa nhật ký</button></div>
+              <div class="table-responsive"><table class="admin-table">
+                <thead><tr><th>Thời gian</th><th>Nhân viên</th><th>Hành động</th><th>Đối tượng</th><th>Chi tiết</th></tr></thead>
+                <tbody id="admin-audit-table"></tbody>
+              </table></div>
             </div>
           </section>
 
@@ -402,10 +556,10 @@
     </div>
 
     <!-- MODAL THÊM ĐƠN ĐẶT XE MỚI TỪ ADMIN -->
-    <div id="admin-create-booking-modal" class="modal-overlay" style="display: none;">
+    <div id="admin-create-booking-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="admin-create-booking-title">
       <div class="modal-card modal-lg">
         <button class="modal-close" id="btn-close-create-modal">&times;</button>
-        <h3 class="modal-title">➕ Khởi Tạo Đơn Đặt Xe Mới (Admin)</h3>
+        <h3 class="modal-title" id="admin-create-booking-title">➕ Tạo đơn đặt xe</h3>
         
         <form id="admin-create-booking-form" class="modal-form-grid">
           <div class="form-row-2">
@@ -444,22 +598,44 @@
             </div>
             <div class="form-group">
               <label class="form-label">Tài xế phân công</label>
-              <input type="text" id="admin-new-driver" class="form-input" value="Trần Thanh Sơn (51K-882.19)" />
+              <input type="text" id="admin-new-driver" class="form-input" placeholder="Để trống nếu chưa phân công" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-new-schedule">Thời gian đón *</label>
+              <input type="datetime-local" id="admin-new-schedule" class="form-input" required />
             </div>
           </div>
 
           <div class="form-row-2">
             <div class="form-group">
-              <label class="form-label">Tổng cước phí ước tính (VND)</label>
-              <input type="number" id="admin-new-amount" class="form-input" value="150000" />
+              <label class="form-label" for="admin-new-amount">Tổng cước phí (VND) *</label>
+              <input type="number" id="admin-new-amount" class="form-input" min="0" step="1000" value="150000" required />
             </div>
             <div class="form-group">
-              <label class="form-label">Trạng thái chuyến</label>
-              <select id="admin-new-status" class="form-select">
-                <option value="driver_assigned">Đang điều xe</option>
-                <option value="in_progress">Đang di chuyển</option>
-                <option value="completed">Hoàn thành</option>
+              <label class="form-label" for="admin-new-payment">Phương thức thanh toán</label>
+              <select id="admin-new-payment" class="form-select">
+                <option value="cash">Tiền mặt</option>
+                <option value="momo">Ví MoMo / ZaloPay</option>
+                <option value="zalopay">Ví ZaloPay</option>
+                <option value="banking">Chuyển khoản QR</option>
+                <option value="vnpay">VNPAY</option>
+                <option value="card">Thẻ ngân hàng</option>
               </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="admin-new-status">Trạng thái đơn</label>
+              <select id="admin-new-status" class="form-select">
+                <option value="pending">Chờ xác nhận</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="in_progress">Đang di chuyển</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-new-note">Ghi chú</label>
+              <input type="text" id="admin-new-note" class="form-input" placeholder="Thông tin cần lưu ý cho chuyến đi" />
             </div>
           </div>
 

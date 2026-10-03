@@ -117,6 +117,19 @@
       "percentage": 10,
       "description": "Phụ phí di chuyển ban đêm (+10% tổng cước)"
     },
+    "serviceFees": {
+      "hourly": 50000,
+      "airport": 15000
+    },
+    "peakHours": {
+      "enabled": false,
+      "ranges": "07:00-09:00,17:00-20:00",
+      "percentage": 15
+    },
+    "rain": {
+      "enabled": false,
+      "percentage": 10
+    },
     "holidaySurcharge": {
       "percentage": 15,
       "description": "Phụ phí Lễ / Tết (+15% tổng cước)"
@@ -139,4 +152,3 @@
     }
   ]
 }
-

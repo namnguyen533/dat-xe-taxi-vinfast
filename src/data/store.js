@@ -35,6 +35,9 @@ export const SERVICE_TYPE_LABELS = {
 export const PAYMENT_LABELS = {
   cash: 'Tiền mặt',
   momo: 'Ví MoMo / ZaloPay',
+  zalopay: 'Ví ZaloPay',
+  vnpay: 'VNPAY',
+  card: 'Thẻ ngân hàng',
   banking: 'Chuyển khoản QR',
 };
 
