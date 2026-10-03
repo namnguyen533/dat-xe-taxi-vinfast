@@ -1720,6 +1720,52 @@ button {
   gap: 8px;
 }
 
+.booking-map-panel {
+  margin-top: 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.booking-map-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  color: var(--text-h);
+}
+
+.booking-map-heading span {
+  color: var(--text);
+  font-size: 13px;
+  text-align: right;
+}
+
+#booking-map {
+  height: 340px;
+  width: 100%;
+  background: #e8edf0;
+  z-index: 1;
+}
+
+.route-status {
+  margin: 0;
+  padding: 11px 16px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.route-status[data-state="success"] {
+  color: #16834a;
+}
+
+.route-status[data-state="error"] {
+  color: #c0392b;
+}
+
 .swap-locations-wrapper {
   display: flex;
   justify-content: flex-end;
@@ -2544,6 +2590,20 @@ button {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  #booking-map {
+    height: 280px;
+  }
+
+  .booking-map-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .booking-map-heading span {
+    text-align: left;
+  }
+
   .vehicle-selection-grid {
     grid-template-columns: 1fr;
   }
@@ -2893,12 +2953,12 @@ button {
 
 .autocomplete-item {
   padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: block;
   cursor: pointer;
   transition: background 0.2s;
   border-bottom: 1px solid var(--social-bg);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .autocomplete-item:last-child {

@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Đặt xe điện VinFast - TaxiVinFast</title>
     <link rel="stylesheet" href="/src/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
   </head>
   
   <body>
@@ -98,6 +104,17 @@
                   </div>
                   <p class="form-error" id="error-destination"></p>
                 </div>
+              </div>
+
+              <div class="booking-map-panel">
+                <div class="booking-map-heading">
+                  <strong>Bản đồ lộ trình thực tế</strong>
+                  <span>Quãng đường theo tuyến đường ô tô</span>
+                </div>
+                <div id="booking-map" aria-label="Bản đồ lộ trình chuyến xe"></div>
+                <p id="route-status" class="route-status" role="status" aria-live="polite">
+                  Đang xác định lộ trình...
+                </p>
               </div>
 
               <!-- Quick Location Tags -->
@@ -542,6 +559,11 @@
       </div>
     </footer>
 
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
     <script type="module" src="/src/booking.js"></script>
   </body>
 </html>

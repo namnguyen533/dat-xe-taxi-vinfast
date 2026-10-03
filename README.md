@@ -18,6 +18,10 @@ To use a different auth API URL, set `VITE_AUTH_API_URL` in the Vite environment
 
 JSON Server Auth is intended here for local development and demos, not production authentication. Use a production-ready backend with secure deployment and account-management controls before accepting real user accounts.
 
+## Booking map and route estimates
+
+The booking page uses Leaflet with OpenStreetMap tiles, Nominatim address search, and the OSRM public demo routing service. The displayed distance and duration come from the returned driving route and are used in the fare estimate; a booking cannot be submitted until a route is available. These public services have usage limits and availability requirements, so configure a hosted or commercial geocoding/routing provider before production use.
+
 ## Admin operations demo
 
 The admin portal includes demo workflows for dispatch, drivers, fleet battery/documents, customer support, pricing/promotions, finance, staff roles, and audit history. Bookings use the same browser-local booking store as customer booking and history pages. Admin operations are stored under `taxivinfast_admin_operations`; pricing and promotions are stored under `taxivinfast_pricing_config` and are read by the customer fare calculator.

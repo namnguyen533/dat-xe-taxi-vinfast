@@ -3,6 +3,7 @@ import { calculateTripFare } from './price-calculator.js';
 import { bookingStore, formatVND } from './data/booking-store.js';
 import { getPricingConfig } from './data/pricing-store.js';
 import { validateBookingForm } from './form-validation.js';
+import { getDrivingRoute, resolveLocation, searchLocations } from './route-service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const authToken = sessionStorage.getItem('taxi-vinfast-auth-token') || localStorage.getItem('taxi-vinfast-auth-token');
@@ -40,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const summaryCarType = document.getElementById('summary-car-type');
   const metricDistance = document.getElementById('metric-distance');
   const metricDuration = document.getElementById('metric-duration');
+  const mapElement = document.getElementById('booking-map');
+  const routeStatus = document.getElementById('route-status');
 
   const priceBaseEl = document.getElementById('price-base');
   const priceDistEl = document.getElementById('price-distance');
@@ -102,8 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  let distanceKm = 12.5;
-  let durationMin = 25;
+  let distanceKm = 0;
+  let durationMin = 0;
+  let hasRoute = false;
+  let routeRequestId = 0;
+  let routeDebounce;
+  let routeMap;
+  let routeLine;
+  let pickupMarker;
+  let destinationMarker;
+  let pickupLocation;
+  let destinationLocation;
   /** Mã giảm giá đã áp dụng thành công ('' = không dùng) */
   let appliedCoupon = '';
 
@@ -124,133 +136,177 @@ document.addEventListener('DOMContentLoaded', () => {
   // XỬ LÝ NHẬP ĐIỂM ĐÓN & ĐIỂM ĐẾN BẰNG JAVASCRIPT (LOCATION INPUT LOGIC)
   // ==========================================================================
 
-  // Danh sách địa điểm gợi ý phổ biến
-  const popularLocations = [
-    { title: "Sân bay Tân Sơn Nhất, TPHCM", icon: "✈️", zone: "Tân Bình" },
-    { title: "Chợ Bến Thành, Quận 1, TPHCM", icon: "🏢", zone: "Quận 1" },
-    { title: "Landmark 81, 720A Điện Biên Phủ, Bình Thạnh, TPHCM", icon: "🏙️", zone: "Bình Thạnh" },
-    { title: "Bến xe Miền Đông mới, TP. Thủ Đức", icon: "🚌", zone: "Thủ Đức" },
-    { title: "Sân bay Quốc tế Nội Bài, Hà Nội", icon: "✈️", zone: "Sóc Sơn" },
-    { title: "Hồ Hoàn Kiếm, Quận Hoàn Kiếm, Hà Nội", icon: "🏞️", zone: "Hoàn Kiếm" },
-    { title: "Crescent Mall, Quận 7, TPHCM", icon: "🛍️", zone: "Quận 7" },
-    { title: "Thành phố Vũng Tàu, Bà Rịa - Vũng Tàu", icon: "🏖️", zone: "Tỉnh khác" }
-  ];
+  function setRouteStatus(message, state = '') {
+    if (!routeStatus) return;
+    routeStatus.textContent = message;
+    routeStatus.dataset.state = state;
+  }
 
-  /**
-   * Tạo menu gợi ý tự động (Autocomplete Dropdown) cho thẻ ô nhập liệu
-   * @param {HTMLInputElement} inputEl Thẻ input cần áp dụng
-   */
+  function clearDisplayedRoute() {
+    routeLine?.remove();
+    pickupMarker?.remove();
+    destinationMarker?.remove();
+    routeLine = null;
+    pickupMarker = null;
+    destinationMarker = null;
+  }
+
+  function initializeMap() {
+    if (!mapElement || !globalThis.L) {
+      setRouteStatus('Không tải được bản đồ. Vui lòng kiểm tra kết nối mạng và tải lại trang.', 'error');
+      return;
+    }
+    routeMap = globalThis.L.map(mapElement).setView([10.7769, 106.7009], 12);
+    globalThis.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(routeMap);
+  }
+
+  initializeMap();
+
+  function renderSuggestions(dropdown, inputEl, locations) {
+    dropdown.replaceChildren();
+    locations.forEach((location) => {
+      const item = document.createElement('li');
+      item.className = 'autocomplete-item';
+      item.textContent = location.label;
+      item.addEventListener('click', () => {
+        inputEl.value = location.label;
+        dropdown.style.display = 'none';
+        if (inputEl === pickupInput) pickupLocation = location;
+        else destinationLocation = location;
+        updateDistance();
+      });
+      dropdown.appendChild(item);
+    });
+    dropdown.style.display = locations.length ? 'block' : 'none';
+  }
+
   function setupLocationAutocomplete(inputEl) {
     if (!inputEl) return;
-
-    // Tạo phần tử danh sách gợi ý bên dưới ô input
     const parent = inputEl.parentElement;
-    if (parent.style.position !== 'relative') {
-      parent.style.position = 'relative';
-    }
-
     const dropdown = document.createElement('ul');
     dropdown.className = 'location-autocomplete-list';
     dropdown.style.display = 'none';
     parent.appendChild(dropdown);
 
-    // Hàm hiển thị danh sách lọc
-    function renderSuggestions(filterText = '') {
-      const keyword = filterText.toLowerCase().trim();
-      const matches = popularLocations.filter(loc => 
-        loc.title.toLowerCase().includes(keyword) || 
-        loc.zone.toLowerCase().includes(keyword)
-      );
-
-      if (matches.length === 0) {
-        dropdown.style.display = 'none';
-        return;
-      }
-
-      dropdown.innerHTML = matches.map(loc => `
-        <li class="autocomplete-item" data-value="${loc.title}">
-          <span class="loc-icon">${loc.icon}</span>
-          <div class="loc-info">
-            <strong class="loc-title">${loc.title}</strong>
-            <span class="loc-zone">${loc.zone}</span>
-          </div>
-        </li>
-      `).join('');
-
-      dropdown.style.display = 'block';
-
-      // Lắng nghe sự kiện click vào từng địa điểm trong danh sách
-      dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
-        item.addEventListener('click', () => {
-          inputEl.value = item.getAttribute('data-value');
-          dropdown.style.display = 'none';
-          updateDistance();
-        });
-      });
-    }
-
-    // Sự kiện khi người dùng gõ phím vào ô nhập liệu
+    let searchTimer;
+    let searchRequestId = 0;
     inputEl.addEventListener('input', () => {
-      renderSuggestions(inputEl.value);
+      clearTimeout(searchTimer);
+      const query = inputEl.value.trim();
+      const currentRequestId = ++searchRequestId;
+      dropdown.style.display = 'none';
+      searchTimer = setTimeout(async () => {
+        if (query.length < 3) return;
+        try {
+          const locations = await searchLocations(query);
+          if (currentRequestId === searchRequestId && inputEl.value.trim() === query) {
+            renderSuggestions(dropdown, inputEl, locations);
+          }
+        } catch (error) {
+          if (currentRequestId === searchRequestId) setRouteStatus(error.message, 'error');
+        }
+      }, 650);
     });
-
-    // Sự kiện khi bấm vào ô input (Focus)
     inputEl.addEventListener('focus', () => {
-      renderSuggestions(inputEl.value);
+      if (dropdown.childElementCount) dropdown.style.display = 'block';
     });
-
-    // Ẩn menu khi click ra ngoài
-    document.addEventListener('click', (e) => {
-      if (!parent.contains(e.target)) {
-        dropdown.style.display = 'none';
-      }
+    inputEl.addEventListener('blur', () => {
+      setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+    });
+    document.addEventListener('click', (event) => {
+      if (!parent.contains(event.target)) dropdown.style.display = 'none';
     });
   }
 
-  // Khởi tạo tính năng gợi ý tự động cho Điểm đón và Điểm đến
   setupLocationAutocomplete(pickupInput);
   setupLocationAutocomplete(destInput);
 
-  /**
-   * Tính toán khoảng cách (Km) & thời gian dựa trên điểm đi và điểm đến
-   */
-  function updateDistance() {
+  async function updateDistance() {
+    const requestId = ++routeRequestId;
+    clearDisplayedRoute();
     const pickupVal = pickupInput ? pickupInput.value.trim() : '';
     const destVal = destInput ? destInput.value.trim() : '';
+    hasRoute = false;
+    distanceKm = 0;
+    durationMin = 0;
+    if (summaryPickup) summaryPickup.textContent = pickupVal || '---';
+    if (summaryDest) summaryDest.textContent = destVal || '---';
+    if (metricDistance) metricDistance.textContent = 'Đang tính...';
+    if (metricDuration) metricDuration.textContent = 'Đang tính...';
+    setRouteStatus('Đang tìm địa chỉ và tính tuyến đường ô tô thực tế...');
+    calculatePrice();
 
-    // Cảnh báo nếu điểm đón trùng điểm đến
-    if (pickupVal && destVal && pickupVal.toLowerCase() === destVal.toLowerCase()) {
-      if (summaryPickup) summaryPickup.textContent = pickupVal;
-      if (summaryDest) summaryDest.textContent = destVal;
-      if (metricDistance) metricDistance.textContent = '0 km (Trùng nhau)';
-      if (metricDuration) metricDuration.textContent = '0 phút';
-      distanceKm = 0;
-      durationMin = 0;
-      calculatePrice();
+    if (!pickupVal || !destVal) {
+      setRouteStatus('Nhập điểm đón và điểm đến để xem tuyến đường.');
+      return;
+    }
+    if (pickupVal.toLocaleLowerCase('vi') === destVal.toLocaleLowerCase('vi')) {
+      if (metricDistance) metricDistance.textContent = '---';
+      if (metricDuration) metricDuration.textContent = '---';
+      setRouteStatus('Điểm đón và điểm đến không được trùng nhau.', 'error');
       return;
     }
 
-    if (!pickupVal || !destVal) {
+    try {
+      const [pickup, destination] = await Promise.all([
+        pickupLocation?.label === pickupVal ? pickupLocation : resolveLocation(pickupVal),
+        destinationLocation?.label === destVal ? destinationLocation : resolveLocation(destVal),
+      ]);
+      if (requestId !== routeRequestId) return;
+      pickupLocation = pickup;
+      destinationLocation = destination;
+      const route = await getDrivingRoute(pickup, destination);
+      if (requestId !== routeRequestId) return;
+
+      distanceKm = route.distanceKm;
+      durationMin = route.durationMin;
+      hasRoute = true;
+      if (metricDistance) metricDistance.textContent = `${distanceKm.toFixed(1)} km`;
+      if (metricDuration) metricDuration.textContent = `~${durationMin} phút`;
+      if (routeMap) {
+        if (routeLine) routeLine.remove();
+        if (pickupMarker) pickupMarker.remove();
+        if (destinationMarker) destinationMarker.remove();
+        pickupMarker = globalThis.L.marker([pickup.lat, pickup.lng]).addTo(routeMap).bindPopup('Điểm đón');
+        destinationMarker = globalThis.L.marker([destination.lat, destination.lng]).addTo(routeMap).bindPopup('Điểm đến');
+        routeLine = globalThis.L.polyline(route.coordinates, { color: '#ff6b35', weight: 5 }).addTo(routeMap);
+        routeMap.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+      }
+      setRouteStatus(`Tuyến đường ô tô: ${distanceKm.toFixed(1)} km · khoảng ${durationMin} phút.`, 'success');
+      calculatePrice();
+    } catch (error) {
+      if (requestId !== routeRequestId) return;
+      hasRoute = false;
       distanceKm = 0;
       durationMin = 0;
-    } else {
-      // Giả lập khoảng cách linh hoạt từ 3.5 km tới 35 km
-      const combined = (pickupVal + destVal).length;
-      distanceKm = parseFloat(((combined % 25) + 4.2).toFixed(1));
-      durationMin = Math.round(distanceKm * 2.1 + 4);
+      pickupLocation = null;
+      destinationLocation = null;
+      clearDisplayedRoute();
+      if (metricDistance) metricDistance.textContent = 'Chưa có tuyến';
+      if (metricDuration) metricDuration.textContent = '---';
+      setRouteStatus(error.message || 'Không thể tính tuyến đường. Vui lòng thử lại.', 'error');
+      calculatePrice();
     }
-
-    if (summaryPickup) summaryPickup.textContent = pickupVal || '---';
-    if (summaryDest) summaryDest.textContent = destVal || '---';
-    if (metricDistance) metricDistance.textContent = distanceKm > 0 ? `${distanceKm} km` : '---';
-    if (metricDuration) metricDuration.textContent = durationMin > 0 ? `~${durationMin} phút` : '---';
-
-    calculatePrice();
   }
 
-  // Lắng nghe sự kiện thay đổi điểm đi & đến trực tiếp
-  if (pickupInput) pickupInput.addEventListener('input', updateDistance);
-  if (destInput) destInput.addEventListener('input', updateDistance);
+  [pickupInput, destInput].forEach((input) => {
+    input?.addEventListener('input', () => {
+      if (input === pickupInput) pickupLocation = null;
+      else destinationLocation = null;
+      routeRequestId += 1;
+      hasRoute = false;
+      distanceKm = 0;
+      durationMin = 0;
+      clearDisplayedRoute();
+      setRouteStatus('Đang cập nhật địa điểm và tính lại tuyến đường...');
+      calculatePrice();
+      clearTimeout(routeDebounce);
+      routeDebounce = setTimeout(updateDistance, 1200);
+    });
+  });
 
   // Nút Đổi Điểm Đi & Điểm Đến (Swap Locations)
   if (btnSwap) {
@@ -265,36 +321,36 @@ document.addEventListener('DOMContentLoaded', () => {
       const temp = pickupInput.value;
       pickupInput.value = destInput.value;
       destInput.value = temp;
+      [pickupLocation, destinationLocation] = [destinationLocation, pickupLocation];
 
       // Cập nhật lại khoảng cách & giá cước
       updateDistance();
     });
   }
 
-  // Nút Lấy vị trí hiện tại bằng Geolocation API (📍)
+  // Nút lấy vị trí hiện tại bằng Geolocation API
   if (btnGeo) {
     btnGeo.addEventListener('click', () => {
       btnGeo.textContent = '⌛';
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            const lat = pos.coords.latitude.toFixed(4);
-            const lng = pos.coords.longitude.toFixed(4);
-            pickupInput.value = `Vị trí hiện tại của tôi (${lat}, ${lng})`;
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            pickupInput.value = `${lat}, ${lng}`;
+            pickupLocation = { label: pickupInput.value, lat, lng };
             btnGeo.textContent = '📍';
             updateDistance();
           },
           (error) => {
             console.warn('Geolocation Error:', error);
-            pickupInput.value = 'Chợ Bến Thành, Lê Lợi, Quận 1, TPHCM';
             btnGeo.textContent = '📍';
-            updateDistance();
+            setRouteStatus(`Không lấy được vị trí: ${error.message}`, 'error');
           }
         );
       } else {
-        pickupInput.value = 'Chợ Bến Thành, Lê Lợi, Quận 1, TPHCM';
         btnGeo.textContent = '📍';
-        updateDistance();
+        setRouteStatus('Trình duyệt này không hỗ trợ định vị.', 'error');
       }
     });
   }
@@ -304,6 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tag.addEventListener('click', () => {
       if (destInput) {
         destInput.value = tag.getAttribute('data-dest');
+        destinationLocation = null;
         updateDistance();
       }
     });
@@ -334,7 +391,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     lastFareResult = result;
 
-    if (priceRowDist) priceRowDist.textContent = `Cước quãng đường (${distanceKm} km):`;
+    if (priceRowDist) {
+      priceRowDist.textContent = hasRoute
+        ? `Cước quãng đường (${distanceKm.toFixed(1)} km):`
+        : 'Cước quãng đường (chưa xác định):';
+    }
+    if (!hasRoute) {
+      priceBaseEl.textContent = '—';
+      priceDistEl.textContent = '—';
+      if (rowDiscount) rowDiscount.style.display = 'none';
+      if (priceRowSurcharge) priceRowSurcharge.style.display = 'none';
+      priceTotalEl.textContent = '—';
+      return;
+    }
+
     priceBaseEl.textContent = formatAmount(result.baseFare);
     priceDistEl.textContent = formatAmount(result.distanceCost);
 
@@ -549,6 +619,15 @@ document.addEventListener('DOMContentLoaded', () => {
         focusFirstError(errors);
         return;
       }
+      if (!hasRoute) {
+        const message = 'Vui lòng chờ bản đồ xác định được tuyến đường thực tế trước khi đặt xe.';
+        if (formErrorSummary) {
+          formErrorSummary.textContent = message;
+          formErrorSummary.style.display = 'block';
+        }
+        setRouteStatus(message, 'error');
+        return;
+      }
 
       const driver = demoDrivers[Math.floor(Math.random() * demoDrivers.length)];
 
@@ -566,6 +645,8 @@ document.addEventListener('DOMContentLoaded', () => {
           destinationLocation: values.destination,
           distanceKm,
           estimatedDurationMin: durationMin,
+          pickupCoordinates: pickupLocation ? [pickupLocation.lat, pickupLocation.lng] : null,
+          destinationCoordinates: destinationLocation ? [destinationLocation.lat, destinationLocation.lng] : null,
         },
         schedule: {
           pickupDate: values.date,
