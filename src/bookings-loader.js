@@ -49,6 +49,11 @@ function getStatusBadge(status, text) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('admin_authenticated') !== 'true') {
+    window.location.replace('admin-login.html?next=danhsachchuyen.html');
+    return;
+  }
+
   const tbody = document.getElementById('bookings-table-body');
   const searchInput = document.getElementById('booking-search-input');
   const statusFilter = document.getElementById('booking-status-filter');

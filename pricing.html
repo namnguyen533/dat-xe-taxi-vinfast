@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Bảng giá dịch vụ taxi điện VinFast theo từng dòng xe, km di chuyển và gói thuê." />
+    <title>Bảng giá dịch vụ - TaxiVinFast</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <a href="index.html"><h1>TaxiVinFast</h1></a>
+        </div>
+        <nav class="nav-menu" aria-label="Điều hướng chính">
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+            <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
+            <li><a href="booking.html" class="nav-link">Đặt xe</a></li>
+            <li><a href="pricing.html" class="nav-link active" aria-current="page">Bảng giá</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <a href="dangnhap.html" class="btn-login">Đăng nhập</a>
+          <a href="dki.html" class="btn-register">Đăng ký</a>
+          <a href="admin.html" class="btn-register">Quản trị</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="pricing-page">
+      <section class="pricing-hero">
+        <div class="pricing-hero-content">
+          <span class="pricing-eyebrow">GIÁ CƯỚC MINH BẠCH</span>
+          <h2>Bảng giá dịch vụ</h2>
+          <p>Chọn dòng xe phù hợp và xem chi tiết giá cước trước mỗi hành trình.</p>
+          <a href="booking.html" class="pricing-cta">Đặt xe ngay <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="pricing-hero-mark" aria-hidden="true">VF</div>
+      </section>
+
+      <section class="pricing-section" aria-labelledby="standard-prices-title">
+        <div class="pricing-section-heading">
+          <div>
+            <span class="pricing-section-kicker">DI CHUYỂN THEO CHUYẾN</span>
+            <h2 id="standard-prices-title">Giá cước theo dòng xe</h2>
+          </div>
+          <p>Áp dụng cùng cấu hình giá đang sử dụng trên trang đặt xe.</p>
+        </div>
+        <p id="pricing-error" class="pricing-error" role="alert" hidden></p>
+        <div class="pricing-table-wrap">
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th scope="col">Dòng xe</th>
+                <th scope="col">Số chỗ</th>
+                <th scope="col">Giá mở cửa</th>
+                <th scope="col">Từ km tiếp theo đến 25km</th>
+                <th scope="col">Từ km 26</th>
+                <th scope="col">Phí chờ / 5 phút</th>
+              </tr>
+            </thead>
+            <tbody id="pricing-table-body">
+              <tr><td colspan="6" class="pricing-loading">Đang tải bảng giá...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="pricing-footnote">Giá mở cửa bao gồm quãng đường đầu tiên theo cấu hình giá. Tổng cước có thể thay đổi theo thời gian, phụ phí áp dụng và điểm đến.</p>
+      </section>
+
+      <section class="pricing-section pricing-rental-section" aria-labelledby="rental-prices-title">
+        <div class="pricing-section-heading">
+          <div>
+            <span class="pricing-section-kicker">CHỦ ĐỘNG LỊCH TRÌNH</span>
+            <h2 id="rental-prices-title">Gói thuê theo giờ</h2>
+          </div>
+          <p>Giá gói và giới hạn quãng đường được cập nhật theo cấu hình hiện tại.</p>
+        </div>
+        <div id="hourly-pricing-list" class="hourly-pricing-list"></div>
+      </section>
+
+      <section class="pricing-notice">
+        <div class="pricing-notice-icon" aria-hidden="true">i</div>
+        <div>
+          <h2>Lưu ý về giá</h2>
+          <p>Phụ phí giờ cao điểm, ban đêm, thời tiết, ngày lễ, phí dịch vụ và khuyến mãi (nếu có) sẽ được hiển thị khi tính giá đặt xe. Phí cầu đường tính theo chi phí thực tế.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>TaxiVinFast</h3>
+          <p>Dịch vụ taxi điện uy tín, chất lượng</p>
+        </div>
+        <div class="footer-section">
+          <h3>Liên kết</h3>
+          <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="cars.html">Danh sách xe</a></li>
+            <li><a href="booking.html">Đặt xe</a></li>
+            <li><a href="pricing.html" aria-current="page">Bảng giá</a></li>
+            <li><a href="admin.html">Trang quản trị</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Liên hệ</h3>
+          <p>Hotline: 1900 232389</p>
+          <p>Email: hotro@taxivinfast.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 TaxiVinFast. All rights reserved.</p></div>
+    </footer>
+
+    <script type="module" src="/src/pricing-table.js"></script>
+  </body>
+</html>

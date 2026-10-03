@@ -136,6 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let operationsState = getAdminOperations();
   let pricingState = getPricingConfig();
   const actorName = adminUser.name || 'Quản trị viên';
+  const driverVehicleSelect = document.getElementById('driver-vehicle-model');
+  if (driverVehicleSelect) {
+    driverVehicleSelect.innerHTML = '<option value="">Chọn loại xe</option>' + carsInitialData
+      .map((car) => `<option value="${escapeHtml(car.name)}">${escapeHtml(car.name)} · ${Number(car.seats)} chỗ</option>`)
+      .join('');
+  }
 
   function recordAudit(action, entity, detail) {
     operationsState.auditLogs.unshift({
@@ -359,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const drivers = new Map(operationsState.drivers.map((driver) => [
       driver.name,
-      { ...driver, car: '', plate: '', trips: 0, activeTrips: 0, completedTrips: 0, earnings: 0 },
+      { ...driver, car: driver.vehicleModel || '', plate: '', trips: 0, activeTrips: 0, completedTrips: 0, earnings: 0 },
     ]));
     bookingsState.forEach((booking) => {
       const name = booking.driver?.name?.trim();
@@ -512,7 +518,10 @@ document.addEventListener('DOMContentLoaded', () => {
               <label>Điều phối tài xế
                 <select class="form-select dispatch-driver-select" data-booking-id="${id}">
                   <option value="">${booking.driver?.name ? `Hiện tại: ${escapeHtml(booking.driver.name)}` : 'Chọn tài xế'}</option>
-                  ${eligibleDrivers.map((driver) => `<option value="${escapeHtml(driver.id)}">${escapeHtml(driver.name)}${driver.shift === 'on' ? ' · Đang trực' : ''}</option>`).join('')}
+                  ${eligibleDrivers
+                    .filter((driver) => !driver.vehicleModel || driver.vehicleModel === booking.vehicle?.model)
+                    .map((driver) => `<option value="${escapeHtml(driver.id)}">${escapeHtml(driver.name)}${driver.vehicleModel ? ` · ${escapeHtml(driver.vehicleModel)}` : ''}${driver.shift === 'on' ? ' · Đang trực' : ''}</option>`)
+                    .join('')}
                 </select>
               </label>
             </article>
@@ -783,6 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     const name = document.getElementById('driver-name').value.trim();
     const phone = document.getElementById('driver-phone').value.trim();
+    const vehicleModel = driverVehicleSelect.value;
     if (operationsState.drivers.some((driver) => driver.phone === phone)) {
       window.alert('Số điện thoại tài xế đã có trong danh sách.');
       return;
@@ -791,6 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
       id: `DRV-${Date.now().toString().slice(-6)}`,
       name,
       phone,
+      vehicleModel,
       rating: null,
       approved: false,
       blocked: false,
@@ -803,7 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
       earnings: 0,
     });
     event.currentTarget.reset();
-    persistOperations('Tạo hồ sơ tài xế demo', name, `${phone} · Chờ duyệt`);
+    persistOperations('Tạo hồ sơ tài xế demo', name, `${phone} · ${vehicleModel} · Chờ duyệt`);
   });
 
   document.getElementById('admin-incidents-table')?.addEventListener('click', (event) => {

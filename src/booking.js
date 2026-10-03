@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('booking-success-modal');
   const btnModalClose = document.getElementById('btn-modal-close');
   const btnModalDone = document.getElementById('btn-modal-done');
-  const btnModalHistory = document.getElementById('btn-modal-history');
   const receiptStatus = document.getElementById('receipt-status');
 
   // Ô nhập liệu + thông báo lỗi tương ứng
@@ -616,7 +615,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnModalClose) btnModalClose.addEventListener('click', closeModal);
   if (btnModalDone) btnModalDone.addEventListener('click', closeModal);
-  if (btnModalHistory) btnModalHistory.addEventListener('click', () => { window.location.href = 'danhsachchuyen.html'; });
   modal?.addEventListener('click', (event) => {
     if (event.target === modal) closeModal();
   });
