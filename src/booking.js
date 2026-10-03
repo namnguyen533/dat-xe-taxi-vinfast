@@ -1,6 +1,7 @@
 import './style.css';
 import { calculateTripFare } from './price-calculator.js';
 import { bookingStore, formatVND } from './data/booking-store.js';
+import { getPricingConfig } from './data/pricing-store.js';
 import { validateBookingForm } from './form-validation.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -84,6 +85,23 @@ document.addEventListener('DOMContentLoaded', () => {
     type: 'Compact SUV (4 chỗ)',
     img: '/src/assets/vf5.jpg'
   };
+
+  const customerPricing = getPricingConfig();
+  vehicleCards.forEach((card) => {
+    const model = card.getAttribute('data-model') || '';
+    const rate = customerPricing.standardRates.find((item) =>
+      item.modelName.toLocaleLowerCase('vi').includes(model.toLocaleLowerCase('vi')),
+    );
+    if (!rate) return;
+    card.dataset.base = String(rate.baseFare);
+    card.dataset.perKm = String(rate.rateUnder25km);
+    const rateElement = card.querySelector('.vehicle-price-tag .price');
+    if (rateElement) rateElement.textContent = `${new Intl.NumberFormat('vi-VN').format(rate.rateUnder25km)}đ`;
+    if (card.classList.contains('active')) {
+      currentCar.basePrice = rate.baseFare;
+      currentCar.perKmPrice = rate.rateUnder25km;
+    }
+  });
 
   let distanceKm = 12.5;
   let durationMin = 25;
@@ -311,7 +329,9 @@ document.addEventListener('DOMContentLoaded', () => {
       perKmPrice: currentCar.perKmPrice,
       serviceType: selectedService,
       pickupTime: timeVal,
-      couponCode: appliedCoupon
+      pickupDate: dateInput?.value || '',
+      couponCode: appliedCoupon,
+      vehicleModel: currentCar.model,
     });
     lastFareResult = result;
 
@@ -327,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Phụ phí dịch vụ / đêm (thay cho dòng "Miễn phí" cố định)
-    const surcharge = (result.nightSurcharge || 0) + (result.serviceFee || 0);
+    const surcharge = (result.nightSurcharge || 0) + (result.peakSurcharge || 0) + (result.rainSurcharge || 0) + (result.holidaySurcharge || 0) + (result.serviceFee || 0);
     if (priceRowSurcharge) priceRowSurcharge.style.display = surcharge > 0 ? 'flex' : 'none';
     if (priceSurchargeEl) priceSurchargeEl.textContent = `+ ${formatAmount(surcharge)}`;
 
@@ -437,13 +457,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (code === 'VINFAST20') {
+      const promotion = getPricingConfig().promotions.find(
+        (item) => item.code.toUpperCase() === code && item.active !== false,
+      );
+      if (promotion) {
         appliedCoupon = code;
-        couponMsg.textContent = '✓ Đã áp dụng mã VINFAST20 (Giảm 20%, tối đa 50.000đ)!';
-        couponMsg.className = 'coupon-msg success';
-      } else if (code === 'XEXANH') {
-        appliedCoupon = code;
-        couponMsg.textContent = '✓ Đã áp dụng mã XEXANH (Giảm 30.000đ)!';
+        couponMsg.textContent = `✓ Đã áp dụng mã ${code} (${promotion.description})`;
         couponMsg.className = 'coupon-msg success';
       } else {
         appliedCoupon = '';

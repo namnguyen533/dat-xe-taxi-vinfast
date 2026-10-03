@@ -1,3 +1,5 @@
+import { getPricingConfig } from './data/pricing-store.js';
+
 /**
  * CÔNG CỤ MÔ PHỎNG TÍNH GIÁ CƯỚC CHUYẾN ĐI TAXI VINFAST
  * @param {Object} params Tham số đầu vào để tính giá cước
@@ -15,7 +17,10 @@ export function calculateTripFare({
   perKmPrice = 10000,
   serviceType = 'point-to-point',
   pickupTime = '12:00',
-  couponCode = ''
+  pickupDate = '',
+  couponCode = '',
+  vehicleModel = '',
+  pricingConfig = getPricingConfig(),
 }) {
   if (distanceKm <= 0) {
     return {
@@ -29,6 +34,15 @@ export function calculateTripFare({
       formattedTotal: '0 đ',
       breakdown: []
     };
+  }
+
+  const normalizedModel = String(vehicleModel).toLocaleLowerCase('vi');
+  const configuredRate = pricingConfig.standardRates.find((rate) =>
+    normalizedModel && rate.modelName.toLocaleLowerCase('vi').includes(normalizedModel),
+  );
+  if (configuredRate) {
+    basePrice = configuredRate.baseFare;
+    perKmPrice = distanceKm > 25 ? configuredRate.rateOver25km : configuredRate.rateUnder25km;
   }
 
   // 1. Tính giá mở cửa (Mặc định cho 1 km đầu tiên)
@@ -46,31 +60,47 @@ export function calculateTripFare({
   // 3. Phụ phí loại dịch vụ
   let serviceFee = 0;
   if (serviceType === 'hourly') {
-    serviceFee = 50000; // Phụ phí thuê theo giờ
+    serviceFee = pricingConfig.surcharges?.serviceFees?.hourly ?? 50000;
   } else if (serviceType === 'airport') {
-    serviceFee = 15000; // Phí sân bay / bến bãi
+    serviceFee = pricingConfig.surcharges?.serviceFees?.airport ?? 15000;
   }
 
-  // 4. Tính Phụ phí đêm (22:00 - 05:00) +10%
+  const surchargeBase = baseFare + distanceCost;
   let nightSurcharge = 0;
   if (pickupTime) {
     const hour = parseInt(pickupTime.split(':')[0], 10);
     if (hour >= 22 || hour < 5) {
-      nightSurcharge = (baseFare + distanceCost) * 0.10;
+      nightSurcharge = surchargeBase * (Number(pricingConfig.surcharges?.nightSurcharge?.percentage ?? 10) / 100);
     }
   }
+  const isPeak = pricingConfig.surcharges?.peakHours?.enabled
+    && String(pricingConfig.surcharges.peakHours.ranges || '').split(',').some((range) => {
+      const [start, end] = range.trim().split('-').map((time) => time.trim());
+      return start && end && pickupTime >= start && pickupTime <= end;
+    });
+  const peakSurcharge = isPeak
+    ? surchargeBase * (Number(pricingConfig.surcharges.peakHours.percentage) || 0) / 100
+    : 0;
+  const rainSurcharge = pricingConfig.surcharges?.rain?.enabled
+    ? surchargeBase * (Number(pricingConfig.surcharges.rain.percentage) || 0) / 100
+    : 0;
+  const isHoliday = (pricingConfig.surcharges?.holidaySurcharge?.dates || []).includes(pickupDate);
+  const holidaySurcharge = isHoliday
+    ? surchargeBase * (Number(pricingConfig.surcharges.holidaySurcharge.percentage) || 0) / 100
+    : 0;
 
   // Tổng tiền trước giảm giá (Subtotal)
-  const subtotal = baseFare + distanceCost + serviceFee + nightSurcharge;
+  const subtotal = baseFare + distanceCost + serviceFee + nightSurcharge + peakSurcharge + rainSurcharge + holidaySurcharge;
 
   // 5. Tính giảm giá Khuyến mãi
   let discount = 0;
   const cleanCoupon = (couponCode || '').trim().toUpperCase();
 
-  if (cleanCoupon === 'VINFAST20') {
-    discount = Math.min(50000, subtotal * 0.20); // Giảm 20%, tối đa 50k
-  } else if (cleanCoupon === 'XEXANH') {
-    discount = 30000; // Giảm cố định 30k
+  const promotion = pricingConfig.promotions.find((item) => item.code.toUpperCase() === cleanCoupon && item.active !== false);
+  if (promotion?.discountType === 'percentage') {
+    discount = Math.min(Number(promotion.maxDiscount) || Number.POSITIVE_INFINITY, subtotal * Number(promotion.discountValue) / 100);
+  } else if (promotion?.discountType === 'fixed') {
+    discount = Number(promotion.discountValue) || 0;
   }
 
   // 6. Tổng tiền cuối cùng sau giảm giá
@@ -83,6 +113,9 @@ export function calculateTripFare({
     baseFare,
     distanceCost: Math.round(distanceCost),
     nightSurcharge: Math.round(nightSurcharge),
+    peakSurcharge: Math.round(peakSurcharge),
+    rainSurcharge: Math.round(rainSurcharge),
+    holidaySurcharge: Math.round(holidaySurcharge),
     serviceFee,
     discount: Math.round(discount),
     subtotal: Math.round(subtotal),
@@ -92,9 +125,11 @@ export function calculateTripFare({
       { label: "Giá mở cửa", value: formatVND(baseFare) },
       { label: `Cước quãng đường (${distanceKm} km)`, value: formatVND(distanceCost) },
       nightSurcharge > 0 ? { label: "Phụ phí đêm (22h-5h +10%)", value: formatVND(nightSurcharge) } : null,
+      peakSurcharge > 0 ? { label: "Phụ phí giờ cao điểm", value: formatVND(peakSurcharge) } : null,
+      rainSurcharge > 0 ? { label: "Phụ phí thời tiết", value: formatVND(rainSurcharge) } : null,
+      holidaySurcharge > 0 ? { label: "Phụ phí ngày lễ", value: formatVND(holidaySurcharge) } : null,
       serviceFee > 0 ? { label: "Phụ phí dịch vụ / Sân bay", value: formatVND(serviceFee) } : null,
       discount > 0 ? { label: `Giảm giá mã (${cleanCoupon})`, value: `- ${formatVND(discount)}`, isDiscount: true } : null
     ].filter(Boolean)
   };
 }
-
