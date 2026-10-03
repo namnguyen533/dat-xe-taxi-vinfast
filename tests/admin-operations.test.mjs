@@ -32,6 +32,30 @@ test('admin operations initialize demo fleet, drivers, complaints, and persist c
   assert.ok(storage.getItem(ADMIN_OPERATIONS_KEY));
 });
 
+test('driver vehicle model is persisted with the driver profile', () => {
+  const storage = memoryStorage();
+  const state = getAdminOperations(storage);
+  state.drivers.push({
+    id: 'DRV-TEST',
+    name: 'Tài xế kiểm thử',
+    phone: '0900000000',
+    vehicleModel: 'VinFast VF 8',
+    approved: false,
+    blocked: false,
+    shift: 'off',
+    walletBalance: 0,
+    incentiveBalance: 0,
+    penaltyBalance: 0,
+    trips: 0,
+    earnings: 0,
+  });
+
+  saveAdminOperations(state, storage);
+
+  const savedDriver = getAdminOperations(storage).drivers.find((driver) => driver.id === 'DRV-TEST');
+  assert.equal(savedDriver.vehicleModel, 'VinFast VF 8');
+});
+
 test('pricing config changes are persisted and used by trip fare calculation', () => {
   const storage = memoryStorage();
   const config = getPricingConfig(storage);

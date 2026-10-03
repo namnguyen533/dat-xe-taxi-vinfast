@@ -40,9 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Ẩn thông báo lỗi nếu có
         if (errorMsg) errorMsg.style.display = 'none';
 
-        // Thông báo & Chuyển hướng sang trang Admin Dashboard
-        alert('🎉 Đăng nhập Admin thành công! Chuyển hướng tới bảng quản trị...');
-        window.location.href = 'admin.html';
+        const requestedNext = new URLSearchParams(window.location.search).get('next');
+        const destination = requestedNext === 'danhsachchuyen.html'
+          ? 'danhsachchuyen.html'
+          : 'admin.html';
+        alert(`🎉 Đăng nhập Admin thành công! Chuyển hướng tới ${destination === 'admin.html' ? 'bảng quản trị' : 'lịch sử chuyến đi'}...`);
+        window.location.href = destination;
       } else {
         if (errorMsg) {
           errorMsg.textContent = '❌ Tên đăng nhập hoặc mật khẩu không chính xác (Thử: admin / 123456)';

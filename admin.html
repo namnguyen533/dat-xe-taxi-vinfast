@@ -329,8 +329,11 @@
                 <span class="badge-status info">Dữ liệu đơn + hồ sơ demo</span>
               </div>
               <form class="admin-inline-form driver-form" id="driver-form">
-                <input id="driver-name" class="form-input" placeholder="Họ tên tài xế" required />
-                <input id="driver-phone" class="form-input" type="tel" placeholder="Số điện thoại" required />
+                <input id="driver-name" class="form-input" placeholder="Họ tên tài xế" aria-label="Họ tên tài xế" required />
+                <input id="driver-phone" class="form-input" type="tel" placeholder="Số điện thoại" aria-label="Số điện thoại tài xế" required />
+                <select id="driver-vehicle-model" class="form-select" aria-label="Loại xe tài xế đảm nhận" required>
+                  <option value="">Chọn loại xe</option>
+                </select>
                 <button class="btn-sm-primary" type="submit">Thêm hồ sơ chờ duyệt</button>
               </form>
 
