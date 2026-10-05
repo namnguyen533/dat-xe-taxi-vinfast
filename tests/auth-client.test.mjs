@@ -1,7 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { AUTH_TOKEN_KEY, createAuthClient, saveAuthToken } from '../src/auth-client.js';
+import {
+  AUTH_TOKEN_KEY,
+  AUTH_USER_KEY,
+  clearAuthSession,
+  createAuthClient,
+  hasAuthSession,
+  saveAuthToken,
+} from '../src/auth-client.js';
 
 function response(body, ok = true) {
   return {
@@ -79,4 +86,31 @@ test('auth token is saved under the session key', () => {
   });
 
   assert.equal(entries.get(AUTH_TOKEN_KEY), 'jwt-token');
+});
+
+test('authentication state is detected from session or persistent storage', () => {
+  const emptyStorage = { getItem: () => null };
+  const sessionStorage = { getItem: (key) => key === AUTH_TOKEN_KEY ? 'jwt-token' : null };
+  const localStorage = { getItem: (key) => key === AUTH_TOKEN_KEY ? 'jwt-token' : null };
+
+  assert.equal(hasAuthSession(emptyStorage, emptyStorage), false);
+  assert.equal(hasAuthSession(sessionStorage, emptyStorage), true);
+  assert.equal(hasAuthSession(emptyStorage, localStorage), true);
+});
+
+test('logging out clears the session, persistent token, and current account', () => {
+  const sessionEntries = new Map([[AUTH_TOKEN_KEY, 'session-token']]);
+  const localEntries = new Map([
+    [AUTH_TOKEN_KEY, 'persistent-token'],
+    [AUTH_USER_KEY, '{"email":"rider@example.com"}'],
+  ]);
+  const storage = (entries) => ({
+    removeItem: (key) => entries.delete(key),
+  });
+
+  clearAuthSession(storage(sessionEntries), storage(localEntries));
+
+  assert.equal(sessionEntries.has(AUTH_TOKEN_KEY), false);
+  assert.equal(localEntries.has(AUTH_TOKEN_KEY), false);
+  assert.equal(localEntries.has(AUTH_USER_KEY), false);
 });

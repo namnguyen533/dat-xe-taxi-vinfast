@@ -136,6 +136,11 @@ function initializeRegistration() {
         result = { accessToken: 'local-demo-token' };
       }
 
+      saveCurrentUser({
+        name: fields.name.value.trim(),
+        phone: fields.phone.value.trim(),
+        email: fields.email.value.trim(),
+      });
       if (result?.accessToken) saveAuthToken(result.accessToken);
       const params = new URLSearchParams(window.location.search);
       const next = params.get('next') || 'index.html';
@@ -185,6 +190,11 @@ function initializeLogin() {
         const result = await authClient.login({
           email: safeEmail,
           password: safePassword,
+        });
+        saveCurrentUser({
+          name: result.user?.name || result.user?.fullname || safeEmail,
+          email: result.user?.email || safeEmail,
+          phone: result.user?.phone || '',
         });
         saveAuthToken(result.accessToken);
         const params = new URLSearchParams(window.location.search);

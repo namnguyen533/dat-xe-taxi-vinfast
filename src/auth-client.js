@@ -2,6 +2,20 @@ const DEFAULT_AUTH_API_URL = 'http://127.0.0.1:3000';
 const AUTH_API_URL = (import.meta.env?.VITE_AUTH_API_URL || DEFAULT_AUTH_API_URL).replace(/\/$/, '');
 
 export const AUTH_TOKEN_KEY = 'taxi-vinfast-auth-token';
+export const AUTH_USER_KEY = 'taxi-current-user';
+
+export function hasAuthSession(sessionStorage = globalThis.sessionStorage, localStorage = globalThis.localStorage) {
+  return Boolean(
+    sessionStorage?.getItem(AUTH_TOKEN_KEY)
+    || localStorage?.getItem(AUTH_TOKEN_KEY),
+  );
+}
+
+export function clearAuthSession(sessionStorage = globalThis.sessionStorage, localStorage = globalThis.localStorage) {
+  sessionStorage?.removeItem(AUTH_TOKEN_KEY);
+  localStorage?.removeItem(AUTH_TOKEN_KEY);
+  localStorage?.removeItem(AUTH_USER_KEY);
+}
 
 function getErrorMessage(body) {
   if (typeof body?.message === 'string') return body.message;
