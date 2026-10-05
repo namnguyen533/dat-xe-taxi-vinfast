@@ -140,6 +140,21 @@ test('đơn hoàn thành được đánh dấu đã thanh toán, đơn hủy đ�
   assert.equal(store.getById(id).payment.status, 'refunded');
 });
 
+test('đơn chờ xác nhận có thể bắt đầu, hoàn thành hoặc hủy chuyến', () => {
+  const { store } = makeStore();
+  const startableBooking = seedBookings.find((booking) => booking.status === 'pending');
+  const cancellableBooking = seedBookings.find((booking) => booking.status === 'confirmed');
+
+  const started = store.updateStatus(startableBooking.bookingId, 'in_progress');
+  assert.equal(started.status, 'in_progress');
+  assert.equal(started.statusText, 'Đang thực hiện');
+  assert.equal(store.updateStatus(startableBooking.bookingId, 'completed').status, 'completed');
+
+  const cancelled = store.updateStatus(cancellableBooking.bookingId, 'cancelled');
+  assert.equal(cancelled.status, 'cancelled');
+  assert.equal(cancelled.statusText, 'Đã hủy');
+});
+
 test('từ chối trạng thái không hợp lệ', () => {
   const { store } = makeStore();
   const id = seedBookings[0].bookingId;
