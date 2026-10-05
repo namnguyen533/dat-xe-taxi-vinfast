@@ -246,7 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tbody.innerHTML = filtered.map((booking) => {
       const id = escapeHtml(booking.bookingId);
-      const canComplete = !['completed', 'cancelled'].includes(booking.status);
+      const canStart = ['pending', 'confirmed'].includes(booking.status);
+      const canComplete = booking.status === 'in_progress';
       const canCancel = !['completed', 'cancelled'].includes(booking.status);
       const paymentStatus = booking.payment?.status === 'paid'
         ? 'Đã thanh toán'
@@ -293,8 +294,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>${getStatusBadge(booking.status)}</td>
           <td>
             <div class="action-buttons-cell">
-              ${canComplete ? `<button type="button" class="btn-sm-action approve" data-action="complete" data-id="${id}">Hoàn thành</button>` : ''}
-              ${canCancel ? `<button type="button" class="btn-sm-action cancel" data-action="cancel" data-id="${id}">Hủy đơn</button>` : ''}
+              ${canStart ? `<button type="button" class="btn-sm-action approve" data-action="start" data-id="${id}">${booking.status === 'pending' ? 'Xác nhận' : 'Bắt đầu chuyến'}</button>` : ''}
+              ${canComplete ? `<button type="button" class="btn-sm-action approve" data-action="complete" data-id="${id}">Hoàn thành chuyến</button>` : ''}
+              ${canCancel ? `<button type="button" class="btn-sm-action cancel" data-action="cancel" data-id="${id}">Hủy chuyến</button>` : ''}
               <button type="button" class="btn-sm-action delete" data-action="delete" data-id="${id}">Xóa</button>
             </div>
           </td>
@@ -1164,11 +1166,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const { action, id } = button.dataset;
     if (!id) return;
 
-    if (action === 'complete' || action === 'cancel') {
-      const nextStatus = action === 'complete' ? 'completed' : 'cancelled';
+    if (action === 'start' || action === 'complete' || action === 'cancel') {
+      const nextStatus = {
+        start: 'in_progress',
+        complete: 'completed',
+        cancel: 'cancelled',
+      }[action];
       const label = STATUS_MAP[nextStatus].text.toLocaleLowerCase('vi');
       if (!window.confirm(`Bạn có chắc muốn chuyển đơn ${id} sang trạng thái "${label}"?`)) return;
-      bookingStore.updateStatus(id, nextStatus);
+      const updatedBooking = bookingStore.updateStatus(id, nextStatus);
+      if (updatedBooking) {
+        recordAudit('Cập nhật trạng thái đơn', id, `Trạng thái mới: ${label}`);
+      }
     } else if (action === 'delete') {
       if (!window.confirm(`Xóa đơn ${id} khỏi lịch sử đặt xe? Thao tác này sẽ đồng bộ sang trang khách hàng.`)) return;
       bookingStore.remove(id);
