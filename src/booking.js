@@ -3,7 +3,7 @@ import { calculateTripFare } from './price-calculator.js';
 import { bookingStore, formatVND } from './data/booking-store.js';
 import { getPricingConfig } from './data/pricing-store.js';
 import { validateBookingForm } from './form-validation.js';
-import { getDrivingRoute, resolveLocation, searchLocations } from './route-service.js';
+import { getDrivingRoute, isWithinHanoi, resolveLocation, searchLocations } from './route-service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const authToken = sessionStorage.getItem('taxi-vinfast-auth-token') || localStorage.getItem('taxi-vinfast-auth-token');
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let destinationMarker;
   let currentLocationMarker;
   let currentLocationAccuracy;
-  let isVietnamOverviewVisible = true;
+  let isHanoiOverviewVisible = true;
   let pickupLocation;
   let destinationLocation;
   /** Mã giảm giá đã áp dụng thành công ('' = không dùng) */
@@ -188,25 +188,25 @@ document.addEventListener('DOMContentLoaded', () => {
     },
   ];
 
-  const vietnamBounds = [[5, 101.5], [24.5, 115]];
-  const majorVietnamCities = [
-    { name: 'Hà Nội', coordinates: [21.0285, 105.8542] },
-    { name: 'Điện Biên Phủ', coordinates: [21.386, 103.023] },
-    { name: 'Hải Phòng', coordinates: [20.8449, 106.6881] },
-    { name: 'Huế', coordinates: [16.4637, 107.5909] },
-    { name: 'Đà Nẵng', coordinates: [16.0544, 108.2022] },
-    { name: 'Nha Trang', coordinates: [12.2388, 109.1967] },
-    { name: 'TP. Hồ Chí Minh', coordinates: [10.8231, 106.6297] },
-    { name: 'Cần Thơ', coordinates: [10.0452, 105.7469] },
-    { name: 'Quần đảo Hoàng Sa', coordinates: [16.5, 112] },
-    { name: 'Quần đảo Trường Sa', coordinates: [8.64, 111.92] },
+  const hanoiBounds = [[20.50, 105.20], [21.50, 106.25]];
+  const hanoiKeyLocations = [
+    { name: 'Hồ Hoàn Kiếm (Trung tâm)', coordinates: [21.0285, 105.8542] },
+    { name: 'Sân bay Quốc tế Nội Bài', coordinates: [21.2212, 105.8072] },
+    { name: 'Hồ Tây (Tây Hồ)', coordinates: [21.0583, 105.8230] },
+    { name: 'Văn Miếu Quốc Tử Giám', coordinates: [21.0293, 105.8360] },
+    { name: 'Cầu Giấy / TT Hội nghị QG', coordinates: [21.0068, 105.7876] },
+    { name: 'Vinhomes Smart City (Nam Từ Liêm)', coordinates: [20.9980, 105.7430] },
+    { name: 'Vinhomes Ocean Park (Gia Lâm)', coordinates: [20.9950, 105.9500] },
+    { name: 'Hà Đông (Văn Quán)', coordinates: [20.9720, 105.7760] },
+    { name: 'Long Biên (Aeon Mall)', coordinates: [21.0270, 105.9010] },
+    { name: 'Bến xe Mỹ Đình', coordinates: [21.0283, 105.7780] },
   ];
 
-  function showVietnamOverview() {
+  function showHanoiOverview() {
     if (!routeMap) return;
-    isVietnamOverviewVisible = true;
-    routeMap.fitBounds(vietnamBounds, { padding: [14, 14] });
-    if (mapViewLabel) mapViewLabel.textContent = 'Toàn Việt Nam · đánh dấu các thành phố lớn';
+    isHanoiOverviewVisible = true;
+    routeMap.fitBounds(hanoiBounds, { padding: [16, 16] });
+    if (mapViewLabel) mapViewLabel.textContent = 'Khu vực Hà Nội · các điểm đón trả phổ biến';
   }
 
   function loadTileProvider(index) {
@@ -239,19 +239,19 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     routeMap = globalThis.L.map(mapElement);
-    routeMap.setMaxBounds(globalThis.L.latLngBounds(vietnamBounds).pad(0.12));
-    routeMap.setMinZoom(4);
-    majorVietnamCities.forEach(({ name, coordinates }) => {
-      const marker = globalThis.L.circleMarker(coordinates, {
-        radius: 4,
+    routeMap.setMaxBounds(globalThis.L.latLngBounds(hanoiBounds).pad(0.08));
+    routeMap.setMinZoom(9);
+    hanoiKeyLocations.forEach(({ name, coordinates }) => {
+      globalThis.L.circleMarker(coordinates, {
+        radius: 5,
         color: '#fff',
-        weight: 1,
-        fillColor: '#fa7045',
-        fillOpacity: 1,
-      }).addTo(routeMap).bindPopup(name);
+        weight: 1.5,
+        fillColor: '#0084ff',
+        fillOpacity: 0.9,
+      }).addTo(routeMap).bindPopup(`<strong>${name}</strong><br><small>Hà Nội</small>`);
     });
-    showVietnamOverview();
-    setMapStatus('Đang tải bản đồ đường phố...');
+    showHanoiOverview();
+    setMapStatus('Đang tải bản đồ đường phố Hà Nội...');
     loadTileProvider(0);
     setTimeout(() => routeMap?.invalidateSize(), 0);
   }
@@ -363,9 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (metricDuration) metricDuration.textContent = `~${durationMin} phút`;
       if (routeMap) {
         routeLine = globalThis.L.polyline(route.coordinates, { color: '#ff6b35', weight: 5 }).addTo(routeMap);
-        if (!isVietnamOverviewVisible) {
+        if (!isHanoiOverviewVisible) {
           routeMap.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
-          if (mapViewLabel) mapViewLabel.textContent = 'Đang xem chi tiết tuyến đường';
+          if (mapViewLabel) mapViewLabel.textContent = 'Đang xem chi tiết tuyến đường tại Hà Nội';
         }
       }
       setRouteStatus(`Tuyến đường ô tô: ${distanceKm.toFixed(1)} km · khoảng ${durationMin} phút.`, 'success');
@@ -391,13 +391,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!routeMap) return;
     pickupMarker?.remove();
     destinationMarker?.remove();
-    pickupMarker = globalThis.L.marker([pickup.lat, pickup.lng]).addTo(routeMap).bindPopup('Điểm đón');
-    destinationMarker = globalThis.L.marker([destination.lat, destination.lng]).addTo(routeMap).bindPopup('Điểm đến');
-    if (!isVietnamOverviewVisible) {
+    pickupMarker = globalThis.L.marker([pickup.lat, pickup.lng]).addTo(routeMap).bindPopup(`<b>Điểm đón:</b> ${pickup.label || 'Điểm đón'}`);
+    destinationMarker = globalThis.L.marker([destination.lat, destination.lng]).addTo(routeMap).bindPopup(`<b>Điểm đến:</b> ${destination.label || 'Điểm đến'}`);
+    if (!isHanoiOverviewVisible) {
       routeMap.fitBounds(globalThis.L.latLngBounds(
         [pickup.lat, pickup.lng],
         [destination.lat, destination.lng],
-      ), { padding: [30, 30], maxZoom: 15 });
+      ), { padding: [30, 30], maxZoom: 16 });
     }
   }
 
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
     input?.addEventListener('input', () => {
       if (input === pickupInput) pickupLocation = null;
       else destinationLocation = null;
-      isVietnamOverviewVisible = false;
+      isHanoiOverviewVisible = false;
       routeRequestId += 1;
       hasRoute = false;
       distanceKm = 0;
@@ -469,12 +469,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setRouteStatus('Đang yêu cầu quyền truy cập vị trí GPS...');
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        isVietnamOverviewVisible = false;
+      async (pos) => {
+        isHanoiOverviewVisible = false;
         const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+
+        if (!isWithinHanoi(lat, lng)) {
+          if (btnGeo) btnGeo.textContent = '📍';
+          if (mapLocateButton) {
+            mapLocateButton.disabled = false;
+            mapLocateButton.textContent = '◎ Vị trí của tôi';
+          }
+          setRouteStatus(`Vị trí GPS của bạn (${lat.toFixed(4)}, ${lng.toFixed(4)}) nằm ngoài phạm vi phục vụ Hà Nội. Vui lòng chọn địa điểm đón tại Hà Nội.`, 'error');
+          return;
+        }
+
         const coordinateLabel = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        let verifiedLocation;
+        try {
+          verifiedLocation = await resolveLocation(coordinateLabel);
+        } catch (error) {
+          if (btnGeo) btnGeo.textContent = '📍';
+          if (mapLocateButton) {
+            mapLocateButton.disabled = false;
+            mapLocateButton.textContent = '◎ Thử lấy vị trí lại';
+          }
+          setRouteStatus(error.message, 'error');
+          return;
+        }
         pickupInput.value = coordinateLabel;
-        pickupLocation = { label: coordinateLabel, lat, lng };
+        pickupLocation = verifiedLocation;
 
         currentLocationMarker?.remove();
         currentLocationAccuracy?.remove();
@@ -521,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnGeo?.addEventListener('click', locateCurrentUser);
   mapLocateButton?.addEventListener('click', locateCurrentUser);
-  mapCountryButton?.addEventListener('click', showVietnamOverview);
+  mapCountryButton?.addEventListener('click', showHanoiOverview);
 
   // Nút chọn gợi ý địa điểm nhanh (Quick Tags)
   quickTags.forEach(tag => {
@@ -793,6 +816,17 @@ document.addEventListener('DOMContentLoaded', () => {
           formErrorSummary.textContent = message;
           formErrorSummary.style.display = 'block';
         }
+        setRouteStatus(message, 'error');
+        return;
+      }
+      if (
+        !pickupLocation
+        || !destinationLocation
+        || !isWithinHanoi(pickupLocation.lat, pickupLocation.lng)
+        || !isWithinHanoi(destinationLocation.lat, destinationLocation.lng)
+      ) {
+        const message = 'TaxiVinFast chỉ nhận đặt xe có điểm đón và điểm đến trong khu vực Hà Nội.';
+        showErrors({ pickup: message, destination: message });
         setRouteStatus(message, 'error');
         return;
       }
