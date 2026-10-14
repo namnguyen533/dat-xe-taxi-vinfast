@@ -83,10 +83,10 @@
                 <!-- Pickup & Destination -->
               <div class="route-inputs-group">
                 <div class="form-group">
-                  <label for="pickup-location" class="form-label">Điểm đón khách <span class="required">*</span></label>
+                  <label for="pickup-location" class="form-label">Điểm đón khách (Hà Nội) <span class="required">*</span></label>
                   <div class="input-with-icon">
                     <span class="input-icon pickup-marker">🟢</span>
-                    <input type="text" id="pickup-location" class="form-input" placeholder="Nhập địa chỉ đón tại Việt Nam" value="Sân bay Nội Bài, Hà Nội" required />
+                    <input type="text" id="pickup-location" class="form-input" placeholder="Nhập địa chỉ đón tại Hà Nội (VD: Sân bay Nội Bài, Cầu Giấy...)" value="Sân bay Nội Bài, Hà Nội" required />
                     <button type="button" class="btn-location-geo" title="Dùng vị trí GPS hiện tại của tôi" aria-label="Dùng vị trí GPS hiện tại">📍</button>
                   </div>
                   <p class="form-error" id="error-pickup"></p>
@@ -97,10 +97,10 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="destination-location" class="form-label">Điểm đến <span class="required">*</span></label>
+                  <label for="destination-location" class="form-label">Điểm đến (Hà Nội) <span class="required">*</span></label>
                   <div class="input-with-icon">
                     <span class="input-icon dest-marker">🔴</span>
-                    <input type="text" id="destination-location" class="form-input" placeholder="Nhập địa chỉ đến tại Việt Nam" value="Hồ Hoàn Kiếm, Hà Nội" required />
+                    <input type="text" id="destination-location" class="form-input" placeholder="Nhập địa chỉ đến tại Hà Nội (VD: Hồ Hoàn Kiếm, Keangnam...)" value="Hồ Hoàn Kiếm, Hà Nội" required />
                   </div>
                   <p class="form-error" id="error-destination"></p>
                 </div>
@@ -108,16 +108,16 @@
 
               <div class="booking-map-panel">
                 <div class="booking-map-heading">
-                  <strong>Bản đồ giao thông Việt Nam</strong>
-                  <span id="map-view-label">Toàn Việt Nam · đánh dấu các thành phố lớn</span>
+                  <strong>Bản đồ giao thông Hà Nội</strong>
+                  <span id="map-view-label">Khu vực Hà Nội · các điểm đón trả phổ biến</span>
                 </div>
-                <div id="booking-map" aria-label="Bản đồ lộ trình chuyến xe"></div>
+                <div id="booking-map" aria-label="Bản đồ lộ trình chuyến xe tại Hà Nội"></div>
                 <p id="map-status" class="map-status" role="status" aria-live="polite"></p>
                 <p id="route-status" class="route-status" role="status" aria-live="polite">
-                  Đang xác định lộ trình...
+                  Đang xác định lộ trình tại Hà Nội...
                 </p>
                 <div class="booking-map-actions">
-                  <button type="button" id="btn-map-country" class="btn-map-action">Bản đồ toàn Việt Nam</button>
+                  <button type="button" id="btn-map-country" class="btn-map-action">Toàn cảnh Hà Nội</button>
                   <button type="button" id="btn-map-locate" class="btn-map-action">◎ Vị trí của tôi</button>
                   <a id="btn-open-google-maps" class="btn-map-action btn-map-external" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
                     Mở Google Maps
@@ -127,12 +127,16 @@
 
               <!-- Quick Location Tags -->
               <div class="quick-locations-container">
-                <span class="quick-title">Gợi ý nhanh:</span>
+                <span class="quick-title">Gợi ý nhanh Hà Nội:</span>
                 <div class="quick-tags">
                   <button type="button" class="quick-tag" data-dest="Sân bay Nội Bài, Hà Nội">✈️ Sân bay Nội Bài</button>
                   <button type="button" class="quick-tag" data-dest="Hồ Hoàn Kiếm, Hà Nội">🏞️ Hồ Hoàn Kiếm</button>
                   <button type="button" class="quick-tag" data-dest="Văn Miếu Quốc Tử Giám, Hà Nội">🏛️ Văn Miếu</button>
                   <button type="button" class="quick-tag" data-dest="Lăng Chủ tịch Hồ Chí Minh, Hà Nội">🏛️ Lăng Bác</button>
+                  <button type="button" class="quick-tag" data-dest="Keangnam Landmark 72, Nam Từ Liêm, Hà Nội">🏢 Keangnam 72</button>
+                  <button type="button" class="quick-tag" data-dest="Vinhomes Smart City, Nam Từ Liêm, Hà Nội">🏙️ Smart City</button>
+                  <button type="button" class="quick-tag" data-dest="Vinhomes Ocean Park, Gia Lâm, Hà Nội">🏖️ Ocean Park</button>
+                  <button type="button" class="quick-tag" data-dest="Bến xe Mỹ Đình, Nam Từ Liêm, Hà Nội">🚌 BX Mỹ Đình</button>
                 </div>
               </div>
 

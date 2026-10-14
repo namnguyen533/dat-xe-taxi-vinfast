@@ -5,8 +5,43 @@ const locationCache = new Map();
 let geocodingQueue = Promise.resolve();
 let lastGeocodingRequestAt = 0;
 
-function isWithinVietnam(lat, lng) {
+export const HANOI_BOUNDS = {
+  minLat: 20.45,
+  maxLat: 21.50,
+  minLng: 105.20,
+  maxLng: 106.25,
+};
+
+export function isWithinHanoi(lat, lng) {
+  return (
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= HANOI_BOUNDS.minLat &&
+    lat <= HANOI_BOUNDS.maxLat &&
+    lng >= HANOI_BOUNDS.minLng &&
+    lng <= HANOI_BOUNDS.maxLng
+  );
+}
+
+export function isWithinVietnam(lat, lng) {
   return lat >= 6 && lat <= 24 && lng >= 102 && lng <= 112;
+}
+
+function hasHanoiAdministrativeArea(address = {}) {
+  const administrativeAreas = [
+    address.city,
+    address.state,
+    address.municipality,
+    address.province,
+  ].filter(Boolean);
+
+  return administrativeAreas.some((area) =>
+    area.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('vi').includes('ha noi'),
+  );
+}
+
+function isHanoiAdministrativeArea(address = {}) {
+  return hasHanoiAdministrativeArea(address);
 }
 
 function requestJson(url, serviceName) {
@@ -38,15 +73,24 @@ export async function searchLocations(query, limit = 5) {
   const cacheKey = cleanQuery.toLocaleLowerCase('vi');
   if (locationCache.has(cacheKey)) return locationCache.get(cacheKey);
 
+  const hasHanoiKeyword = /hà nội|ha noi|\bhn\b/i.test(cleanQuery);
+  const searchQuery = hasHanoiKeyword ? cleanQuery : `${cleanQuery}, Hà Nội`;
+
   const nominatimParams = new URLSearchParams({
-    q: cleanQuery,
+    q: searchQuery,
     format: 'jsonv2',
     limit: String(limit),
     addressdetails: '1',
     'accept-language': 'vi',
     countrycodes: 'vn',
+    viewbox: '105.20,21.50,106.25,20.45',
+    bounded: '0',
   });
-  const photonParams = new URLSearchParams({ q: cleanQuery, limit: String(limit) });
+  const photonParams = new URLSearchParams({
+    q: searchQuery,
+    limit: String(limit),
+    bbox: '105.20,20.45,106.25,21.50',
+  });
   const request = (async () => {
     try {
       const results = await requestGeocoding(`${NOMINATIM_URL}?${nominatimParams}`);
@@ -57,12 +101,14 @@ export async function searchLocations(query, limit = 5) {
           lat: Number(item.lat),
           lng: Number(item.lon),
           countryCode: item.address?.country_code,
+          administrativeArea: item.address,
         }))
         .filter((location) =>
           location.label
           && Number.isFinite(location.lat)
           && Number.isFinite(location.lng)
-          && isWithinVietnam(location.lat, location.lng)
+          && isWithinHanoi(location.lat, location.lng)
+          && isHanoiAdministrativeArea(location.administrativeArea)
           && (!location.countryCode || location.countryCode.toLowerCase() === 'vn'),
         )
         .map(({ label, lat, lng }) => ({ label, lat, lng }));
@@ -92,12 +138,20 @@ export async function searchLocations(query, limit = 5) {
           lng: Number(feature.geometry?.coordinates?.[0]),
           lat: Number(feature.geometry?.coordinates?.[1]),
           countryCode: properties.countrycode,
+          administrativeArea: {
+            city: properties.city,
+            state: properties.state,
+            municipality: properties.municipality,
+            province: properties.province,
+          },
         };
       })
       .filter((location) =>
         location.label
         && Number.isFinite(location.lat)
         && Number.isFinite(location.lng)
+        && isWithinHanoi(location.lat, location.lng)
+        && isHanoiAdministrativeArea(location.administrativeArea)
         && (!location.countryCode || location.countryCode.toUpperCase() === 'VN'),
       )
       .map(({ label, lat, lng }) => ({ label, lat, lng }));
@@ -120,22 +174,37 @@ export async function resolveLocation(query) {
     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
       throw new Error('Tọa độ GPS không hợp lệ.');
     }
-    if (!isWithinVietnam(lat, lng)) {
-      throw new Error('Ứng dụng hiện chỉ hỗ trợ đặt xe trong lãnh thổ Việt Nam.');
+    if (!isWithinHanoi(lat, lng)) {
+      throw new Error('Dịch vụ TaxiVinFast hiện chỉ hỗ trợ đặt xe trong khu vực Hà Nội.');
+    }
+
+    const reverseParams = new URLSearchParams({
+      lat: String(lat),
+      lon: String(lng),
+      format: 'jsonv2',
+      addressdetails: '1',
+      'accept-language': 'vi',
+    });
+    const result = await requestGeocoding(`${NOMINATIM_URL.replace('/search', '/reverse')}?${reverseParams}`);
+    if (
+      result.address?.country_code?.toLowerCase() !== 'vn'
+      || !hasHanoiAdministrativeArea(result.address)
+    ) {
+      throw new Error('Dịch vụ TaxiVinFast hiện chỉ hỗ trợ đặt xe trong khu vực Hà Nội.');
     }
     return { label: cleanQuery, lat, lng };
   }
 
   const locations = await searchLocations(cleanQuery, 1);
   if (!locations.length) {
-    throw new Error(`Không tìm thấy địa chỉ "${cleanQuery}". Hãy nhập rõ hơn hoặc chọn gợi ý.`);
+    throw new Error(`Không tìm thấy địa chỉ "${cleanQuery}" tại Hà Nội. Vui lòng chọn địa điểm trong phạm vi Hà Nội.`);
   }
   return locations[0];
 }
 
 export async function getDrivingRoute(pickup, destination) {
-  if (!isWithinVietnam(pickup.lat, pickup.lng) || !isWithinVietnam(destination.lat, destination.lng)) {
-    throw new Error('Điểm đón và điểm đến phải nằm trong lãnh thổ Việt Nam.');
+  if (!isWithinHanoi(pickup.lat, pickup.lng) || !isWithinHanoi(destination.lat, destination.lng)) {
+    throw new Error('Điểm đón và điểm đến phải nằm trong phạm vi khu vực Hà Nội.');
   }
   const coordinates = `${pickup.lng},${pickup.lat};${destination.lng},${destination.lat}`;
   const params = new URLSearchParams({ overview: 'full', geometries: 'geojson' });

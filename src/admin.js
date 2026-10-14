@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const x = 12 + ((index * 31) % 76);
         const y = 16 + ((index * 43) % 68);
         return `<span class="map-vehicle-pin ${status}" style="left:${x}%;top:${y}%" title="${escapeHtml(vehicle.plate)} · ${vehicle.stateOfCharge}% pin"><b>⚡</b><small>${escapeHtml(vehicle.plate)}</small></span>`;
-      }).join('') + '<span class="map-place-label place-one">Quận 1</span><span class="map-place-label place-two">Bình Thạnh</span><span class="map-place-label place-three">Thủ Đức</span>';
+      }).join('') + '<span class="map-place-label place-one">Hoàn Kiếm</span><span class="map-place-label place-two">Cầu Giấy</span><span class="map-place-label place-three">Tây Hồ</span>';
     }
 
     const incidentsBody = document.getElementById('admin-incidents-table');

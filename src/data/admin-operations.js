@@ -3,12 +3,12 @@ import bookingSeed from './bookings.json' with { type: 'json' };
 export const ADMIN_OPERATIONS_KEY = 'taxivinfast_admin_operations';
 
 const demoFleet = [
-  { id: 'VF-001', plate: '51K-882.19', model: 'VinFast VF 5 Plus', stateOfCharge: 78, odometerKm: 18240, inspectionDue: '2027-02-10', insuranceDue: '2027-01-18', maintenanceDue: '2026-11-22', status: 'ready', lat: 10.801, lng: 106.702 },
-  { id: 'VF-002', plate: '30H-991.82', model: 'VinFast VF 8', stateOfCharge: 24, odometerKm: 32650, inspectionDue: '2026-11-01', insuranceDue: '2027-03-14', maintenanceDue: '2026-10-28', status: 'charging', lat: 21.028, lng: 105.835 },
-  { id: 'VF-003', plate: '51L-123.45', model: 'VinFast VF 3', stateOfCharge: 63, odometerKm: 12450, inspectionDue: '2027-05-16', insuranceDue: '2027-04-22', maintenanceDue: '2026-12-05', status: 'ready', lat: 10.776, lng: 106.701 },
-  { id: 'VF-004', plate: '51K-999.99', model: 'VinFast VF 9', stateOfCharge: 17, odometerKm: 43880, inspectionDue: '2026-10-28', insuranceDue: '2026-12-09', maintenanceDue: '2026-10-15', status: 'maintenance', lat: 10.792, lng: 106.698 },
-  { id: 'VF-005', plate: '60A-778.12', model: 'VinFast VF 7', stateOfCharge: 91, odometerKm: 21870, inspectionDue: '2027-03-18', insuranceDue: '2027-02-28', maintenanceDue: '2026-12-19', status: 'ready', lat: 10.814, lng: 106.724 },
-  { id: 'VF-006', plate: '51H-234.56', model: 'VinFast VF 6', stateOfCharge: 46, odometerKm: 29710, inspectionDue: '2027-01-12', insuranceDue: '2027-01-30', maintenanceDue: '2026-11-08', status: 'ready', lat: 10.758, lng: 106.682 },
+  { id: 'VF-001', plate: '30K-882.19', model: 'VinFast VF 5 Plus', stateOfCharge: 78, odometerKm: 18240, inspectionDue: '2027-02-10', insuranceDue: '2027-01-18', maintenanceDue: '2026-11-22', status: 'ready', lat: 21.028, lng: 105.854 },
+  { id: 'VF-002', plate: '30H-991.82', model: 'VinFast VF 8', stateOfCharge: 24, odometerKm: 32650, inspectionDue: '2026-11-01', insuranceDue: '2027-03-14', maintenanceDue: '2026-10-28', status: 'charging', lat: 21.221, lng: 105.807 },
+  { id: 'VF-003', plate: '30L-123.45', model: 'VinFast VF 3', stateOfCharge: 63, odometerKm: 12450, inspectionDue: '2027-05-16', insuranceDue: '2027-04-22', maintenanceDue: '2026-12-05', status: 'ready', lat: 21.036, lng: 105.834 },
+  { id: 'VF-004', plate: '29A-999.99', model: 'VinFast VF 9', stateOfCharge: 17, odometerKm: 43880, inspectionDue: '2026-10-28', insuranceDue: '2026-12-09', maintenanceDue: '2026-10-15', status: 'maintenance', lat: 21.016, lng: 105.783 },
+  { id: 'VF-005', plate: '30E-778.12', model: 'VinFast VF 7', stateOfCharge: 91, odometerKm: 21870, inspectionDue: '2027-03-18', insuranceDue: '2027-02-28', maintenanceDue: '2026-12-19', status: 'ready', lat: 20.985, lng: 105.795 },
+  { id: 'VF-006', plate: '30F-234.56', model: 'VinFast VF 6', stateOfCharge: 46, odometerKm: 29710, inspectionDue: '2027-01-12', insuranceDue: '2027-01-30', maintenanceDue: '2026-11-08', status: 'ready', lat: 21.045, lng: 105.885 },
 ];
 
 function createSeedState() {

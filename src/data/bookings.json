@@ -18,10 +18,10 @@
       "rating": 4.9
     },
     "route": {
-      "pickupLocation": "Sân bay Tân Sơn Nhất, Phường 2, Tân Bình, TPHCM",
-      "destinationLocation": "Landmark 81, 720A Điện Biên Phủ, Bình Thạnh, TPHCM",
-      "distanceKm": 12.5,
-      "estimatedDurationMin": 25
+      "pickupLocation": "Sân bay Quốc tế Nội Bài, Sóc Sơn, Hà Nội",
+      "destinationLocation": "Keangnam Landmark 72, Phạm Hùng, Nam Từ Liêm, Hà Nội",
+      "distanceKm": 26.5,
+      "estimatedDurationMin": 35
     },
     "schedule": {
       "pickupDate": "2026-09-28",
@@ -30,10 +30,10 @@
     },
     "fare": {
       "basePrice": 12000,
-      "distanceCost": 115000,
+      "distanceCost": 255000,
       "discountCode": "VINFAST20",
-      "discountAmount": 25400,
-      "totalAmount": 101600,
+      "discountAmount": 53400,
+      "totalAmount": 213600,
       "currency": "VND"
     },
     "payment": {
@@ -42,7 +42,7 @@
     },
     "status": "completed",
     "statusText": "Hoàn thành",
-    "note": "Khách có 2 vali nhỏ, đón tại cột số 5 sảnh đến quốc nội."
+    "note": "Khách có 2 vali nhỏ, đón tại sảnh ga T1 Nội Bài."
   },
   {
     "bookingId": "VF-2026-9822",
@@ -100,7 +100,7 @@
     "vehicle": {
       "model": "VinFast VF 3",
       "seats": 2,
-      "licensePlate": "51L-123.45"
+      "licensePlate": "30L-123.45"
     },
     "driver": {
       "name": "Đặng Văn Hùng",
@@ -108,10 +108,10 @@
       "rating": 4.8
     },
     "route": {
-      "pickupLocation": "Chợ Bến Thành, Lê Lợi, Phường Bến Thành, Quận 1, TPHCM",
-      "destinationLocation": "Trung tâm thương mại Crescent Mall, Quận 7, TPHCM",
-      "distanceKm": 6.8,
-      "estimatedDurationMin": 18
+      "pickupLocation": "Hồ Hoàn Kiếm, Hàng Trống, Hoàn Kiếm, Hà Nội",
+      "destinationLocation": "Vinhomes Smart City, Tây Mỗ, Nam Từ Liêm, Hà Nội",
+      "distanceKm": 14.5,
+      "estimatedDurationMin": 25
     },
     "schedule": {
       "pickupDate": "2026-09-28",
@@ -120,10 +120,10 @@
     },
     "fare": {
       "basePrice": 10000,
-      "distanceCost": 46400,
+      "distanceCost": 108000,
       "discountCode": null,
       "discountAmount": 0,
-      "totalAmount": 56400,
+      "totalAmount": 118000,
       "currency": "VND"
     },
     "payment": {
@@ -132,7 +132,7 @@
     },
     "status": "confirmed",
     "statusText": "Đã xác nhận",
-    "note": "Xin xe có máy lạnh mát."
+    "note": "Xe điện di chuyển êm, khách yêu cầu nhiệt độ 24 độ C."
   },
   {
     "bookingId": "VF-2026-9824",
@@ -145,7 +145,7 @@
     "vehicle": {
       "model": "VinFast VF 9",
       "seats": 7,
-      "licensePlate": "51K-999.99"
+      "licensePlate": "29A-999.99"
     },
     "driver": {
       "name": "Nguyễn Hoàng Đức",
@@ -153,8 +153,8 @@
       "rating": 5.0
     },
     "route": {
-      "pickupLocation": "Tòa nhà Bitexco Financial Tower, Quận 1, TPHCM",
-      "destinationLocation": "Thuê 4 tiếng phục vụ đối tác ngoại giao (Quận 1 - Q2 - Q7)",
+      "pickupLocation": "Tòa nhà Lotte Center, 54 Liễu Giai, Ba Đình, Hà Nội",
+      "destinationLocation": "Thuê 4 tiếng phục vụ đối tác ngoại giao (Ba Đình - Hoàn Kiếm - Cầu Giấy)",
       "distanceKm": 45,
       "estimatedDurationMin": 240
     },
@@ -190,7 +190,7 @@
     "vehicle": {
       "model": "VinFast VF 7",
       "seats": 5,
-      "licensePlate": "60A-778.12"
+      "licensePlate": "30E-778.12"
     },
     "driver": {
       "name": "Phạm Quốc Huy",
@@ -198,10 +198,10 @@
       "rating": 4.7
     },
     "route": {
-      "pickupLocation": "Quận 3, TPHCM",
-      "destinationLocation": "Thành phố Vũng Tàu, Bà Rịa - Vũng Tàu",
-      "distanceKm": 95,
-      "estimatedDurationMin": 110
+      "pickupLocation": "Vinhomes Ocean Park, Gia Lâm, Hà Nội",
+      "destinationLocation": "Khu du lịch Khoang Xanh Suối Tiên, Ba Vì, Hà Nội",
+      "distanceKm": 65,
+      "estimatedDurationMin": 80
     },
     "schedule": {
       "pickupDate": "2026-09-27",
@@ -210,10 +210,10 @@
     },
     "fare": {
       "basePrice": 18000,
-      "distanceCost": 1130500,
+      "distanceCost": 780000,
       "discountCode": null,
       "discountAmount": 0,
-      "totalAmount": 1148500,
+      "totalAmount": 798000,
       "currency": "VND"
     },
     "payment": {
@@ -222,7 +222,7 @@
     },
     "status": "completed",
     "statusText": "Hoàn thành",
-    "note": "Chuyến đi tỉnh Vũng Tàu khứ hồi."
+    "note": "Gia đình đi dã ngoại ngoại thành Hà Nội trong ngày (đoàn khách Vũng Tàu ra thăm Thủ đô)."
   },
   {
     "bookingId": "VF-2026-9826",
@@ -235,14 +235,14 @@
     "vehicle": {
       "model": "VinFast VF 6",
       "seats": 5,
-      "licensePlate": "51H-456.78"
+      "licensePlate": "30F-234.56"
     },
     "driver": null,
     "route": {
-      "pickupLocation": "Bệnh viện Đa khoa Đồng Nai, Biên Hòa",
-      "destinationLocation": "Trường Đại học Bách Khoa, TP. Thủ Đức",
-      "distanceKm": 22.4,
-      "estimatedDurationMin": 45
+      "pickupLocation": "Bệnh viện Bạch Mai, Giải Phóng, Đống Đa, Hà Nội",
+      "destinationLocation": "Đại học Quốc gia Hà Nội, 144 Xuân Thủy, Cầu Giấy, Hà Nội",
+      "distanceKm": 9.8,
+      "estimatedDurationMin": 22
     },
     "schedule": {
       "pickupDate": "2026-09-28",
@@ -251,10 +251,10 @@
     },
     "fare": {
       "basePrice": 15000,
-      "distanceCost": 256800,
+      "distanceCost": 110000,
       "discountCode": null,
       "discountAmount": 0,
-      "totalAmount": 271800,
+      "totalAmount": 125000,
       "currency": "VND"
     },
     "payment": {
@@ -263,6 +263,6 @@
     },
     "status": "cancelled",
     "statusText": "Đã hủy",
-    "note": "Khách hủy vì thay đổi lịch hẹn, đã hoàn tiền cọc."
+    "note": "Khách hủy vì thay đổi lịch khám, đã hoàn tiền cọc."
   }
 ]
