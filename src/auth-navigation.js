@@ -2,14 +2,19 @@ import {
   AUTH_USER_KEY,
   clearAuthSession,
   hasAuthSession,
+  isDriverUser,
 } from './auth-client.js';
 
 const ACTION_SELECTOR = 'a[href="dangnhap.html"], a[href="dki.html"], button.btn-login, button.btn-register';
 const PROFILE_MENU_ID = 'account-menu';
 
 function getCurrentUser() {
-  const user = JSON.parse(localStorage.getItem(AUTH_USER_KEY) || 'null');
-  return user && typeof user === 'object' ? user : {};
+  try {
+    const user = JSON.parse(localStorage.getItem(AUTH_USER_KEY) || 'null');
+    return user && typeof user === 'object' ? user : {};
+  } catch {
+    return {};
+  }
 }
 
 function closeProfileMenus(exceptMenu) {
@@ -52,6 +57,16 @@ function createProfileMenu(actions) {
     identity.append(email);
   }
 
+  const menuItems = [identity];
+  if (isDriverUser(user)) {
+    const driverDashboard = document.createElement('a');
+    driverDashboard.href = 'driver.html';
+    driverDashboard.className = 'account-menu-action';
+    driverDashboard.textContent = 'Khu vực tài xế';
+    driverDashboard.setAttribute('role', 'menuitem');
+    menuItems.push(driverDashboard);
+  }
+
   const switchAccount = document.createElement('a');
   switchAccount.href = 'dangnhap.html';
   switchAccount.className = 'account-menu-action';
@@ -69,7 +84,7 @@ function createProfileMenu(actions) {
     renderAccountActions(actions);
   });
 
-  menu.append(identity, switchAccount, logout);
+  menu.append(...menuItems, switchAccount, logout);
   button.addEventListener('click', () => {
     const opening = menu.hidden;
     closeProfileMenus(menu);

@@ -7,6 +7,7 @@ import {
   clearAuthSession,
   createAuthClient,
   hasAuthSession,
+  isDriverUser,
   saveAuthToken,
 } from '../src/auth-client.js';
 
@@ -96,6 +97,13 @@ test('authentication state is detected from session or persistent storage', () =
   assert.equal(hasAuthSession(emptyStorage, emptyStorage), false);
   assert.equal(hasAuthSession(sessionStorage, emptyStorage), true);
   assert.equal(hasAuthSession(emptyStorage, localStorage), true);
+});
+
+test('driver access requires an explicit driver role', () => {
+  assert.equal(isDriverUser({ role: 'driver' }), true);
+  assert.equal(isDriverUser({ role: 'customer' }), false);
+  assert.equal(isDriverUser({}), false);
+  assert.equal(isDriverUser(null), false);
 });
 
 test('logging out clears the session, persistent token, and current account', () => {

@@ -309,9 +309,9 @@ export function createBookingStore(options = {}) {
 
     const patch = { status, statusText: statusMeta(status).text, updatedAt: now().toISOString() };
 
-    // Đơn hoàn thành thì coi như đã thu tiền, đơn hủy thì hoàn lại trạng thái
-    if (status === 'completed' || status === 'cancelled') {
-      patch.payment = { ...(current.payment || {}), status: status === 'completed' ? 'paid' : 'refunded' };
+    // Payment providers own online payment confirmation; completing a ride must not fake it.
+    if (status === 'cancelled') {
+      patch.payment = { ...(current.payment || {}), status: 'refunded' };
     }
 
     return update(id, patch);

@@ -129,12 +129,13 @@ test('cập nhật trạng thái đủ 5 trạng thái (mục 34)', () => {
   }
 });
 
-test('đơn hoàn thành được đánh dấu đã thanh toán, đơn hủy được hoàn tiền', () => {
+test('hoàn thành chuyến không tự xác nhận thanh toán online, đơn hủy được hoàn tiền', () => {
   const { store } = makeStore();
-  const id = seedBookings[2].bookingId;
+  const id = seedBookings.find((booking) => booking.payment.method === 'banking' && booking.payment.status === 'pending').bookingId;
 
   store.updateStatus(id, 'completed');
-  assert.equal(store.getById(id).payment.status, 'paid');
+  assert.equal(store.getById(id).payment.status, 'pending');
+  assert.equal(store.getById(id).status, 'completed');
 
   store.updateStatus(id, 'cancelled');
   assert.equal(store.getById(id).payment.status, 'refunded');
