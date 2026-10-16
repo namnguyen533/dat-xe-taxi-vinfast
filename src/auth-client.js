@@ -4,6 +4,10 @@ const AUTH_API_URL = (import.meta.env?.VITE_AUTH_API_URL || DEFAULT_AUTH_API_URL
 export const AUTH_TOKEN_KEY = 'taxi-vinfast-auth-token';
 export const AUTH_USER_KEY = 'taxi-current-user';
 
+export function isDriverUser(user) {
+  return user?.role === 'driver';
+}
+
 export function hasAuthSession(sessionStorage = globalThis.sessionStorage, localStorage = globalThis.localStorage) {
   return Boolean(
     sessionStorage?.getItem(AUTH_TOKEN_KEY)
