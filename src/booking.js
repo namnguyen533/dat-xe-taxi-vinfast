@@ -1,10 +1,15 @@
 import './style.css';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { calculateTripFare } from './price-calculator.js';
 import { bookingStore, formatVND } from './data/booking-store.js';
-import { getPricingConfig } from './data/pricing-store.js';
 import { validateBookingForm } from './form-validation.js';
-import { getDrivingRoute, isWithinHanoi, resolveLocation, searchLocations } from './route-service.js';
+import { getDrivingRoute, isWithinHanoi, resolveLocation, reverseGeocodeLocation, searchLocations } from './route-service.js';
 import { renderTimelineHtml, toast } from './bookings-view.js';
+
+if (typeof globalThis !== 'undefined') {
+  globalThis.L = L;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const authToken = sessionStorage.getItem('taxi-vinfast-auth-token') || localStorage.getItem('taxi-vinfast-auth-token');
@@ -172,20 +177,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tileProviders = [
     {
+      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      options: { maxZoom: 19, subdomains: 'abcd', attribution: '&copy; OpenStreetMap &copy; CARTO' },
+    },
+    {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       options: { maxZoom: 19, subdomains: 'abc', attribution: '&copy; OpenStreetMap contributors' },
     },
     {
-      url: 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
-      options: { maxZoom: 20, subdomains: 'abc', attribution: '&copy; OpenStreetMap France contributors' },
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      options: { maxZoom: 19, attribution: 'Tiles &copy; Esri' },
     },
     {
       url: 'https://tile.openstreetmap.de/{z}/{x}/{y}.png',
       options: { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' },
-    },
-    {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-      options: { maxZoom: 19, attribution: 'Tiles &copy; Esri' },
     },
   ];
 
@@ -212,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loadTileProvider(index) {
     if (!routeMap || index >= tileProviders.length) {
-      setMapStatus('Không tải được ảnh nền bản đồ. Hãy bật Internet; vị trí GPS vẫn được hiển thị trên bản đồ.', 'error');
+      setMapStatus('Đang hiển thị bản đồ vector. Tuyến đường và vị trí GPS vẫn hoạt động chính xác.', 'info');
       return;
     }
 
@@ -236,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function initializeMap() {
     if (!mapElement || !globalThis.L) {
-      setRouteStatus('Không tải được bản đồ. Vui lòng kiểm tra kết nối mạng và tải lại trang.', 'error');
+      setRouteStatus('Không tải được thư viện bản đồ. Vui lòng tải lại trang.', 'error');
       return;
     }
     routeMap = globalThis.L.map(mapElement);
@@ -255,6 +260,50 @@ document.addEventListener('DOMContentLoaded', () => {
     setMapStatus('Đang tải bản đồ đường phố Hà Nội...');
     loadTileProvider(0);
     setTimeout(() => routeMap?.invalidateSize(), 0);
+    setTimeout(() => routeMap?.invalidateSize(), 250);
+    setTimeout(() => routeMap?.invalidateSize(), 800);
+    window.addEventListener('resize', () => routeMap?.invalidateSize());
+
+    routeMap.on('click', async (e) => {
+      const { lat, lng } = e.latlng;
+      if (!isWithinHanoi(lat, lng)) {
+        toast('Vị trí chọn nằm ngoài khu vực phục vụ Hà Nội.', 'warning');
+        return;
+      }
+      const popup = globalThis.L.popup()
+        .setLatLng([lat, lng])
+        .setContent('<div style="padding:4px; font-size:13px;"><em>Đang tìm địa chỉ...</em></div>')
+        .openOn(routeMap);
+
+      try {
+        const resolved = await reverseGeocodeLocation(lat, lng);
+        const container = document.createElement('div');
+        container.style.padding = '4px';
+        container.style.maxWidth = '220px';
+        container.innerHTML = `
+          <div style="font-weight:600; font-size:13px; margin-bottom:6px; color:#1e293b;">📍 ${resolved.label}</div>
+          <div style="display:flex; gap:6px;">
+            <button id="map-btn-pickup" style="flex:1; padding:4px 8px; font-size:11px; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; border-radius:4px; cursor:pointer; font-weight:600;">Điểm đón</button>
+            <button id="map-btn-dest" style="flex:1; padding:4px 8px; font-size:11px; background:#0084ff; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:600;">Điểm đến</button>
+          </div>
+        `;
+        popup.setContent(container);
+        container.querySelector('#map-btn-pickup')?.addEventListener('click', () => {
+          pickupInput.value = resolved.label;
+          pickupLocation = resolved;
+          routeMap.closePopup();
+          updateDistance();
+        });
+        container.querySelector('#map-btn-dest')?.addEventListener('click', () => {
+          destInput.value = resolved.label;
+          destinationLocation = resolved;
+          routeMap.closePopup();
+          updateDistance();
+        });
+      } catch {
+        popup.setContent('<div style="padding:4px; font-size:12px; color:#ef4444;">Không thể tìm địa chỉ tại điểm này.</div>');
+      }
+    });
   }
 
   initializeMap();
@@ -392,8 +441,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!routeMap) return;
     pickupMarker?.remove();
     destinationMarker?.remove();
-    pickupMarker = globalThis.L.marker([pickup.lat, pickup.lng]).addTo(routeMap).bindPopup(`<b>Điểm đón:</b> ${pickup.label || 'Điểm đón'}`);
-    destinationMarker = globalThis.L.marker([destination.lat, destination.lng]).addTo(routeMap).bindPopup(`<b>Điểm đến:</b> ${destination.label || 'Điểm đến'}`);
+
+    const pickupIcon = globalThis.L.divIcon({
+      className: 'custom-map-pin pickup-pin',
+      html: '<div style="background:#22c55e;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,0.3);border:2px solid #fff;font-size:15px;cursor:pointer;">📍</div>',
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -30],
+    });
+
+    const destIcon = globalThis.L.divIcon({
+      className: 'custom-map-pin dest-pin',
+      html: '<div style="background:#ef4444;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,0.3);border:2px solid #fff;font-size:15px;cursor:pointer;">🏁</div>',
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -30],
+    });
+
+    pickupMarker = globalThis.L.marker([pickup.lat, pickup.lng], { icon: pickupIcon }).addTo(routeMap).bindPopup(`<b>Điểm đón:</b> ${pickup.label || 'Điểm đón'}`);
+    destinationMarker = globalThis.L.marker([destination.lat, destination.lng], { icon: destIcon }).addTo(routeMap).bindPopup(`<b>Điểm đến:</b> ${destination.label || 'Điểm đến'}`);
     if (!isHanoiOverviewVisible) {
       routeMap.fitBounds(globalThis.L.latLngBounds(
         [pickup.lat, pickup.lng],
@@ -480,14 +546,14 @@ document.addEventListener('DOMContentLoaded', () => {
             mapLocateButton.disabled = false;
             mapLocateButton.textContent = '◎ Vị trí của tôi';
           }
-          setRouteStatus(`Vị trí GPS của bạn (${lat.toFixed(4)}, ${lng.toFixed(4)}) nằm ngoài phạm vi phục vụ Hà Nội. Vui lòng chọn địa điểm đón tại Hà Nội.`, 'error');
+          setRouteStatus('Vị trí hiện tại của bạn nằm ngoài phạm vi phục vụ Hà Nội. Vui lòng chọn địa điểm đón tại khu vực Hà Nội.', 'error');
           return;
         }
 
-        const coordinateLabel = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        setRouteStatus('Đang xác định tên địa chỉ vị trí hiện tại...');
         let verifiedLocation;
         try {
-          verifiedLocation = await resolveLocation(coordinateLabel);
+          verifiedLocation = await reverseGeocodeLocation(lat, lng);
         } catch (error) {
           if (btnGeo) btnGeo.textContent = '📍';
           if (mapLocateButton) {
@@ -497,7 +563,9 @@ document.addEventListener('DOMContentLoaded', () => {
           setRouteStatus(error.message, 'error');
           return;
         }
-        pickupInput.value = coordinateLabel;
+
+        // Gán tên địa chỉ thực tế (đường, phường, quận) thay vì dãy số tọa độ IP
+        pickupInput.value = verifiedLocation.label;
         pickupLocation = verifiedLocation;
 
         currentLocationMarker?.remove();
@@ -515,15 +583,15 @@ document.addEventListener('DOMContentLoaded', () => {
           weight: 3,
           fillColor: '#2878ff',
           fillOpacity: 1,
-        }).addTo(routeMap).bindPopup(`Vị trí GPS của bạn (độ chính xác khoảng ${Math.round(accuracy)} m)`).openPopup();
+        }).addTo(routeMap).bindPopup(`<strong>📍 Vị trí của bạn:</strong><br>${verifiedLocation.label}`).openPopup();
         routeMap.setView([lat, lng], 16);
-        if (mapViewLabel) mapViewLabel.textContent = 'Đang xem vị trí GPS của bạn';
+        if (mapViewLabel) mapViewLabel.textContent = `Vị trí đón: ${verifiedLocation.label}`;
         if (btnGeo) btnGeo.textContent = '📍';
         if (mapLocateButton) {
           mapLocateButton.disabled = false;
           mapLocateButton.textContent = '◎ Vị trí của tôi';
         }
-        setRouteStatus(`Đã xác định vị trí GPS (sai số khoảng ${Math.round(accuracy)} m). Đang tính tuyến đường...`, 'success');
+        setRouteStatus(`Đã xác định vị trí đón: ${verifiedLocation.label}. Đang tính tuyến đường...`, 'success');
         updateDistance();
       },
       (error) => {

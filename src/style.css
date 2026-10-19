@@ -7514,3 +7514,818 @@ body.home-page :is(a, button, input, select):focus-visible {
   .crm-search { width: 100%; }
   .dynamic-pricing-controls { align-items: flex-start; flex-direction: column; }
 }
+
+
+/* ==========================================================================
+   FEATURE STYLES: USER HEADER, TIMELINE, CANCEL TRIP, REVIEWS & QR PAYMENT
+   ========================================================================== */
+
+/* 1. User Header Badge & Dropdown */
+.user-account-badge-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.user-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 107, 53, 0.08);
+  border: 1px solid rgba(255, 107, 53, 0.25);
+  color: var(--primary);
+  padding: 7px 14px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.user-badge-btn:hover {
+  background: rgba(255, 107, 53, 0.15);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.user-avatar-icon {
+  font-size: 16px;
+}
+
+.user-display-name {
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-caret {
+  font-size: 10px;
+  color: var(--text);
+  transition: transform 0.2s ease;
+}
+
+.user-badge-btn[aria-expanded="true"] .badge-caret {
+  transform: rotate(180deg);
+}
+
+.user-badge-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 8px;
+  z-index: 1000;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.user-avatar-large {
+  font-size: 26px;
+  background: rgba(255, 107, 53, 0.1);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-header-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-name-title {
+  color: var(--text-h);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-sub-info {
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.dropdown-item.text-danger {
+  color: #e74c3c;
+}
+
+.dropdown-item.text-danger:hover {
+  background: #fdf2f2;
+}
+
+/* 2. Trip Status Timeline */
+.trip-timeline-wrapper {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+
+.timeline-heading-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.trip-timeline-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  position: relative;
+}
+
+.timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.timeline-step::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 100%;
+  height: 3px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.timeline-step:last-child::after {
+  display: none;
+}
+
+.timeline-step.step-done::after {
+  background: #10b981;
+}
+
+.timeline-step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+  transition: all 0.25s ease;
+}
+
+.timeline-step.step-done .timeline-step-icon {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.timeline-step.step-active .timeline-step-icon {
+  background: #ff6b35;
+  border-color: #ff6b35;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.25);
+}
+
+.timeline-step.step-upcoming .timeline-step-icon {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.timeline-step-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.timeline-step.step-upcoming .timeline-step-title {
+  color: #94a3b8;
+}
+
+.timeline-step-sub {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.trip-timeline-container.is-cancelled {
+  margin-bottom: 16px;
+}
+
+.timeline-cancelled-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.timeline-cancelled-banner .cancel-icon {
+  width: 36px;
+  height: 36px;
+  background: #ef4444;
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.timeline-cancelled-banner .cancel-text strong {
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.timeline-cancelled-banner .cancel-text p {
+  color: #b91c1c;
+  font-size: 13px;
+  margin: 4px 0 0 0;
+}
+
+/* 3. Action Buttons on Bookings Table */
+.btn-cancel-view {
+  background: transparent;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-cancel-view:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.btn-review-view {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #d97706;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-review-view:hover {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #f59e0b;
+}
+
+.btn-review-view.has-rated {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fcd34d;
+}
+
+/* Cancel Section inside Detail Modal */
+.detail-cancel-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: #fff5f5;
+  border: 1px dashed #fca5a5;
+  border-radius: 10px;
+}
+
+.detail-cancel-box span {
+  font-size: 13px;
+  color: #b91c1c;
+  font-weight: 500;
+}
+
+.btn-cancel-from-detail {
+  background: #ffffff;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-cancel-from-detail:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+/* Cancel Modal Dialog */
+.modal-header-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.warning-icon {
+  font-size: 24px;
+}
+
+.cancel-reasons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.reason-radio-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-h);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.reason-radio-item:hover {
+  border-color: #cbd5e1;
+}
+
+.reason-radio-item input[type="radio"]:checked + span {
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.btn-modal-danger {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease;
+}
+
+.btn-modal-danger:hover {
+  background: #dc2626;
+}
+
+/* 4. Star Rating & Review Modal */
+.review-header {
+  margin-bottom: 16px;
+}
+
+.review-badge-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.star-rating-select-wrap {
+  text-align: center;
+  padding: 16px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.rating-label {
+  display: block;
+  font-size: 13px;
+  color: #92400e;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.star-rating-group {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.star-btn {
+  font-size: 34px;
+  color: #cbd5e1;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.star-btn:hover {
+  transform: scale(1.15);
+}
+
+.star-btn.active {
+  color: #f59e0b;
+}
+
+.rating-score-text {
+  display: block;
+  font-size: 14px;
+  color: #b45309;
+}
+
+.review-quick-tags-wrap {
+  margin-top: 14px;
+}
+
+.review-tag-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tag-check-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #334155;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.tag-check-pill input[type="checkbox"] {
+  accent-color: #ff6b35;
+}
+
+.tag-check-pill:hover {
+  background: #e2e8f0;
+}
+
+/* Review Display Card in Detail Modal */
+.detail-review-card {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: #fffdf5;
+  border: 1px solid #fef3c7;
+  border-radius: 10px;
+}
+
+.review-stars-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.stars-gold {
+  color: #f59e0b;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+
+.review-quote {
+  font-style: italic;
+  color: #475569;
+  font-size: 13px;
+  margin: 6px 0;
+  line-height: 1.5;
+}
+
+.review-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.tag-pill {
+  font-size: 11px;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.detail-review-prompt {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detail-review-prompt p {
+  margin: 0;
+  font-size: 13px;
+  color: #166534;
+  font-weight: 500;
+}
+
+.btn-review-now {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-review-now:hover {
+  background: #059669;
+}
+
+/* 5. Online QR Payment Modal Simulation */
+.modal-payment-card {
+  max-width: 480px;
+}
+
+.payment-brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 107, 53, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.qr-payment-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 14px 0;
+}
+
+.qr-code-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr-code-box {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  background: #ffffff;
+  border: 3px solid #ff6b35;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.qr-logo-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border: 1px solid #ff6b35;
+  border-radius: 6px;
+  padding: 2px 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.vf-tiny-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ff6b35;
+}
+
+.qr-countdown {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qr-countdown strong {
+  color: #ef4444;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.bank-transfer-details {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.bank-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  gap: 10px;
+}
+
+.bank-detail-item span {
+  color: #64748b;
+}
+
+.bank-detail-item strong {
+  color: #1e293b;
+  text-align: right;
+  word-break: break-all;
+}
+
+.bank-detail-item.total-highlight {
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.price-highlight {
+  font-size: 17px;
+  color: var(--primary) !important;
+}
+
+.copyable-text {
+  cursor: pointer;
+}
+
+.copy-hint {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.copyable-text:hover .copy-hint {
+  opacity: 1;
+}
+
+.qr-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.qr-actions button {
+  flex: 1;
+}
+
+.badge-paid {
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 6px;
+}
+
+.badge-unpaid {
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 6px;
+}
+
+/* Responsive adjustment for Trip Timeline on Mobile */
+@media (max-width: 640px) {
+  .trip-timeline-steps {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .timeline-step {
+    flex-direction: row;
+    text-align: left;
+    gap: 12px;
+  }
+
+  .timeline-step::after {
+    left: 17px;
+    top: 36px;
+    width: 2px;
+    height: calc(100% - 10px);
+  }
+
+  .timeline-step-icon {
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .qr-actions {
+    flex-direction: column;
+  }
+}
