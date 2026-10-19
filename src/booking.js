@@ -4,6 +4,7 @@ import { bookingStore, formatVND } from './data/booking-store.js';
 import { getPricingConfig } from './data/pricing-store.js';
 import { validateBookingForm } from './form-validation.js';
 import { getDrivingRoute, isWithinHanoi, resolveLocation, searchLocations } from './route-service.js';
+import { renderTimelineHtml, toast } from './bookings-view.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const authToken = sessionStorage.getItem('taxi-vinfast-auth-token') || localStorage.getItem('taxi-vinfast-auth-token');
@@ -832,6 +833,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const driver = demoDrivers[Math.floor(Math.random() * demoDrivers.length)];
+      const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'cash';
+      const isOnlinePayment = ['banking', 'momo', 'vnpay'].includes(selectedPaymentMethod);
 
       const savedBooking = bookingStore.add({
         customer: { name: values.name, phone: values.phone },
@@ -863,26 +866,158 @@ document.addEventListener('DOMContentLoaded', () => {
           currency: 'VND',
         },
         payment: {
-          method: document.querySelector('input[name="payment_method"]:checked')?.value || 'cash',
+          method: selectedPaymentMethod,
           status: 'pending',
         },
         status: 'pending',
         note: values.note || '',
       });
 
-      // Populate Receipt Modal
-      document.getElementById('receipt-id').textContent = savedBooking.bookingId;
-      document.getElementById('receipt-name').textContent = savedBooking.customer.name;
-      document.getElementById('receipt-phone').textContent = savedBooking.customer.phone;
-      document.getElementById('receipt-car').textContent = savedBooking.vehicle.model;
-      document.getElementById('receipt-pickup').textContent = savedBooking.route.pickupLocation;
-      document.getElementById('receipt-dest').textContent = savedBooking.route.destinationLocation;
-      document.getElementById('receipt-time').textContent = `${savedBooking.schedule.pickupTime} - ${savedBooking.schedule.pickupDate}`;
-      document.getElementById('receipt-total').textContent = formatVND(savedBooking.fare.totalAmount);
-      if (receiptStatus) receiptStatus.textContent = savedBooking.statusText;
+      function showReceiptModal(currentBooking) {
+        document.getElementById('receipt-id').textContent = currentBooking.bookingId;
+        document.getElementById('receipt-name').textContent = currentBooking.customer.name;
+        document.getElementById('receipt-phone').textContent = currentBooking.customer.phone;
+        document.getElementById('receipt-car').textContent = currentBooking.vehicle.model;
+        
+        const driverEl = document.getElementById('receipt-driver');
+        if (driverEl) driverEl.textContent = `${currentBooking.driver?.name || 'Tài xế VinFast'} (${currentBooking.driver?.phone || '0903 112 233'})`;
+        
+        const plateEl = document.getElementById('receipt-plate');
+        if (plateEl) plateEl.textContent = currentBooking.vehicle.licensePlate;
 
-      // Show Modal
-      if (modal) modal.style.display = 'flex';
+        document.getElementById('receipt-pickup').textContent = currentBooking.route.pickupLocation;
+        document.getElementById('receipt-dest').textContent = currentBooking.route.destinationLocation;
+        document.getElementById('receipt-time').textContent = `${currentBooking.schedule.pickupTime} - ${currentBooking.schedule.pickupDate}`;
+        document.getElementById('receipt-total').textContent = formatVND(currentBooking.fare.totalAmount);
+        
+        const payStatusEl = document.getElementById('receipt-payment-status');
+        if (payStatusEl) {
+          if (currentBooking.payment?.status === 'paid') {
+            payStatusEl.innerHTML = '<strong class="text-success">✓ Đã thanh toán trực tuyến</strong>';
+          } else {
+            payStatusEl.innerHTML = '<span class="text-muted">Tiền mặt (thanh toán cho tài xế)</span>';
+          }
+        }
+
+        if (receiptStatus) receiptStatus.textContent = currentBooking.statusText;
+
+        const timelineWrapper = document.getElementById('receipt-timeline-wrapper');
+        if (timelineWrapper) {
+          timelineWrapper.innerHTML = renderTimelineHtml(currentBooking.status, currentBooking);
+        }
+
+        if (modal) modal.style.display = 'flex';
+      }
+
+      // Nếu chọn thanh toán trực tuyến -> Hiện popup QR giả lập
+      const qrModal = document.getElementById('payment-qr-modal');
+      let qrTimerInterval = null;
+
+      if (isOnlinePayment && qrModal) {
+        const brandBadge = document.getElementById('qr-payment-badge');
+        const brandIcon = document.getElementById('qr-brand-icon');
+        const brandName = document.getElementById('qr-brand-name');
+        const qrAmount = document.getElementById('qr-payment-amount');
+        const qrContent = document.getElementById('qr-transfer-content');
+        const qrImg = document.getElementById('qr-code-img');
+        const qrTimerText = document.getElementById('qr-timer-text');
+        const btnVerifyPaid = document.getElementById('btn-verify-paid');
+        const btnSwitchCash = document.getElementById('btn-switch-to-cash');
+        const btnCloseQr = document.getElementById('btn-close-qr-modal');
+
+        const transferMsg = `THANH TOAN ${savedBooking.bookingId}`;
+        const totalAmountNum = savedBooking.fare.totalAmount || 0;
+
+        if (qrAmount) qrAmount.textContent = formatVND(totalAmountNum);
+        if (qrContent) qrContent.innerHTML = `${transferMsg} <span class="copy-hint" title="Sao chép">📋</span>`;
+
+        if (selectedPaymentMethod === 'momo') {
+          if (brandIcon) brandIcon.textContent = '📱';
+          if (brandName) brandName.textContent = 'Thanh Toán Ví MoMo / ZaloPay';
+        } else if (selectedPaymentMethod === 'vnpay') {
+          if (brandIcon) brandIcon.textContent = '💳';
+          if (brandName) brandName.textContent = 'Cổng Thanh Toán VNPAY-QR';
+        } else {
+          if (brandIcon) brandIcon.textContent = '🏦';
+          if (brandName) brandName.textContent = 'Chuyển Khoản Nhanh VietQR (MBBank)';
+        }
+
+        // Tạo ảnh QR Code qua api VietQR hoặc SVG giả lập
+        if (qrImg) {
+          const vietQrUrl = `https://api.vietqr.io/image/970422-0912345678-qVqYxK.jpg?amount=${totalAmountNum}&addInfo=${encodeURIComponent(transferMsg)}&accountName=CONG%20TY%20CP%20TAXI%20DIEN%20VINFAST`;
+          qrImg.src = vietQrUrl;
+          qrImg.onerror = () => {
+            // Fallback SVG QR đẹp mắt nếu offline
+            qrImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23fff"/><path d="M20 20h60v60H20zM30 30v40h40V30zM120 20h60v60h-60zM130 30v40h40V30zM20 120h60v60H20zM30 130v40h40v-40zM40 40h20v20H40zM140 40h20v20h-20zM40 140h20v20H40zM90 20h20v40H90zM120 90h20v20h-20zM90 90h20v20H90zM20 90h20v20H20zM60 90h20v20H60zM100 130h20v20h-20zM130 120h30v20h-30zM170 120h10v60h-20v-40h-20v20h-10v-20h-10v40h-20v-20h10v-20h20v-20h20z" fill="%231a202c"/></svg>';
+          };
+        }
+
+        // Đếm lùi 15 phút
+        let timeLeft = 15 * 60;
+        clearInterval(qrTimerInterval);
+        qrTimerInterval = setInterval(() => {
+          timeLeft -= 1;
+          if (timeLeft <= 0) {
+            clearInterval(qrTimerInterval);
+            if (qrTimerText) qrTimerText.textContent = 'Hết hạn';
+          } else {
+            const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+            const secs = String(timeLeft % 60).padStart(2, '0');
+            if (qrTimerText) qrTimerText.textContent = `${mins}:${secs}`;
+          }
+        }, 1000);
+
+        qrModal.style.display = 'flex';
+
+        function closeQrModal() {
+          clearInterval(qrTimerInterval);
+          qrModal.style.display = 'none';
+        }
+
+        btnCloseQr?.addEventListener('click', closeQrModal, { once: true });
+
+        // Khi người dùng bấm "Tôi đã chuyển khoản xong"
+        btnVerifyPaid?.addEventListener('click', () => {
+          btnVerifyPaid.disabled = true;
+          btnVerifyPaid.textContent = '⏳ Đang kiểm tra giao dịch...';
+
+          setTimeout(() => {
+            btnVerifyPaid.disabled = false;
+            btnVerifyPaid.textContent = '✅ Tôi đã chuyển khoản xong';
+            closeQrModal();
+
+            // Cập nhật trạng thái thanh toán
+            bookingStore.update(savedBooking.bookingId, {
+              payment: {
+                method: selectedPaymentMethod,
+                status: 'paid',
+                paidAt: new Date().toISOString(),
+              },
+            });
+            const updatedBooking = bookingStore.getById(savedBooking.bookingId);
+            toast('Xác nhận thanh toán trực tuyến thành công!', 'success');
+            showReceiptModal(updatedBooking || savedBooking);
+          }, 800);
+        }, { once: true });
+
+        // Khi người dùng bấm "Đổi sang tiền mặt"
+        btnSwitchCash?.addEventListener('click', () => {
+          closeQrModal();
+          bookingStore.update(savedBooking.bookingId, {
+            payment: {
+              method: 'cash',
+              status: 'pending',
+            },
+          });
+          const updatedBooking = bookingStore.getById(savedBooking.bookingId);
+          toast('Đã chuyển sang phương thức Tiền mặt.', 'info');
+          showReceiptModal(updatedBooking || savedBooking);
+        }, { once: true });
+
+      } else {
+        // Thanh toán tiền mặt -> Mở trực tiếp Modal Biên nhận
+        showReceiptModal(savedBooking);
+      }
     });
   }
 

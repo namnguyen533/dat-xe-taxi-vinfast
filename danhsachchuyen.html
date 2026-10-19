@@ -144,6 +144,99 @@
       </div>
     </div>
 
+    <!-- Popup Xác nhận Hủy chuyến xe -->
+    <div id="cancel-trip-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card">
+        <button type="button" class="modal-close" id="btn-close-cancel-modal" aria-label="Đóng">&times;</button>
+        <div class="modal-header-warning">
+          <span class="warning-icon">⚠️</span>
+          <h3 class="modal-title">Xác Nhận Hủy Chuyến Xe</h3>
+        </div>
+        <p class="modal-subtitle">Bạn có chắc chắn muốn hủy chuyến <strong id="cancel-modal-booking-id">#VF-0000</strong> không?</p>
+        
+        <form id="cancel-trip-form" class="cancel-form">
+          <label class="form-label">Vui lòng chọn lý do hủy chuyến:</label>
+          <div class="cancel-reasons-list">
+            <label class="reason-radio-item">
+              <input type="radio" name="cancel_reason" value="Thay đổi kế hoạch di chuyển" checked />
+              <span>Tôi thay đổi kế hoạch, không cần đi nữa</span>
+            </label>
+            <label class="reason-radio-item">
+              <input type="radio" name="cancel_reason" value="Thời gian chờ đón quá lâu" />
+              <span>Thời gian chờ đón quá lâu</span>
+            </label>
+            <label class="reason-radio-item">
+              <input type="radio" name="cancel_reason" value="Muốn đổi điểm đón / điểm đến hoặc loại xe" />
+              <span>Muốn đổi điểm đón / điểm đến hoặc loại xe</span>
+            </label>
+            <label class="reason-radio-item">
+              <input type="radio" name="cancel_reason" value="Đã tìm được phương tiện khác" />
+              <span>Đã tìm được phương tiện di chuyển khác</span>
+            </label>
+            <label class="reason-radio-item">
+              <input type="radio" name="cancel_reason" value="other" id="radio-reason-other" />
+              <span>Lý do khác:</span>
+            </label>
+          </div>
+          <div class="form-group" id="other-reason-group" style="display: none; margin-top: 8px;">
+            <input type="text" id="cancel-other-reason-input" class="form-input" placeholder="Nhập lý do của bạn..." />
+          </div>
+
+          <div class="modal-actions mt-3">
+            <button type="button" class="btn-modal-secondary" id="btn-abort-cancel">Giữ lại chuyến</button>
+            <button type="submit" class="btn-modal-danger" id="btn-confirm-cancel">Xác nhận hủy chuyến</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Popup Đánh Giá Chuyến Đi (Rating & Review) -->
+    <div id="review-trip-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card">
+        <button type="button" class="modal-close" id="btn-close-review-modal" aria-label="Đóng">&times;</button>
+        <div class="review-header text-center">
+          <span class="review-badge-icon">⭐</span>
+          <h3 class="modal-title">Đánh Giá Chuyến Đi</h3>
+          <p class="modal-subtitle">Chuyến xe <strong id="review-modal-booking-id">#VF-0000</strong> cùng tài xế <strong id="review-modal-driver-name">Tài xế</strong></p>
+        </div>
+
+        <form id="review-trip-form" class="review-form">
+          <div class="star-rating-select-wrap">
+            <span class="rating-label">Chất lượng chuyến đi của bạn:</span>
+            <div class="star-rating-group" id="star-rating-group">
+              <span class="star-btn active" data-rating="1">★</span>
+              <span class="star-btn active" data-rating="2">★</span>
+              <span class="star-btn active" data-rating="3">★</span>
+              <span class="star-btn active" data-rating="4">★</span>
+              <span class="star-btn active" data-rating="5">★</span>
+            </div>
+            <strong class="rating-score-text" id="rating-score-text">5 sao - Rất tuyệt vời</strong>
+          </div>
+
+          <div class="review-quick-tags-wrap">
+            <label class="form-label">Điểm bạn hài lòng nhất:</label>
+            <div class="review-tag-checkboxes">
+              <label class="tag-check-pill"><input type="checkbox" name="rating_tag" value="Xe sạch sẽ, không mùi" checked /> <span>🌿 Xe sạch, êm ái</span></label>
+              <label class="tag-check-pill"><input type="checkbox" name="rating_tag" value="Tài xế thân thiện, lịch sự" checked /> <span>😊 Tài xế thân thiện</span></label>
+              <label class="tag-check-pill"><input type="checkbox" name="rating_tag" value="Lái xe an toàn, đúng luật" checked /> <span>🛡️ Lái xe an toàn</span></label>
+              <label class="tag-check-pill"><input type="checkbox" name="rating_tag" value="Đón đúng giờ" /> <span>⏱️ Đón đúng giờ</span></label>
+              <label class="tag-check-pill"><input type="checkbox" name="rating_tag" value="Giá cước minh bạch, hợp lý" /> <span>💰 Giá cước hợp lý</span></label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label for="review-comment-input" class="form-label">Nhận xét chi tiết (không bắt buộc):</label>
+            <textarea id="review-comment-input" class="form-textarea" rows="3" placeholder="Chia sẻ thêm cảm nhận của bạn về chuyến xe VinFast..."></textarea>
+          </div>
+
+          <div class="modal-actions mt-3">
+            <button type="button" class="btn-modal-secondary" id="btn-abort-review">Đóng</button>
+            <button type="submit" class="btn-modal-primary" id="btn-submit-review">Gửi đánh giá</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-container">

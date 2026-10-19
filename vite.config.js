@@ -15,6 +15,7 @@ export default defineConfig({
         admin: resolve(import.meta.dirname, 'admin.html'),
         adminLogin: resolve(import.meta.dirname, 'admin-login.html'),
         dangnhap: resolve(import.meta.dirname, 'dangnhap.html'),
+        dki: resolve(import.meta.dirname, 'dki.html'),
       },
     },
   },
