@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
           setRouteStatus(error.message, 'error');
           return;
         }
-        pickupInput.value = coordinateLabel;
+        pickupInput.value = verifiedLocation?.label || coordinateLabel;
         pickupLocation = verifiedLocation;
 
         currentLocationMarker?.remove();

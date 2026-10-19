@@ -192,7 +192,24 @@ export async function resolveLocation(query) {
     ) {
       throw new Error('Dịch vụ TaxiVinFast hiện chỉ hỗ trợ đặt xe trong khu vực Hà Nội.');
     }
-    return { label: cleanQuery, lat, lng };
+
+    const labelFromAddress = [
+      result.address?.house_number,
+      result.address?.road,
+      result.address?.neighbourhood,
+      result.address?.suburb,
+      result.address?.village,
+      result.address?.town,
+      result.address?.city,
+      result.address?.state,
+      result.address?.country,
+    ].filter(Boolean).join(', ');
+
+    return {
+      label: result.display_name || labelFromAddress || cleanQuery,
+      lat,
+      lng,
+    };
   }
 
   const locations = await searchLocations(cleanQuery, 1);
