@@ -2,6 +2,7 @@ import {
   AUTH_USER_KEY,
   clearAuthSession,
   hasAuthSession,
+  isDriverUser,
 } from './auth-client.js';
 
 const ACTION_SELECTOR = 'a[href="dangnhap.html"], a[href="dki.html"], button.btn-login, button.btn-register';

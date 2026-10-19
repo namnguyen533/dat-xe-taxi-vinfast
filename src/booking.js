@@ -860,15 +860,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  /** Tài xế được hệ thống điều ngẫu nhiên (mô phỏng) */
-  const demoDrivers = [
-    { name: 'Trần Thanh Sơn', phone: '0903 112 233', rating: 4.9 },
-    { name: 'Lê Hoàng Nam', phone: '0977 445 566', rating: 5.0 },
-    { name: 'Đặng Văn Hùng', phone: '0918 887 766', rating: 4.8 },
-    { name: 'Nguyễn Hoàng Đức', phone: '0933 665 544', rating: 5.0 },
-    { name: 'Phạm Quốc Huy', phone: '0908 334 455', rating: 4.7 },
-  ];
-
   // Submit: kiểm tra dữ liệu rồi lưu đơn vào LocalStorage (mục 37 & 38)
   if (btnConfirm) {
     btnConfirm.addEventListener('click', () => {
@@ -912,7 +903,7 @@ document.addEventListener('DOMContentLoaded', () => {
           seats: Number(currentCar.seats) || 4,
           licensePlate: `${randPlatePrefix()}-${Math.floor(100 + Math.random() * 900)}.${Math.floor(10 + Math.random() * 89)}`,
         },
-        driver,
+        driver: null,
         route: {
           pickupLocation: values.pickup,
           destinationLocation: values.destination,

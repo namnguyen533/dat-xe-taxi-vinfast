@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Khu vực tài xế - TaxiVinFast</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  </head>
+  <body class="driver-page">
+    <header class="header">
+      <div class="header-container">
+        <div class="logo"><a href="index.html"><h1>TaxiVinFast</h1></a></div>
+        <div class="driver-header-copy"><span>KHU VỰC TÀI XẾ</span><strong id="driver-header-name">Xin chào, tài xế</strong></div>
+        <div class="header-actions">
+          <a href="index.html" class="nav-link">Trang khách hàng</a>
+          <button id="driver-logout" class="driver-logout" type="button">Đăng xuất</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="driver-shell">
+      <div id="driver-notice" class="driver-notice" role="status" aria-live="polite" hidden></div>
+      <nav class="driver-tabs" aria-label="Điều hướng tài xế">
+        <button class="driver-tab is-active" type="button" data-tab="home" aria-selected="true">⌂ <span>Trang chủ</span></button>
+        <button class="driver-tab" type="button" data-tab="rides" aria-selected="false">⇄ <span>Chuyến xe</span><i id="driver-ride-count">0</i></button>
+        <button class="driver-tab" type="button" data-tab="income" aria-selected="false">₫ <span>Thu nhập</span></button>
+        <button class="driver-tab" type="button" data-tab="account" aria-selected="false">◉ <span>Tài khoản</span></button>
+      </nav>
+
+      <section class="driver-panel is-active" data-panel="home">
+        <div class="driver-welcome">
+          <div><span class="driver-eyebrow">BẢNG ĐIỀU KHIỂN</span><h2 id="driver-greeting">Chào tài xế!</h2><p>Sẵn sàng cho hành trình xanh hôm nay?</p></div>
+          <button id="driver-online-toggle" class="driver-online-toggle" type="button" aria-pressed="false"><span></span><b id="driver-online-text">Bật nhận chuyến</b></button>
+        </div>
+        <div class="driver-home-grid">
+          <article class="driver-map-card">
+            <div class="driver-card-heading"><div><span class="driver-eyebrow">KHU VỰC HÀ NỘI</span><h3>Bản đồ Hà Nội</h3></div><button id="driver-locate" class="driver-small-button" type="button">◎ Vị trí của tôi</button></div>
+            <div id="driver-map" class="driver-map" aria-label="Bản đồ khu vực Hà Nội"></div>
+            <div class="driver-connectivity"><span id="driver-gps-state"><i></i> GPS chưa bật</span><span id="driver-network-state"><i></i> Đang kiểm tra mạng</span></div>
+          </article>
+          <div class="driver-home-side">
+            <article class="driver-card driver-vehicle-card"><div class="driver-card-heading"><div><span class="driver-eyebrow">XE ĐANG SỬ DỤNG</span><h3 id="driver-vehicle-model">VinFast VF 5 Plus</h3></div><span class="driver-vehicle-icon">🚘</span></div><p id="driver-vehicle-plate">51K-882.19 · Dịch vụ xe điện</p></article>
+            <article class="driver-card driver-today-card"><span class="driver-eyebrow">TỔNG QUAN HÔM NAY</span><div class="driver-today-stats"><div><strong id="driver-today-income">0 đ</strong><span>Thu nhập ước tính</span></div><div><strong id="driver-today-trips">0</strong><span>Chuyến hoàn thành</span></div></div><button class="driver-inline-link" type="button" data-open-tab="income">Xem thu nhập <span>→</span></button></article>
+            <article class="driver-card driver-current-card" id="driver-current-trip"></article>
+          </div>
+        </div>
+        <section class="driver-section-block"><div class="driver-section-heading"><div><span class="driver-eyebrow">SẴN SÀNG LÊN ĐƯỜNG</span><h3>Chuyến mới dành cho bạn</h3><p class="driver-muted">Đơn khách đặt sẽ hiển thị ở đây đến khi có tài xế nhận.</p></div><button class="driver-inline-link" type="button" data-open-tab="rides">Tất cả chuyến <span>→</span></button></div><div id="driver-home-offers" class="driver-ride-grid"></div></section>
+      </section>
+
+      <section class="driver-panel" data-panel="rides">
+        <div class="driver-page-heading"><div><span class="driver-eyebrow">ĐIỀU PHỐI CỦA BẠN</span><h2>Chuyến xe</h2><p>Nhận chuyến mới và theo dõi hành trình đang phục vụ.</p></div><label class="driver-filter">Lịch sử <select id="driver-history-filter"><option value="all">Tất cả</option><option value="month">Tháng này</option><option value="week">7 ngày qua</option></select></label></div>
+        <section class="driver-section-block"><div class="driver-section-heading"><h3>Đang phục vụ</h3><span id="driver-active-count" class="driver-count-badge">0 chuyến</span></div><div id="driver-active-rides" class="driver-ride-grid"></div></section>
+        <section class="driver-section-block"><div class="driver-section-heading"><h3>Chuyến mới</h3><span class="driver-muted">Chuyến chưa có tài xế nhận sẽ luôn hiển thị tại đây</span></div><div id="driver-offers" class="driver-ride-grid"></div></section>
+        <section class="driver-section-block"><div class="driver-section-heading"><h3>Lịch sử chuyến</h3><span id="driver-history-count" class="driver-muted"></span></div><div class="driver-table-wrap"><table class="driver-table"><thead><tr><th>Mã chuyến</th><th>Ngày giờ</th><th>Hành trình</th><th>Tổng cước</th><th>Thực nhận</th><th>Thanh toán</th><th></th></tr></thead><tbody id="driver-history"></tbody></table></div></section>
+      </section>
+
+      <section class="driver-panel" data-panel="income">
+        <div class="driver-page-heading"><div><span class="driver-eyebrow">THU NHẬP & VÍ</span><h2>Thu nhập của bạn</h2><p>Số liệu ước tính theo mức chiết khấu demo 20%; đối soát thật cần hệ thống máy chủ.</p></div></div>
+        <div class="driver-income-grid"><article class="driver-income-main"><span>Thực nhận trong tháng</span><strong id="driver-income-month">0 đ</strong><small><span id="driver-month-trips">0 chuyến</span> · Sau phí nền tảng</small></article><article class="driver-income-stat"><span>Hôm nay</span><strong id="driver-income-today">0 đ</strong><small id="driver-today-trip-label">0 chuyến hoàn thành</small></article><article class="driver-income-stat"><span>Tuần này</span><strong id="driver-income-week">0 đ</strong><small id="driver-week-trip-label">0 chuyến hoàn thành</small></article><article class="driver-income-stat"><span>Số dư khả dụng</span><strong id="driver-wallet-available">0 đ</strong><small>Thu nhập sau phí, trừ yêu cầu rút</small></article><article class="driver-income-stat"><span>Chờ đối soát</span><strong id="driver-wallet-pending">0 đ</strong><small>Giao dịch chưa được xác nhận bởi máy chủ</small></article></div>
+        <div class="driver-income-content"><section class="driver-card"><div class="driver-section-heading"><div><span class="driver-eyebrow">BIẾN ĐỘNG SỐ DƯ</span><h3>Lịch sử giao dịch</h3></div><button id="driver-withdraw-open" class="driver-primary-button" type="button">Yêu cầu rút tiền</button></div><div id="driver-transactions" class="driver-transactions"></div></section><section class="driver-card"><div class="driver-section-heading"><div><span class="driver-eyebrow">HIỆU SUẤT</span><h3>Thống kê làm việc</h3></div></div><div class="driver-performance"><div><span>Chuyến hoàn thành</span><strong id="driver-performance-trips">0</strong></div><div><span>Đánh giá trung bình</span><strong id="driver-performance-rating">5.0 ★</strong></div><div><span>Phí nền tảng</span><strong id="driver-performance-fees">0 đ</strong></div><div><span>Thưởng & phụ cấp</span><strong>0 đ</strong></div></div></section></div>
+      </section>
+
+      <section class="driver-panel" data-panel="account">
+        <div class="driver-page-heading"><div><span class="driver-eyebrow">HỒ SƠ TÀI XẾ</span><h2>Tài khoản</h2><p>Quản lý thông tin liên hệ, xe và giấy tờ.</p></div></div>
+        <form id="driver-profile-form" class="driver-profile-layout">
+          <section class="driver-card driver-profile-card"><div class="driver-avatar" id="driver-avatar">TX</div><div class="driver-profile-title"><span class="driver-eyebrow">THÔNG TIN CÁ NHÂN</span><h3 id="driver-profile-display-name">Tài xế</h3><p id="driver-profile-display-phone">Chưa cập nhật số điện thoại</p><strong id="driver-profile-rating">5.0 ★ Đánh giá demo</strong></div><div class="driver-form-grid"><label>Họ và tên<input name="fullName" required minlength="2" /></label><label>Số điện thoại<input name="phone" type="tel" /></label><label>Email đăng nhập<input name="email" type="email" disabled /></label><label>Đánh giá<input name="rating" type="number" min="1" max="5" step="0.1" readonly /></label></div></section>
+          <section class="driver-card"><div class="driver-section-heading"><div><span class="driver-eyebrow">PHƯƠNG TIỆN & GIẤY TỜ</span><h3>Thông tin xe</h3></div></div><div class="driver-form-grid"><label>Dòng xe<input name="vehicle" required /></label><label>Biển số<input name="plate" required /></label><label>Giấy phép lái xe có hạn đến<input name="licenseExpiry" type="date" /></label><label>Đăng kiểm / giấy tờ xe có hạn đến<input name="vehiclePaperExpiry" type="date" /></label></div><div class="driver-card-divider"></div><div class="driver-section-heading"><div><span class="driver-eyebrow">NHẬN THANH TOÁN</span><h3>Tài khoản ngân hàng</h3></div></div><div class="driver-form-grid"><label>Ngân hàng<input name="bankName" placeholder="Ví dụ: Vietcombank" /></label><label>Số tài khoản<input name="bankAccount" inputmode="numeric" /></label></div><div class="driver-card-divider"></div><div class="driver-section-heading"><div><span class="driver-eyebrow">TÙY CHỌN</span><h3>Cài đặt tài khoản</h3></div></div><div class="driver-form-grid"><label>Ngôn ngữ giao diện<select name="language"><option value="vi">Tiếng Việt</option></select></label></div><div class="driver-settings-row"><label><input name="notifications" type="checkbox" /> Nhận thông báo chuyến mới</label><label><input name="sound" type="checkbox" /> Bật âm thanh thông báo</label></div><button class="driver-primary-button" type="submit">Lưu thông tin</button></section>
+          <aside class="driver-card driver-help-card"><span class="driver-eyebrow">LUÔN CÓ NGƯỜI HỖ TRỢ</span><h3>Trung tâm trợ giúp</h3><p>Nếu gặp sự cố trong chuyến, liên hệ tổng đài hỗ trợ hoặc báo cáo vấn đề.</p><a href="tel:1900232345">☎ Gọi hỗ trợ 1900 232 345</a><button type="button" id="driver-sos" class="driver-sos-button">SOS · Báo sự cố</button><button type="button" id="driver-account-logout" class="driver-inline-link">Đăng xuất tài khoản →</button></aside>
+        </form>
+      </section>
+    </main>
+
+    <dialog id="driver-withdraw-dialog" class="driver-dialog"><form id="driver-withdraw-form"><button type="button" class="driver-dialog-close" aria-label="Đóng">×</button><span class="driver-eyebrow">RÚT TIỀN VÍ</span><h2>Yêu cầu rút tiền</h2><p id="driver-withdraw-bank-hint">Điền thông tin ngân hàng trong tài khoản trước khi yêu cầu.</p><label>Số tiền cần rút<input name="amount" type="number" min="10000" step="1000" required /></label><div class="driver-dialog-actions"><button type="button" class="driver-secondary-button" data-close-dialog>Để sau</button><button class="driver-primary-button" type="submit">Gửi yêu cầu</button></div></form></dialog>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="/src/driver.js"></script>
+    <script type="module" src="/src/auth-navigation.js"></script>
+  </body>
+</html>

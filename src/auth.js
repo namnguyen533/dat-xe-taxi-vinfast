@@ -6,8 +6,8 @@ const DEMO_USER = {
   email: 'demo@taxivinfast.com',
   phone: '0912345678',
   password: '123456',
+  role: 'customer',
 };
-
 function setFieldError(input, errorElement, message) {
   if (!input || !errorElement) return;
   input.classList.toggle('invalid', Boolean(message));
@@ -30,10 +30,10 @@ function setSubmitting(form, isSubmitting) {
 
 function ensureUserStorage() {
   const storedUsers = JSON.parse(localStorage.getItem('taxi-users') || '[]');
-  if (!storedUsers.some((user) => user.email.toLowerCase() === DEMO_USER.email.toLowerCase())) {
-    storedUsers.push(DEMO_USER);
-    localStorage.setItem('taxi-users', JSON.stringify(storedUsers));
-  }
+  const existing = storedUsers.find((user) => user.email.toLowerCase() === DEMO_USER.email.toLowerCase());
+  if (existing) existing.role = DEMO_USER.role;
+  else storedUsers.push(DEMO_USER);
+  localStorage.setItem('taxi-users', JSON.stringify(storedUsers));
 }
 
 function saveCurrentUser(user) {
@@ -41,6 +41,7 @@ function saveCurrentUser(user) {
     name: user.name,
     email: user.email,
     phone: user.phone,
+    role: user.role === 'driver' ? 'driver' : 'customer',
   }));
 }
 
@@ -140,6 +141,7 @@ function initializeRegistration() {
         name: fields.name.value.trim(),
         phone: fields.phone.value.trim(),
         email: fields.email.value.trim(),
+        role: 'customer',
       });
       if (result?.accessToken) saveAuthToken(result.accessToken);
       const params = new URLSearchParams(window.location.search);
@@ -164,6 +166,9 @@ function initializeLogin() {
   const globalError = form.querySelector('#login-global-error');
   const submitButton = form.querySelector('button[type="submit"]');
   if (submitButton) submitButton.dataset.defaultText = submitButton.textContent;
+  if (new URLSearchParams(window.location.search).get('error') === 'driver-only') {
+    setGlobalError(globalError, 'Khu vực này chỉ dành cho tài khoản tài xế. Hãy đăng nhập bằng tài khoản tài xế.');
+  }
 
   form.addEventListener('input', (event) => {
     if (event.target === email) setFieldError(email, emailError, '');
@@ -195,6 +200,7 @@ function initializeLogin() {
           name: result.user?.name || result.user?.fullname || safeEmail,
           email: result.user?.email || safeEmail,
           phone: result.user?.phone || '',
+          role: result.user?.role,
         });
         saveAuthToken(result.accessToken);
         const params = new URLSearchParams(window.location.search);
