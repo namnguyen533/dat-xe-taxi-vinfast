@@ -38,7 +38,6 @@ function initializeDriverPage() {
     phone: user.phone || '',
   });
   const skippedOffers = new Set();
-  const offerExpiry = new Map();
   let knownOfferIds = new Set();
   let driverMap;
   let driverMarker;
@@ -94,19 +93,11 @@ function initializeDriverPage() {
   }
 
   function getOffers() {
-    if (localStorage.getItem('taxivinfast_driver_online') !== 'true') return [];
     return allBookings().filter((booking) => (
       booking.status === 'pending'
       && !booking.driver?.name
       && !skippedOffers.has(booking.bookingId)
     ));
-  }
-
-  function ensureOfferExpiry(offers) {
-    const now = Date.now();
-    offers.forEach((booking) => {
-      if (!offerExpiry.has(booking.bookingId)) offerExpiry.set(booking.bookingId, now + 60_000);
-    });
   }
 
   function rideCard(booking, isOffer = false) {
@@ -116,7 +107,7 @@ function initializeDriverPage() {
     const flowStage = booking.driver?.stage || 'accepted';
     const destination = booking.status === 'in_progress';
     const actionButtons = isOffer
-      ? `<div class="driver-ride-actions"><span class="driver-countdown" data-countdown="${escape(booking.bookingId)}">⏱ 01:00</span><button class="driver-secondary-button" type="button" data-action="skip" data-id="${escape(booking.bookingId)}">Bỏ qua</button><button class="driver-primary-button" type="button" data-action="accept" data-id="${escape(booking.bookingId)}">Nhận chuyến</button></div>`
+      ? `<div class="driver-ride-actions"><button class="driver-secondary-button" type="button" data-action="skip" data-id="${escape(booking.bookingId)}">Bỏ qua</button><button class="driver-primary-button" type="button" data-action="accept" data-id="${escape(booking.bookingId)}">Nhận chuyến</button></div>`
       : booking.status === 'pending'
         ? `<div class="driver-ride-actions"><button class="driver-primary-button" type="button" data-action="accept" data-id="${escape(booking.bookingId)}">Xác nhận nhận chuyến</button></div>`
         : booking.status === 'confirmed'
@@ -147,10 +138,9 @@ function initializeDriverPage() {
 
   function renderOffers() {
     const offers = getOffers();
-    ensureOfferExpiry(offers);
     const html = offers.length
       ? offers.map((booking) => rideCard(booking, true)).join('')
-      : '<div class="driver-empty-state"><span>✓</span><strong>Chưa có chuyến mới</strong><p>Chuyến chưa được phân công sẽ xuất hiện tại đây khi bạn bật nhận chuyến.</p></div>';
+      : '<div class="driver-empty-state"><span>✓</span><strong>Chưa có chuyến mới</strong><p>Đơn khách vừa đặt sẽ xuất hiện tại đây để bạn nhận chuyến.</p></div>';
     document.getElementById('driver-offers').innerHTML = html;
     document.getElementById('driver-home-offers').innerHTML = offers.slice(0, 2).map((booking) => rideCard(booking, true)).join('')
       || '<div class="driver-empty-state compact"><strong>Chưa có chuyến mới</strong><p>Hãy bật nhận chuyến để sẵn sàng đón yêu cầu.</p></div>';
@@ -378,12 +368,6 @@ function initializeDriverPage() {
       return;
     }
     if (action === 'accept') {
-      if (isOffer && Date.now() > (offerExpiry.get(id) || 0)) {
-        showNotice('Đã hết thời gian phản hồi chuyến này.', 'error');
-        skippedOffers.add(id);
-        renderAll();
-        return;
-      }
       if (booking.status !== 'pending' || booking.driver?.name) {
         showNotice('Chuyến này đã được tài xế khác nhận hoặc không còn khả dụng.', 'error');
         renderAll();
@@ -596,13 +580,6 @@ function initializeDriverPage() {
   setupMap();
   renderAll();
   setInterval(() => {
-    document.querySelectorAll('[data-countdown]').forEach((timer) => {
-      const expiresAt = offerExpiry.get(timer.dataset.countdown) || Date.now();
-      const seconds = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
-      timer.textContent = seconds ? `⏱ ${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}` : 'Hết thời gian';
-      const card = timer.closest('.driver-ride-card');
-      if (seconds === 0) card.querySelectorAll('button[data-action="accept"]').forEach((button) => { button.disabled = true; });
-    });
     document.querySelectorAll('[data-waiting-from]').forEach((timer) => {
       const minutes = Math.max(0, Math.floor((Date.now() - Number(timer.dataset.waitingFrom)) / 60_000));
       timer.textContent = `Chờ ${minutes} phút`;
