@@ -157,14 +157,48 @@ function initializeDriverPage() {
     document.getElementById('driver-current-trip').innerHTML = current
       ? `<div class="driver-current-trip-heading"><span class="driver-eyebrow">CHUYẾN ĐANG PHỤC VỤ</span><span class="driver-status-chip status-${escape(current.status)}">${escape(statusLabel(current))}</span></div><strong>${escape(current.customer?.name || 'Khách hàng')}</strong><p>${routeText(current)}</p><button type="button" class="driver-inline-link" data-open-tab="rides">Mở chi tiết chuyến →</button>`
       : '<div class="driver-current-trip-empty"><span class="driver-eyebrow">CHUYẾN ĐANG PHỤC VỤ</span><strong>Chưa có chuyến</strong><p>Chuyến được nhận sẽ hiển thị tại đây.</p></div>';
+
+    // Hiển thị nút xem lộ trình nếu có chuyến đang phục vụ
+    const showRouteBtn = document.getElementById('driver-show-route');
+    if (showRouteBtn) {
+      showRouteBtn.style.display = current ? 'inline-block' : 'none';
+      if (current) {
+        showRouteBtn.onclick = () => {
+          drawRoute(current.route?.pickupLocation, current.route?.destinationLocation);
+          showNotice('Đã hiển thị lộ trình trên bản đồ.');
+        };
+      }
+    }
   }
 
   function renderHistory() {
-    const filter = document.getElementById('driver-history-filter').value;
+    const timeFilter = document.getElementById('driver-history-filter').value;
+    const statusFilter = document.getElementById('driver-status-filter')?.value || 'all';
+    const paymentFilter = document.getElementById('driver-payment-filter')?.value || 'all';
+
     const completed = assignedBookings()
       .filter((booking) => ['completed', 'cancelled'].includes(booking.status))
-      .filter((booking) => filter === 'month' ? isThisMonth(booking) : filter === 'week' ? isThisWeek(booking) : true)
+      .filter((booking) => {
+        // Time filter
+        if (timeFilter === 'month' && !isThisMonth(booking)) return false;
+        if (timeFilter === 'week' && !isThisWeek(booking)) return false;
+        if (timeFilter === 'today' && !isSameDay(booking)) return false;
+        return true;
+      })
+      .filter((booking) => {
+        // Status filter
+        if (statusFilter === 'completed' && booking.status !== 'completed') return false;
+        if (statusFilter === 'cancelled' && booking.status !== 'cancelled') return false;
+        return true;
+      })
+      .filter((booking) => {
+        // Payment filter
+        if (paymentFilter === 'cash' && booking.payment?.method !== 'cash') return false;
+        if (paymentFilter === 'card' && booking.payment?.method === 'cash') return false;
+        return true;
+      })
       .sort((a, b) => new Date(bookedAt(b)) - new Date(bookedAt(a)));
+
     document.getElementById('driver-history-count').textContent = `${completed.length} chuyến`;
     document.getElementById('driver-history').innerHTML = completed.length
       ? completed.map((booking) => {
@@ -216,6 +250,274 @@ function initializeDriverPage() {
       || '<div class="driver-empty-state compact"><strong>Chưa có giao dịch</strong><p>Thu nhập từ chuyến hoàn thành sẽ hiển thị tại đây.</p></div>';
     document.getElementById('driver-today-income').textContent = formatVND(sum(today));
     document.getElementById('driver-today-trips').textContent = String(today.length);
+
+    // Render income chart
+    renderIncomeChart(completed);
+  }
+
+  function renderNotifications() {
+    const notifications = JSON.parse(localStorage.getItem('taxivinfast_driver_notifications') || '[]');
+    const unreadCount = notifications.filter((n) => !n.read).length;
+
+    // Update badge
+    const badge = document.getElementById('driver-notification-count');
+    if (badge) {
+      badge.textContent = String(unreadCount);
+      badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+    }
+
+    // Render list
+    const list = document.getElementById('driver-notifications-list');
+    if (!list) return;
+
+    if (notifications.length === 0) {
+      list.innerHTML = '<div class="driver-notifications-empty"><span>🔔</span><strong>Chưa có thông báo</strong><p>Thông báo từ hệ thống sẽ hiển thị tại đây.</p></div>';
+      return;
+    }
+
+    list.innerHTML = notifications.map((notification) => {
+      const iconMap = {
+        info: 'ℹ️',
+        success: '✅',
+        warning: '⚠️',
+        error: '❌',
+      };
+      const timeAgo = getTimeAgo(notification.createdAt);
+      return `<div class="driver-notification-item ${notification.read ? '' : 'unread'}" data-id="${notification.id}">
+        <div class="driver-notification-icon ${notification.type}">${iconMap[notification.type] || '📢'}</div>
+        <div class="driver-notification-content">
+          <strong>${escape(notification.title)}</strong>
+          <p>${escape(notification.message)}</p>
+          <span class="driver-notification-time">${timeAgo}</span>
+          ${!notification.read ? '<div class="driver-notification-actions"><button type="button" data-action="mark-read">Đánh dấu đã đọc</button></div>' : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    // Add event listeners
+    list.querySelectorAll('[data-action="mark-read"]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const item = e.target.closest('.driver-notification-item');
+        const id = item.dataset.id;
+        markNotificationAsRead(id);
+      });
+    });
+  }
+
+  function addNotification(title, message, type = 'info') {
+    const notifications = JSON.parse(localStorage.getItem('taxivinfast_driver_notifications') || '[]');
+    const notification = {
+      id: `NOTIF-${Date.now()}`,
+      title,
+      message,
+      type,
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    notifications.unshift(notification);
+
+    // Keep only last 50 notifications
+    if (notifications.length > 50) {
+      notifications.pop();
+    }
+
+    localStorage.setItem('taxivinfast_driver_notifications', JSON.stringify(notifications));
+    renderNotifications();
+  }
+
+  function markNotificationAsRead(id) {
+    const notifications = JSON.parse(localStorage.getItem('taxivinfast_driver_notifications') || '[]');
+    const notification = notifications.find((n) => n.id === id);
+    if (notification) {
+      notification.read = true;
+      localStorage.setItem('taxivinfast_driver_notifications', JSON.stringify(notifications));
+      renderNotifications();
+    }
+  }
+
+  function clearAllNotifications() {
+    localStorage.setItem('taxivinfast_driver_notifications', JSON.stringify([]));
+    renderNotifications();
+    showNotice('Đã xóa tất cả thông báo.');
+  }
+
+  function getTimeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return 'Vừa xong';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} phút trước`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} giờ trước`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} ngày trước`;
+    return formatDateTime(dateString);
+  }
+
+  function renderIncomeChart(completed) {
+    const canvas = document.getElementById('incomeChart');
+    if (!canvas) return;
+
+    // Get last 7 days data
+    const days = [];
+    const data = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const dayName = date.toLocaleDateString('vi-VN', { weekday: 'short' });
+      days.push(dayName);
+
+      const dayIncome = completed
+        .filter((booking) => {
+          const bookingDate = new Date(bookedAt(booking));
+          return bookingDate.toISOString().split('T')[0] === dateStr;
+        })
+        .reduce((total, booking) => total + bookingNet(booking), 0);
+      data.push(dayIncome);
+    }
+
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+      canvas.parentElement.innerHTML = '<div class="driver-chart-fallback"><strong>Không tải được thư viện biểu đồ</strong><p>Vui lòng kiểm tra kết nối Internet để xem biểu đồ thu nhập.</p></div>';
+      return;
+    }
+
+    // Destroy existing chart if any
+    if (window.incomeChartInstance) {
+      window.incomeChartInstance.destroy();
+    }
+
+    // Create chart
+    const ctx = canvas.getContext('2d');
+    window.incomeChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [{
+          label: 'Thu nhập (đ)',
+          data: data,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#6366f1',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `Thu nhập: ${formatVND(context.raw)}`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => value >= 1000000 ? `${(value / 1000000).toFixed(1)}M` : value >= 1000 ? `${(value / 1000).toFixed(0)}K` : value,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function exportIncomeReport() {
+    const completed = assignedBookings().filter((booking) => booking.status === 'completed');
+    const month = completed.filter((booking) => isThisMonth(booking));
+
+    if (month.length === 0) {
+      showNotice('Không có dữ liệu để xuất báo cáo trong tháng này.', 'error');
+      return;
+    }
+
+    // Create CSV content
+    const headers = ['Mã chuyến', 'Ngày giờ', 'Điểm đón', 'Điểm đến', 'Tổng cước', 'Thực nhận', 'Phí nền tảng', 'Phương thức thanh toán'];
+    const rows = month.map((booking) => [
+      booking.bookingId,
+      formatDateTime(bookedAt(booking)),
+      booking.route?.pickupLocation || '',
+      booking.route?.destinationLocation || '',
+      Number(booking.fare?.totalAmount) || 0,
+      bookingNet(booking),
+      Math.round((Number(booking.fare?.totalAmount) || 0) * 0.2),
+      paymentMethodLabel(booking.payment?.method),
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+    ].join('\n');
+
+    // Create download link
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bao_cao_thu_nhap_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showNotice('Đã xuất báo cáo thu nhập thành công.');
+  }
+
+  function openSOSDialog(bookingId) {
+    const dialog = document.getElementById('driver-sos-dialog');
+    const form = document.getElementById('driver-sos-form');
+    form.reset();
+    form.dataset.bookingId = bookingId || '';
+    dialog.showModal();
+  }
+
+  function handleSOSSubmit(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const bookingId = form.dataset.bookingId;
+    const severity = formData.get('severity');
+    const type = formData.get('type');
+    const description = formData.get('description');
+    const includeLocation = formData.has('includeLocation');
+
+    const incident = {
+      id: `SOS-${Date.now()}`,
+      bookingId: bookingId || null,
+      severity,
+      type,
+      description: description.trim(),
+      location: includeLocation ? currentMapPosition() : null,
+      driverEmail: email,
+      driverName: driverName(),
+      driverPhone: profile.phone,
+      createdAt: new Date().toISOString(),
+      status: 'pending',
+    };
+
+    const incidents = JSON.parse(localStorage.getItem('taxivinfast_driver_incidents') || '[]');
+    incidents.unshift(incident);
+    localStorage.setItem('taxivinfast_driver_incidents', JSON.stringify(incidents));
+
+    // Close dialog
+    document.getElementById('driver-sos-dialog').close();
+
+    // Show appropriate notice based on severity
+    if (severity === 'critical' || severity === 'high') {
+      showNotice('Đã gửi báo cáo SOS khẩn cấp! Nếu cần hỗ trợ ngay, hãy gọi 1900 232 345.', 'error');
+    } else {
+      showNotice('Đã gửi báo cáo sự cố. Đội hỗ trợ sẽ liên hệ với bạn sớm.');
+    }
   }
 
   function renderProfile() {
@@ -253,17 +555,34 @@ function initializeDriverPage() {
     renderHistory();
     renderIncome();
     renderNetworkState();
+    renderNotifications();
   }
 
   function notifyIncomingOffers(previousOfferIds) {
     const incoming = getOffers().filter((booking) => !previousOfferIds.has(booking.bookingId));
     if (!incoming.length || !profile.notifications) return;
     showNotice(`Bạn có ${incoming.length} chuyến mới đang chờ nhận.`);
+
+    // Browser notification
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('TaxiVinFast · Có chuyến mới', {
-        body: `${incoming.length} yêu cầu mới đang chờ tài xế phản hồi.`,
+      incoming.forEach((booking) => {
+        const notification = new Notification('TaxiVinFast · Chuyến mới', {
+          body: `${escape(booking.route?.pickupLocation || '')} → ${escape(booking.route?.destinationLocation || '')}\nCước: ${formatVND(booking.fare?.totalAmount)}`,
+          icon: '/favicon.svg',
+          tag: booking.bookingId,
+          requireInteraction: true,
+        });
+        notification.onclick = () => {
+          window.focus();
+          switchTab('rides');
+          notification.close();
+        };
       });
+    } else if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
     }
+
+    // Sound notification
     if (profile.sound && (window.AudioContext || window.webkitAudioContext)) {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       const context = new AudioContextClass();
@@ -277,6 +596,29 @@ function initializeDriverPage() {
       oscillator.stop(context.currentTime + 0.16);
       oscillator.addEventListener('ended', () => context.close());
     }
+
+    // Add visual indicator to tab
+    document.title = `(${incoming.length}) TaxiVinFast - Khu vực tài xế`;
+    setTimeout(() => {
+      document.title = 'Khu vực tài xế - TaxiVinFast';
+    }, 5000);
+  }
+
+  function sendSystemNotification(title, message, type = 'info') {
+    if (!profile.notifications) return;
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const notification = new Notification(`TaxiVinFast · ${title}`, {
+        body: message,
+        icon: '/favicon.svg',
+      });
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+    }
+
+    showNotice(message, type);
   }
 
   function renderNetworkState() {
@@ -296,7 +638,71 @@ function initializeDriverPage() {
       attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 19,
     }).addTo(driverMap);
+
+    // Tạo icon tùy chỉnh cho vị trí tài xế
+    const driverIcon = globalThis.L.divIcon({
+      className: 'driver-marker-icon',
+      html: '<div style="width: 24px; height: 24px; background: #6366f1; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+    });
+
+    // Thêm marker mặc định tại trung tâm Hà Nội
+    driverMarker = globalThis.L.marker([21.0285, 105.8542], { icon: driverIcon }).addTo(driverMap);
+    driverMarker.bindPopup('Vị trí mặc định: Trung tâm Hà Nội').openPopup();
+
     setTimeout(() => driverMap.invalidateSize(), 0);
+  }
+
+  function drawRoute(pickup, destination) {
+    if (!driverMap || !pickup || !destination) return;
+
+    // Xóa route cũ nếu có
+    if (window.driverRouteLine) {
+      driverMap.removeLayer(window.driverRouteLine);
+    }
+
+    // Thêm marker cho điểm đón và điểm đến
+    if (window.pickupMarker) driverMap.removeLayer(window.pickupMarker);
+    if (window.destinationMarker) driverMap.removeLayer(window.destinationMarker);
+
+    const pickupIcon = globalThis.L.divIcon({
+      className: 'pickup-marker-icon',
+      html: '<div style="width: 20px; height: 20px; background: #2ecc71; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></div>',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    const destinationIcon = globalThis.L.divIcon({
+      className: 'destination-marker-icon',
+      html: '<div style="width: 20px; height: 20px; background: #e74c3c; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></div>',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    // Giả lập tọa độ cho demo (trong thực tế sẽ dùng Geocoding API)
+    const pickupCoords = [21.0285 + (Math.random() - 0.5) * 0.05, 105.8542 + (Math.random() - 0.5) * 0.05];
+    const destCoords = [21.0285 + (Math.random() - 0.5) * 0.05, 105.8542 + (Math.random() - 0.5) * 0.05];
+
+    window.pickupMarker = globalThis.L.marker(pickupCoords, { icon: pickupIcon })
+      .addTo(driverMap)
+      .bindPopup(`Điểm đón: ${pickup}`);
+
+    window.destinationMarker = globalThis.L.marker(destCoords, { icon: destinationIcon })
+      .addTo(driverMap)
+      .bindPopup(`Điểm đến: ${destination}`);
+
+    // Vẽ đường thẳng giữa 2 điểm (demo - thực tế cần routing API)
+    window.driverRouteLine = globalThis.L.polyline([pickupCoords, destCoords], {
+      color: '#6366f1',
+      weight: 4,
+      opacity: 0.7,
+      dashArray: '10, 10',
+    }).addTo(driverMap);
+
+    // Fit bounds để hiển thị cả 2 điểm
+    const bounds = globalThis.L.latLngBounds([pickupCoords, destCoords]);
+    driverMap.fitBounds(bounds, { padding: [50, 50] });
   }
 
   function currentMapPosition() {
@@ -319,9 +725,15 @@ function initializeDriverPage() {
         if (driverMarker) {
           driverMarker.setLatLng(currentPosition);
         } else {
-          driverMarker = globalThis.L.marker(currentPosition).addTo(driverMap);
+          const driverIcon = globalThis.L.divIcon({
+            className: 'driver-marker-icon',
+            html: '<div style="width: 24px; height: 24px; background: #6366f1; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12],
+          });
+          driverMarker = globalThis.L.marker(currentPosition, { icon: driverIcon }).addTo(driverMap);
         }
-        driverMarker.bindPopup('Vị trí GPS hiện tại của bạn').openPopup();
+        driverMarker.bindPopup(`Vị trí GPS hiện tại của bạn<br><small>${currentPosition[0].toFixed(6)}, ${currentPosition[1].toFixed(6)}</small>`).openPopup();
         driverMap.setView(currentPosition, 15);
       }
       state.classList.add('is-connected');
@@ -334,6 +746,17 @@ function initializeDriverPage() {
         ? 'Bạn chưa cấp quyền vị trí. Hãy cho phép GPS trong cài đặt trình duyệt.'
         : 'Không thể xác định vị trí. Vui lòng kiểm tra thiết bị và thử lại.', 'error');
     }, { enableHighAccuracy: true, timeout: 12_000, maximumAge: 0 });
+  }
+
+  // Auto update GPS location every 30 seconds when online
+  let gpsUpdateInterval;
+  function startGPSAutoUpdate() {
+    if (gpsUpdateInterval) clearInterval(gpsUpdateInterval);
+    gpsUpdateInterval = setInterval(() => {
+      if (localStorage.getItem('taxivinfast_driver_online') === 'true') {
+        requestDriverLocation();
+      }
+    }, 30000); // Update every 30 seconds
   }
 
   function switchTab(tab) {
@@ -352,6 +775,7 @@ function initializeDriverPage() {
   function logout() {
     clearAuthSession();
     localStorage.removeItem('taxivinfast_driver_online');
+    sendSystemNotification('Đã đăng xuất', 'Bạn đã đăng xuất khỏi khu vực tài xế.');
     window.location.replace('dangnhap.html');
   }
 
@@ -379,10 +803,12 @@ function initializeDriverPage() {
       });
       bookingStore.updateStatus(id, 'confirmed');
       showNotice(`Bạn đã nhận chuyến ${id}.`);
+      addNotification('Đã nhận chuyến mới', `Bạn đã nhận chuyến ${id} từ ${escape(booking.customer?.name || 'khách hàng')}.`, 'success');
     } else if (action === 'arrive') {
       if (booking.status !== 'confirmed' || booking.driver?.name !== driverName()) return;
       bookingStore.update(id, { driver: { ...booking.driver, stage: 'arrived', arrivedAt: new Date().toISOString() } });
       showNotice('Đã ghi nhận bạn tới điểm đón. Hãy xác nhận sau khi khách lên xe.');
+      addNotification('Đã đến điểm đón', `Bạn đã đến điểm đón cho chuyến ${id}.`, 'info');
     } else if (action === 'start') {
       if (booking.status !== 'confirmed' || booking.driver?.name !== driverName() || booking.driver?.stage !== 'arrived') {
         showNotice('Hãy xác nhận đã tới điểm đón trước khi bắt đầu chuyến.', 'error');
@@ -390,6 +816,7 @@ function initializeDriverPage() {
       }
       bookingStore.updateStatus(id, 'in_progress');
       showNotice('Chuyến đi đã bắt đầu.');
+      addNotification('Chuyến đi bắt đầu', `Chuyến ${id} đã bắt đầu di chuyển.`, 'info');
     } else if (action === 'cash-received') {
       if (booking.payment?.method !== 'cash' || booking.status !== 'in_progress') return;
       bookingStore.update(id, { payment: { ...(booking.payment || {}), status: 'paid', receivedAt: new Date().toISOString() } });
@@ -401,9 +828,11 @@ function initializeDriverPage() {
         return;
       }
       bookingStore.updateStatus(id, 'completed');
+      const fare = bookingNet(booking);
       showNotice(booking.payment?.method !== 'cash' && booking.payment?.status !== 'paid'
         ? 'Đã kết thúc chuyến. Thanh toán online vẫn chờ hệ thống thanh toán xác nhận.'
         : 'Chuyến đi đã hoàn thành.');
+      addNotification('Chuyến hoàn thành', `Chuyến ${id} đã hoàn thành. Thu nhập: ${formatVND(fare)}`, 'success');
     } else if (action === 'cancel') {
       const reason = window.prompt('Lý do hủy chuyến (bắt buộc):');
       if (reason === null) return;
@@ -414,6 +843,7 @@ function initializeDriverPage() {
       bookingStore.update(id, { cancellationReason: reason.trim() });
       bookingStore.updateStatus(id, 'cancelled');
       showNotice('Đã hủy chuyến và lưu lý do.');
+      addNotification('Đã hủy chuyến', `Chuyến ${id} đã bị hủy. Lý do: ${escape(reason.trim())}`, 'warning');
     } else if (action === 'complaint') {
       const detail = window.prompt(`Nội dung khiếu nại cho chuyến ${id}:`);
       if (detail === null) return;
@@ -439,21 +869,7 @@ function initializeDriverPage() {
       localStorage.setItem('taxivinfast_driver_customer_ratings', JSON.stringify(ratings));
       showNotice('Đã lưu đánh giá khách hàng.');
     } else if (action === 'sos') {
-      const description = window.prompt('Mô tả sự cố để gửi cho trung tâm hỗ trợ:');
-      if (description === null) return;
-      if (!description.trim()) {
-        showNotice('Vui lòng mô tả sự cố để gửi hỗ trợ.', 'error');
-        return;
-      }
-      const incidents = JSON.parse(localStorage.getItem('taxivinfast_driver_incidents') || '[]');
-      incidents.unshift({
-        bookingId: id,
-        description: description.trim(),
-        location: currentMapPosition(),
-        createdAt: new Date().toISOString(),
-      });
-      localStorage.setItem('taxivinfast_driver_incidents', JSON.stringify(incidents));
-      showNotice('Đã lưu báo cáo SOS demo. Nếu khẩn cấp, hãy gọi 1900 232 345.', 'error');
+      openSOSDialog(id);
     }
     renderAll();
   }
@@ -476,11 +892,18 @@ function initializeDriverPage() {
     localStorage.setItem('taxivinfast_driver_online', String(!online));
     renderAll();
     showNotice(online ? 'Bạn đã tắt nhận chuyến.' : 'Bạn đang bật nhận chuyến.');
+
+    // Start/stop GPS auto update based on online status
+    if (!online) {
+      requestDriverLocation(); // Immediately get location when going online
+    }
   });
   document.getElementById('driver-locate').addEventListener('click', requestDriverLocation);
   document.getElementById('driver-logout').addEventListener('click', logout);
   document.getElementById('driver-account-logout').addEventListener('click', logout);
   document.getElementById('driver-history-filter').addEventListener('change', renderHistory);
+  document.getElementById('driver-status-filter')?.addEventListener('change', renderHistory);
+  document.getElementById('driver-payment-filter')?.addEventListener('change', renderHistory);
   window.addEventListener('online', renderNetworkState);
   window.addEventListener('offline', renderNetworkState);
   window.addEventListener('storage', (event) => {
@@ -573,11 +996,21 @@ function initializeDriverPage() {
   });
   document.getElementById('driver-sos').addEventListener('click', () => {
     const active = assignedBookings().find((booking) => booking.status === 'in_progress');
-    if (active) handleRideAction('sos', active.bookingId);
-    else showNotice('Chưa có chuyến đang thực hiện. Nếu khẩn cấp, hãy gọi 1900 232 345.', 'error');
+    if (active) openSOSDialog(active.bookingId);
+    else openSOSDialog(null);
   });
 
+  const sosDialog = document.getElementById('driver-sos-dialog');
+  sosDialog.querySelectorAll('[data-close-dialog], .driver-dialog-close').forEach((button) => {
+    button.addEventListener('click', () => sosDialog.close());
+  });
+  document.getElementById('driver-sos-form').addEventListener('submit', handleSOSSubmit);
+
+  document.getElementById('driver-export-report')?.addEventListener('click', exportIncomeReport);
+  document.getElementById('driver-clear-notifications')?.addEventListener('click', clearAllNotifications);
+
   setupMap();
+  startGPSAutoUpdate();
   renderAll();
   setInterval(() => {
     document.querySelectorAll('[data-waiting-from]').forEach((timer) => {
