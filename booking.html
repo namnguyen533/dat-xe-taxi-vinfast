@@ -25,6 +25,7 @@
             <li><a href="index.html" class="nav-link">Trang chủ</a></li>
             <li><a href="cars.html" class="nav-link">Danh sách xe</a></li>
             <li><a href="booking.html" class="nav-link active">Đặt xe</a></li>
+            <li><a href="danhsachchuyen.html" class="nav-link">Lịch sử chuyến</a></li>
             <li><a href="pricing.html" class="nav-link">Bảng giá</a></li>
           </ul>
         </nav>
@@ -491,14 +492,74 @@
       </section>
     </main>
 
+    <!-- Modal Giả Lập Thanh Toán QR Code (Online Payment Simulation) -->
+    <div id="payment-qr-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card modal-payment-card">
+        <button class="modal-close" id="btn-close-qr-modal" aria-label="Đóng">&times;</button>
+        <div class="qr-modal-header text-center">
+          <div class="payment-brand-badge" id="qr-payment-badge">
+            <span class="brand-icon" id="qr-brand-icon">💳</span>
+            <span class="brand-name" id="qr-brand-name">Thanh Toán Chuyển Khoản VietQR</span>
+          </div>
+          <h3 class="modal-title">Quét Mã QR Để Thanh Toán</h3>
+          <p class="modal-subtitle">Sử dụng ứng dụng ngân hàng hoặc ví điện tử để quét mã thanh toán</p>
+        </div>
+
+        <div class="qr-payment-body">
+          <div class="qr-code-frame">
+            <div class="qr-code-box" id="qr-code-box">
+              <img id="qr-code-img" src="" alt="Mã QR thanh toán chuyến xe" class="qr-image" />
+              <div class="qr-logo-overlay">
+                <span class="vf-tiny-badge">⚡ TaxiVF</span>
+              </div>
+            </div>
+            <div class="qr-countdown" id="qr-countdown">
+              <span>⏱️ Mã thanh toán hết hạn sau:</span> <strong id="qr-timer-text">15:00</strong>
+            </div>
+          </div>
+
+          <div class="bank-transfer-details">
+            <div class="bank-detail-item">
+              <span>Ngân hàng thụ hưởng:</span>
+              <strong>MB Bank (Ngân Hàng Quân Đội)</strong>
+            </div>
+            <div class="bank-detail-item">
+              <span>Số tài khoản:</span>
+              <strong class="copyable-text" id="qr-account-number">0912345678 <span class="copy-hint" title="Sao chép">📋</span></strong>
+            </div>
+            <div class="bank-detail-item">
+              <span>Chủ tài khoản:</span>
+              <strong>CONG TY CO PHAN TAXI DIEN VINFAST</strong>
+            </div>
+            <div class="bank-detail-item total-highlight">
+              <span>Số tiền cần thanh toán:</span>
+              <strong class="text-primary price-highlight" id="qr-payment-amount">0 đ</strong>
+            </div>
+            <div class="bank-detail-item">
+              <span>Nội dung chuyển khoản:</span>
+              <strong class="copyable-text" id="qr-transfer-content">THANH TOAN VF-0000 <span class="copy-hint" title="Sao chép">📋</span></strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions qr-actions">
+          <button type="button" class="btn-modal-secondary" id="btn-switch-to-cash">💵 Đổi sang trả Tiền mặt</button>
+          <button type="button" class="btn-modal-primary" id="btn-verify-paid">✅ Tôi đã chuyển khoản xong</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Booking Confirmation Success -->
     <div id="booking-success-modal" class="modal-overlay" style="display: none;">
-      <div class="modal-card">
+      <div class="modal-card modal-card-wide">
         <button class="modal-close" id="btn-modal-close">&times;</button>
         <div class="modal-icon-success">🎉</div>
         <h2 class="modal-title">Đặt Xe Thành Công!</h2>
         <p class="modal-subtitle">Cảm ơn bạn đã lựa chọn dịch vụ TaxiVinFast. Thông tin chuyến xe của bạn đã được ghi nhận.</p>
         
+        <!-- Tiến trình chuyến đi thời gian thực -->
+        <div id="receipt-timeline-wrapper" class="receipt-timeline-wrapper"></div>
+
         <div class="booking-receipt">
           <div class="receipt-header">
             <span>Mã chuyến xe: <strong id="receipt-id">#VF0000</strong></span>
@@ -530,6 +591,14 @@
               <strong id="receipt-car">---</strong>
             </div>
             <div class="receipt-item">
+              <span>Tài xế đón:</span>
+              <strong id="receipt-driver">---</strong>
+            </div>
+            <div class="receipt-item">
+              <span>Biển số xe:</span>
+              <strong id="receipt-plate" class="car-badge-sm">---</strong>
+            </div>
+            <div class="receipt-item">
               <span>Điểm đón:</span>
               <span id="receipt-pickup">---</span>
             </div>
@@ -541,6 +610,10 @@
               <span>Thời gian đón:</span>
               <span id="receipt-time">Ngay bây giờ</span>
             </div>
+            <div class="receipt-item">
+              <span>Trạng thái thanh toán:</span>
+              <span id="receipt-payment-status">---</span>
+            </div>
             <div class="receipt-item total">
               <span>Tổng thanh toán:</span>
               <strong id="receipt-total" class="receipt-price">0 đ</strong>
@@ -549,7 +622,7 @@
         </div>
 
         <div class="modal-actions">
-          <button type="button" class="btn-modal-home" onclick="window.location.href='index.html'">Trang chủ</button>
+          <button type="button" class="btn-modal-secondary" onclick="window.location.href='danhsachchuyen.html'">📋 Xem danh sách chuyến</button>
           <button type="button" class="btn-modal-close-main" id="btn-modal-done">Hoàn tất</button>
         </div>
       </div>
