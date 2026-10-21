@@ -165,119 +165,6 @@ export async function searchLocations(query, limit = 5) {
   }
 }
 
-export const HANOI_DISTRICTS = [
-  { name: 'Hồ Hoàn Kiếm, Quận Hoàn Kiếm, Hà Nội', lat: 21.0285, lng: 105.8542 },
-  { name: 'Quảng trường Ba Đình, Quận Ba Đình, Hà Nội', lat: 21.0341, lng: 105.8244 },
-  { name: 'Văn Miếu, Quận Đống Đa, Hà Nội', lat: 21.0181, lng: 105.8299 },
-  { name: 'Công viên Thống Nhất, Quận Hai Bà Trưng, Hà Nội', lat: 21.0076, lng: 105.8524 },
-  { name: 'Cầu Giấy, Quận Cầu Giấy, Hà Nội', lat: 21.0313, lng: 105.7892 },
-  { name: 'Hồ Tây, Quận Tây Hồ, Hà Nội', lat: 21.0718, lng: 105.8230 },
-  { name: 'Nguyễn Trãi, Quận Thanh Xuân, Hà Nội', lat: 20.9937, lng: 105.8078 },
-  { name: 'Bến xe Giáp Bát, Quận Hoàng Mai, Hà Nội', lat: 20.9765, lng: 105.8451 },
-  { name: 'Aeon Mall Long Biên, Quận Long Biên, Hà Nội', lat: 21.0400, lng: 105.8800 },
-  { name: 'Sân vận động Mỹ Đình, Quận Nam Từ Liêm, Hà Nội', lat: 21.0134, lng: 105.7656 },
-  { name: 'Đại học Mỏ - Địa chất, Quận Bắc Từ Liêm, Hà Nội', lat: 21.0667, lng: 105.7667 },
-  { name: 'Văn Quán, Quận Hà Đông, Hà Nội', lat: 20.9720, lng: 105.7760 },
-  { name: 'Vinhomes Ocean Park, Huyện Gia Lâm, Hà Nội', lat: 21.0100, lng: 105.9400 },
-  { name: 'Thị trấn Đông Anh, Huyện Đông Anh, Hà Nội', lat: 21.1367, lng: 105.8467 },
-  { name: 'Sân bay Quốc tế Nội Bài, Huyện Sóc Sơn, Hà Nội', lat: 21.2212, lng: 105.8072 },
-];
-
-function getNearestDistrict(lat, lng) {
-  let nearest = HANOI_DISTRICTS[0];
-  let minD = Infinity;
-  for (const d of HANOI_DISTRICTS) {
-    const distSq = (d.lat - lat) ** 2 + (d.lng - lng) ** 2;
-    if (distSq < minD) {
-      minD = distSq;
-      nearest = d;
-    }
-  }
-  return nearest;
-}
-
-function formatAddressResult(result, lat, lng) {
-  if (!result) return getNearestDistrict(lat, lng).name;
-
-  const addr = result.address || {};
-  
-  // Xây dựng địa chỉ thân thiện, dễ đọc theo chuẩn Việt Nam
-  const streetPart = [
-    addr.house_number,
-    addr.road || addr.pedestrian || addr.street || addr.amenity || addr.building,
-  ].filter(Boolean).join(' ');
-
-  const wardPart = addr.suburb || addr.quarter || addr.neighbourhood || addr.residential || addr.village;
-  const districtPart = addr.city_district || addr.district || addr.county || addr.town;
-  const cityPart = addr.city || addr.state || 'Hà Nội';
-
-  const parts = [streetPart, wardPart, districtPart, cityPart].filter(Boolean);
-  const uniqueParts = parts.filter((part, idx, arr) => arr.indexOf(part) === idx);
-
-  if (uniqueParts.length >= 2) {
-    return uniqueParts.join(', ');
-  }
-
-  if (result.display_name) {
-    const cleanName = result.display_name
-      .replace(/,\s*\d{5,6}/g, '')
-      .replace(/,\s*Việt Nam/gi, '')
-      .trim();
-    if (cleanName) return cleanName;
-  }
-
-  return getNearestDistrict(lat, lng).name;
-}
-
-export async function reverseGeocodeLocation(lat, lng) {
-  if (!isWithinHanoi(lat, lng)) {
-    throw new Error('Dịch vụ TaxiVinFast hiện chỉ hỗ trợ khu vực Hà Nội.');
-  }
-
-  // 1. Thử Nominatim reverse geocode
-  try {
-    const reverseParams = new URLSearchParams({
-      lat: String(lat),
-      lon: String(lng),
-      format: 'jsonv2',
-      addressdetails: '1',
-      'accept-language': 'vi',
-    });
-    const result = await requestGeocoding(`${NOMINATIM_URL.replace('/search', '/reverse')}?${reverseParams}`);
-    if (result && hasHanoiAdministrativeArea(result.address)) {
-      const label = formatAddressResult(result, lat, lng);
-      return { label, lat, lng };
-    }
-  } catch {
-    // Thử dịch vụ dự phòng Photon
-  }
-
-  // 2. Thử Photon reverse geocode
-  try {
-    const photonReverseUrl = `https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}`;
-    const data = await requestJson(photonReverseUrl, 'Dịch vụ tìm địa chỉ');
-    const feature = data.features?.[0];
-    if (feature?.properties) {
-      const p = feature.properties;
-      const parts = [p.name, p.street, p.district || p.suburb, p.city || 'Hà Nội'].filter(Boolean);
-      const unique = parts.filter((x, i, a) => a.indexOf(x) === i);
-      if (unique.length) {
-        return { label: unique.join(', '), lat, lng };
-      }
-    }
-  } catch {
-    // Dùng vị trí quận Hà Nội gần nhất
-  }
-
-  // 3. Fallback: Quận Hà Nội gần nhất
-  const nearest = getNearestDistrict(lat, lng);
-  return {
-    label: nearest.name,
-    lat,
-    lng,
-  };
-}
-
 export async function resolveLocation(query) {
   const cleanQuery = query.trim();
   const coordinates = cleanQuery.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
@@ -291,7 +178,21 @@ export async function resolveLocation(query) {
       throw new Error('Dịch vụ TaxiVinFast hiện chỉ hỗ trợ đặt xe trong khu vực Hà Nội.');
     }
 
-    return await reverseGeocodeLocation(lat, lng);
+    const reverseParams = new URLSearchParams({
+      lat: String(lat),
+      lon: String(lng),
+      format: 'jsonv2',
+      addressdetails: '1',
+      'accept-language': 'vi',
+    });
+    const result = await requestGeocoding(`${NOMINATIM_URL.replace('/search', '/reverse')}?${reverseParams}`);
+    if (
+      result.address?.country_code?.toLowerCase() !== 'vn'
+      || !hasHanoiAdministrativeArea(result.address)
+    ) {
+      throw new Error('Dịch vụ TaxiVinFast hiện chỉ hỗ trợ đặt xe trong khu vực Hà Nội.');
+    }
+    return { label: cleanQuery, lat, lng };
   }
 
   const locations = await searchLocations(cleanQuery, 1);

@@ -17,8 +17,5 @@
   },
   "overrides": {
     "jsonwebtoken": "^9.0.3"
-  },
-  "dependencies": {
-    "leaflet": "^1.9.4"
   }
 }
