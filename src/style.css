@@ -8329,3 +8329,338 @@ body.home-page :is(a, button, input, select):focus-visible {
     flex-direction: column;
   }
 }
+
+/* Driver portal refresh */
+.driver-page {
+  --driver-ink: #17384a;
+  --driver-muted: #718493;
+  --driver-accent: #ef7044;
+  color: var(--driver-ink);
+  background:
+    radial-gradient(ellipse at 8% 15%, rgba(211, 238, 232, .42), transparent 32rem),
+    #f3f7f8;
+}
+
+.driver-page .header {
+  border-bottom-color: rgba(214, 226, 230, .85);
+  box-shadow: 0 4px 18px rgba(24, 53, 66, .035);
+}
+
+.driver-page .logo h1 {
+  font-size: 25px;
+  letter-spacing: -.055em;
+}
+
+.driver-header-copy span, .driver-eyebrow {
+  color: #708997;
+}
+
+.driver-shell {
+  width: min(1240px, calc(100% - 56px));
+  margin-top: 28px;
+}
+
+.driver-tabs {
+  position: sticky;
+  top: 86px;
+  z-index: 450;
+  padding: 8px;
+  border-color: #e0e9ec;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 9px 28px rgba(26, 59, 72, .07);
+  backdrop-filter: blur(14px);
+}
+
+.driver-tab {
+  min-height: 50px;
+  color: #667d8a;
+  font-size: 14px;
+}
+
+.driver-tab:hover:not(.is-active) {
+  color: #204b5a;
+  background: #f0f6f5;
+}
+
+.driver-tab.is-active {
+  background: linear-gradient(120deg, #173d4e, #24586a);
+  box-shadow: 0 6px 15px rgba(24, 62, 78, .2);
+}
+
+.driver-welcome {
+  position: relative;
+  overflow: hidden;
+  min-height: 124px;
+  margin: 4px 0 24px;
+  padding: 23px 27px;
+  border: 1px solid #dce9e8;
+  border-radius: 19px;
+  background: linear-gradient(112deg, #fff 8%, #f1f8f6 100%);
+  box-shadow: 0 10px 28px rgba(23, 57, 70, .055);
+}
+
+.driver-welcome::after {
+  position: absolute;
+  top: -95px;
+  right: 19%;
+  width: 230px;
+  height: 230px;
+  border: 1px solid rgba(52, 128, 125, .08);
+  border-radius: 50%;
+  box-shadow: 0 0 0 28px rgba(52, 128, 125, .035), 0 0 0 58px rgba(52, 128, 125, .025);
+  content: "";
+  pointer-events: none;
+}
+
+.driver-welcome > div, .driver-online-toggle {
+  position: relative;
+  z-index: 1;
+}
+
+.driver-welcome h2, .driver-page-heading h2 {
+  color: #183b4d;
+  font-size: clamp(27px, 3vw, 35px);
+  letter-spacing: -.045em;
+}
+
+.driver-welcome p, .driver-page-heading p {
+  margin-top: 5px;
+  color: #718593;
+  font-size: 14px;
+}
+
+.driver-online-toggle {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-color: #dbe5e8;
+  border-radius: 13px;
+  box-shadow: 0 3px 10px rgba(22, 55, 68, .04);
+  font-size: 13px;
+}
+
+.driver-card, .driver-map-card, .driver-ride-card {
+  border-color: #e0e9ec;
+  border-radius: 17px;
+  box-shadow: 0 8px 24px rgba(25, 57, 70, .055);
+}
+
+.driver-card, .driver-map-card {
+  padding: 22px;
+}
+
+.driver-card-heading h3, .driver-section-heading h3, .driver-income-content h3, .driver-card h3 {
+  color: #1e4051;
+  font-size: 17px;
+}
+
+.driver-home-grid {
+  gap: 20px;
+}
+
+.driver-home-side {
+  gap: 16px;
+}
+
+.driver-vehicle-icon {
+  width: 48px;
+  height: 48px;
+  color: #226657;
+  background: #eaf5f1;
+}
+
+.driver-vehicle-card p, .driver-welcome p, .driver-page-heading p {
+  line-height: 1.65;
+}
+
+.driver-today-stats {
+  margin: 19px 0 12px;
+}
+
+.driver-today-stats strong {
+  color: #1d4c5b;
+  font-size: 25px;
+}
+
+.driver-section-block {
+  margin-top: 34px;
+}
+
+.driver-section-heading {
+  margin-bottom: 16px;
+}
+
+.driver-ride-card {
+  padding: 20px;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.driver-ride-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbdcde;
+  box-shadow: 0 13px 30px rgba(25, 57, 70, .09);
+}
+
+.driver-ride-card.is-offer {
+  border-color: #f0d3c6;
+  background: linear-gradient(145deg, #fff 65%, #fff9f5);
+}
+
+.driver-route-lines strong, .driver-customer-row strong {
+  color: #294a5a;
+  font-size: 13px;
+}
+
+.driver-route-lines small, .driver-ride-meta, .driver-customer-row span {
+  font-size: 11px;
+}
+
+.driver-primary-button {
+  min-height: 40px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #ed7145, #df5d37);
+  box-shadow: 0 4px 10px rgba(216, 89, 51, .15);
+  font-size: 12px;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+.driver-primary-button:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(120deg, #df633a, #cf4e2f);
+  box-shadow: 0 7px 15px rgba(216, 89, 51, .2);
+}
+
+.driver-small-button, .driver-secondary-button, .driver-sos-inline, .driver-sos-button {
+  min-height: 39px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.driver-status-chip, .driver-count-badge {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.driver-income-main, .driver-income-stat {
+  min-height: 120px;
+  padding: 20px;
+  border-color: #e0e9ec;
+  border-radius: 16px;
+  box-shadow: 0 7px 20px rgba(25, 57, 70, .045);
+}
+
+.driver-income-main {
+  background: linear-gradient(130deg, #173e50, #2b6d79);
+}
+
+.driver-income-main > strong {
+  font-size: 29px;
+}
+
+.driver-income-main > span, .driver-income-stat > span,
+.driver-income-main > small, .driver-income-stat > small {
+  font-size: 11px;
+}
+
+.driver-income-stat > strong {
+  color: #1c4657;
+  font-size: 20px;
+}
+
+.driver-table-wrap, .driver-dialog {
+  border-color: #e0e9ec;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(25, 57, 70, .045);
+}
+
+.driver-table {
+  font-size: 12px;
+}
+
+.driver-table th {
+  padding: 14px 13px;
+  color: #607986;
+  background: #f3f7f7;
+  font-size: 10px;
+}
+
+.driver-table td {
+  padding: 14px 13px;
+  line-height: 1.55;
+}
+
+.driver-form-grid label, .driver-dialog label {
+  color: #4e6978;
+  font-size: 12px;
+}
+
+.driver-form-grid input, .driver-dialog input {
+  min-height: 43px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.driver-page :is(button, a, input, select):focus-visible {
+  outline: 3px solid rgba(55, 131, 137, .35);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .driver-shell {
+    width: calc(100% - 28px);
+    margin: 16px auto 100px;
+  }
+
+  .driver-tabs {
+    position: fixed;
+    top: auto;
+    right: 12px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 12px;
+    width: auto;
+    padding: 6px;
+    border-color: rgba(220, 231, 233, .95);
+    border-radius: 17px;
+    box-shadow: 0 12px 34px rgba(21, 49, 61, .18);
+  }
+
+  .driver-tab {
+    min-height: 54px;
+    border-radius: 12px;
+  }
+
+  .driver-welcome {
+    min-height: 0;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .driver-welcome::after {
+    right: -100px;
+  }
+
+  .driver-welcome h2, .driver-page-heading h2 {
+    font-size: 27px;
+  }
+
+  .driver-card, .driver-map-card {
+    padding: 17px;
+    border-radius: 15px;
+  }
+
+  .driver-map {
+    height: 255px;
+  }
+
+  .driver-income-main, .driver-income-stat {
+    min-height: 104px;
+    padding: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .driver-ride-card, .driver-primary-button {
+    transition: none;
+  }
+}
