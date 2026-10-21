@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (booking.bookingId && existingIds.has(booking.bookingId)) {
           const sharedBooking = bookingStore.getById(booking.bookingId);
           if (sharedBooking && !sharedBooking.updatedAt && sharedBooking.status !== status) {
-            bookingStore.updateStatus(booking.bookingId, status);
+            bookingStore.update(booking.bookingId, { status, statusText: statusMeta(status).text });
           }
           return;
         }
@@ -121,9 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
           status,
           statusText: statusMeta(status).text,
         });
-        if (status === 'completed' || status === 'cancelled') {
-          bookingStore.updateStatus(migratedBooking.bookingId, status);
-        }
         existingIds.add(migratedBooking.bookingId);
       });
       bookingsState = bookingStore.getAll();
@@ -246,14 +243,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tbody.innerHTML = filtered.map((booking) => {
       const id = escapeHtml(booking.bookingId);
-      const canStart = ['pending', 'confirmed'].includes(booking.status);
-      const canComplete = booking.status === 'in_progress';
       const canCancel = !['completed', 'cancelled'].includes(booking.status);
       const paymentStatus = booking.payment?.status === 'paid'
-        ? 'Đã thanh toán'
+        ? booking.payment?.receivedBy === 'driver' ? 'Tài xế đã thu tiền mặt' : 'Đã đối soát'
         : booking.payment?.status === 'refunded'
           ? 'Đã hoàn tiền'
-          : 'Chưa thanh toán';
+          : booking.status === 'completed' ? 'Chờ thanh toán' : 'Chưa đến hạn';
       const pickup = booking.route?.pickupLocation || 'Chưa có điểm đón';
       const destination = booking.route?.destinationLocation || 'Chưa có điểm đến';
       const pickupDateTime = booking.schedule?.pickupDate
@@ -294,8 +289,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>${getStatusBadge(booking.status)}</td>
           <td>
             <div class="action-buttons-cell">
-              ${canStart ? `<button type="button" class="btn-sm-action approve" data-action="start" data-id="${id}">${booking.status === 'pending' ? 'Xác nhận' : 'Bắt đầu chuyến'}</button>` : ''}
-              ${canComplete ? `<button type="button" class="btn-sm-action approve" data-action="complete" data-id="${id}">Hoàn thành chuyến</button>` : ''}
+              ${booking.status === 'pending' ? '<span class="admin-action-hint">Chờ tài xế nhận chuyến</span>' : ''}
+              ${booking.status === 'confirmed' ? '<span class="admin-action-hint">Chờ tài xế bắt đầu</span>' : ''}
+              ${booking.status === 'in_progress' ? '<span class="admin-action-hint">Chờ tài xế hoàn thành</span>' : ''}
               ${canCancel ? `<button type="button" class="btn-sm-action cancel" data-action="cancel" data-id="${id}">Hủy chuyến</button>` : ''}
               <button type="button" class="btn-sm-action delete" data-action="delete" data-id="${id}">Xóa</button>
             </div>
@@ -518,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <span>${escapeHtml(booking.customer?.name || 'Khách hàng')} · ${escapeHtml(booking.vehicle?.model || 'Chưa chọn xe')}</span>
               <span class="dispatch-route">${escapeHtml(booking.route?.pickupLocation || 'Chưa có điểm đón')} → ${escapeHtml(booking.route?.destinationLocation || 'Chưa có điểm đến')}</span>
               <label>Điều phối tài xế
-                <select class="form-select dispatch-driver-select" data-booking-id="${id}">
+                <select class="form-select dispatch-driver-select" data-booking-id="${id}"${booking.status !== 'pending' ? ' disabled' : ''}>
                   <option value="">${booking.driver?.name ? `Hiện tại: ${escapeHtml(booking.driver.name)}` : 'Chọn tài xế'}</option>
                   ${eligibleDrivers
                     .filter((driver) => !driver.vehicleModel || driver.vehicleModel === booking.vehicle?.model)
@@ -625,11 +621,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderFinance() {
     const relevantBookings = bookingsState.filter((booking) => booking.status !== 'cancelled');
-    const revenue = relevantBookings.reduce((sum, booking) => sum + (Number(booking.fare?.totalAmount) || 0), 0);
-    const pendingPayments = relevantBookings.filter((booking) => booking.payment?.status !== 'paid' && booking.payment?.status !== 'refunded');
+    const completedBookings = relevantBookings.filter((booking) => booking.status === 'completed');
+    const revenue = completedBookings.reduce((sum, booking) => sum + (Number(booking.fare?.totalAmount) || 0), 0);
+    const pendingPayments = completedBookings.filter((booking) => booking.payment?.status !== 'paid' && booking.payment?.status !== 'refunded');
     const pendingAmount = pendingPayments.reduce((sum, booking) => sum + (Number(booking.fare?.totalAmount) || 0), 0);
-    const completedBookings = bookingsState.filter((booking) => booking.status === 'completed');
-    const driverPayout = completedBookings.reduce((sum, booking) => sum + Math.round((Number(booking.fare?.totalAmount) || 0) * 0.8), 0);
+    const settledOnlineTrips = completedBookings.filter((booking) => (
+      booking.payment?.status === 'paid' && booking.payment?.method !== 'cash'
+    ));
+    const driverPayout = settledOnlineTrips.reduce((sum, booking) => sum + Math.round((Number(booking.fare?.totalAmount) || 0) * 0.8), 0);
     document.getElementById('finance-revenue').textContent = formatVND(revenue);
     document.getElementById('finance-unreconciled').textContent = formatVND(pendingAmount);
     document.getElementById('finance-driver-payout').textContent = formatVND(driverPayout);
@@ -640,10 +639,19 @@ document.addEventListener('DOMContentLoaded', () => {
       paymentsTable.innerHTML = relevantBookings.length
         ? relevantBookings.map((booking) => {
           const isPaid = booking.payment?.status === 'paid';
+          const isCompleted = booking.status === 'completed';
+          const isCashCollected = isPaid && booking.payment?.receivedBy === 'driver';
+          const reconciliationLabel = isCashCollected
+            ? 'Tài xế đã thu tiền mặt'
+            : isPaid ? 'Đã đối soát online' : isCompleted ? 'Chờ thanh toán' : 'Chưa đến hạn';
+          const canReconcile = isCompleted
+            && booking.payment?.method !== 'cash'
+            && !isPaid
+            && booking.payment?.status !== 'refunded';
           return `<tr><td><strong>${escapeHtml(booking.bookingId)}</strong></td><td>${escapeHtml(booking.customer?.name || 'Khách hàng')}</td>
             <td>${escapeHtml(booking.payment?.method ? paymentMethodLabel(booking.payment.method) : 'Chưa xác định')}</td>
-            <td>${formatVND(booking.fare?.totalAmount)}</td><td><span class="badge-status ${isPaid ? 'success' : 'warning'}">${isPaid ? 'Đã đối soát demo' : 'Chưa đối soát'}</span></td>
-            <td>${isPaid ? '—' : `<button class="btn-sm-action approve" data-action="payment-reconcile" data-id="${escapeHtml(booking.bookingId)}">Đánh dấu đã nhận</button>`}</td></tr>`;
+            <td>${formatVND(booking.fare?.totalAmount)}</td><td><span class="badge-status ${isPaid ? 'success' : 'warning'}">${reconciliationLabel}</span>${booking.payment?.receivedAt ? `<small>${escapeHtml(formatDateTime(booking.payment.receivedAt))}</small>` : ''}</td>
+            <td>${canReconcile ? `<button class="btn-sm-action approve" data-action="payment-reconcile" data-id="${escapeHtml(booking.bookingId)}">Đối soát online</button>` : '—'}</td></tr>`;
         }).join('')
         : '<tr><td colspan="6" class="admin-empty-state">Chưa có giao dịch.</td></tr>';
     }
@@ -651,7 +659,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const payroll = document.getElementById('admin-payroll-table');
     if (payroll) {
       const drivers = operationsState.drivers.map((driver) => {
-        const trips = completedBookings.filter((booking) => booking.driver?.name === driver.name);
+        const trips = settledOnlineTrips.filter((booking) => booking.driver?.name === driver.name);
         const amount = trips.reduce((sum, booking) => sum + Math.round((Number(booking.fare?.totalAmount) || 0) * 0.8), 0);
         return { driver, trips, amount };
       }).filter((item) => item.trips.length);
@@ -686,13 +694,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!select || !select.value) return;
     const driver = operationsState.drivers.find((item) => item.id === select.value);
     const booking = bookingStore.getById(select.dataset.bookingId);
-    if (!driver || !booking) return;
+    if (!driver || !booking || booking.status !== 'pending') return;
     bookingStore.update(booking.bookingId, {
       driver: { ...(booking.driver || {}), name: driver.name, phone: driver.phone },
-      status: booking.status === 'pending' ? 'confirmed' : booking.status,
-      statusText: booking.status === 'pending' ? statusMeta('confirmed').text : booking.statusText,
+      status: booking.status,
+      statusText: booking.statusText,
     });
-    persistOperations('Phân công tài xế', booking.bookingId, `Giao chuyến cho ${driver.name}`);
+    persistOperations('Phân công tài xế', booking.bookingId, `Đã giao yêu cầu cho ${driver.name}; chờ tài xế nhận chuyến`);
   });
 
   document.getElementById('admin-fleet-ops-table')?.addEventListener('click', (event) => {
@@ -936,8 +944,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const button = event.target.closest('[data-action="payment-reconcile"]');
     if (!button) return;
     const booking = bookingStore.getById(button.dataset.id);
-    if (!booking || !window.confirm('Đánh dấu khoản này đã nhận trong bản demo? Chưa xác nhận với cổng thanh toán thật.')) return;
-    bookingStore.update(booking.bookingId, { payment: { ...(booking.payment || {}), status: 'paid' } });
+    if (
+      !booking
+      || booking.status !== 'completed'
+      || booking.payment?.method === 'cash'
+      || booking.payment?.status === 'paid'
+      || booking.payment?.status === 'refunded'
+      || !window.confirm('Xác nhận đã nhận khoản thanh toán online này trong bản demo? Cổng thanh toán thật chưa được kết nối.')
+    ) return;
+    bookingStore.update(booking.bookingId, {
+      payment: {
+        ...(booking.payment || {}),
+        status: 'paid',
+        receivedBy: 'admin',
+        receivedAt: new Date().toISOString(),
+      },
+    });
     persistOperations('Đối soát giao dịch demo', booking.bookingId, formatVND(booking.fare?.totalAmount));
   });
 
@@ -947,11 +969,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const driver = operationsState.drivers.find((item) => item.id === button.dataset.id);
     if (!driver) return;
     const amount = bookingsState
-      .filter((booking) => booking.status === 'completed' && booking.driver?.name === driver.name)
+      .filter((booking) => (
+        booking.status === 'completed'
+        && booking.driver?.name === driver.name
+        && booking.payment?.status === 'paid'
+        && booking.payment?.method !== 'cash'
+      ))
       .reduce((sum, booking) => sum + Math.round((Number(booking.fare?.totalAmount) || 0) * 0.8), 0);
     const outstanding = amount - (driver.paidOut || 0);
     if (outstanding <= 0 || !window.confirm(`Xác nhận chi trả demo ${formatVND(outstanding)} cho ${driver.name}?`)) return;
     driver.paidOut = (driver.paidOut || 0) + outstanding;
+    driver.payouts ||= [];
+    driver.payouts.unshift({ amount: outstanding, createdAt: new Date().toISOString() });
     driver.walletBalance = Math.max(0, (driver.walletBalance || 0) - outstanding);
     persistOperations('Chi trả tài xế demo', driver.name, formatVND(outstanding));
   });
@@ -1167,11 +1196,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!id) return;
 
     if (action === 'start' || action === 'complete' || action === 'cancel') {
-      const nextStatus = {
-        start: 'in_progress',
-        complete: 'completed',
-        cancel: 'cancelled',
-      }[action];
+      if (action !== 'cancel') return;
+      const nextStatus = 'cancelled';
       const label = STATUS_MAP[nextStatus].text.toLocaleLowerCase('vi');
       if (!window.confirm(`Bạn có chắc muốn chuyển đơn ${id} sang trạng thái "${label}"?`)) return;
       const updatedBooking = bookingStore.updateStatus(id, nextStatus);
@@ -1251,7 +1277,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       fare: { basePrice: amount, distanceCost: 0, totalAmount: amount, currency: 'VND' },
       payment: { method: readValue('admin-new-payment'), status: 'pending' },
-      status: readValue('admin-new-status'),
+      status: 'pending',
       note: readValue('admin-new-note'),
     });
 

@@ -1,6 +1,6 @@
 import './style.css';
 import { calculateTripFare } from './price-calculator.js';
-import { bookingStore, formatVND } from './data/booking-store.js';
+import { bookingStore, formatVND, statusMeta } from './data/booking-store.js';
 import { getPricingConfig } from './data/pricing-store.js';
 import { validateBookingForm } from './form-validation.js';
 import { getDrivingRoute, isWithinHanoi, resolveLocation, searchLocations } from './route-service.js';
@@ -71,6 +71,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnModalClose = document.getElementById('btn-modal-close');
   const btnModalDone = document.getElementById('btn-modal-done');
   const receiptStatus = document.getElementById('receipt-status');
+  let activeReceiptBookingId = null;
+
+  function renderReceiptProgress(booking) {
+    if (!booking) return;
+    const progress = document.getElementById('receipt-progress');
+    const driver = document.getElementById('receipt-driver');
+    const payment = document.getElementById('receipt-payment');
+    const stateMessages = {
+      pending: 'Đang chờ tài xế nhận chuyến',
+      confirmed: 'Tài xế đã nhận chuyến',
+      in_progress: 'Chuyến đi đang thực hiện',
+      completed: 'Chuyến đi đã hoàn thành',
+      cancelled: 'Chuyến đi đã hủy',
+    };
+    if (receiptStatus) receiptStatus.textContent = statusMeta(booking.status).text;
+    if (progress) progress.textContent = stateMessages[booking.status] || statusMeta(booking.status).text;
+    if (driver) driver.textContent = booking.driver?.name || 'Đang tìm tài xế';
+    if (payment) {
+      payment.textContent = booking.payment?.status === 'paid'
+        ? booking.payment?.receivedBy === 'driver' ? 'Tài xế đã xác nhận nhận tiền mặt' : 'Đã xác nhận thanh toán'
+        : booking.payment?.status === 'refunded' ? 'Đã hoàn tiền' : 'Chờ thanh toán';
+    }
+  }
 
   // Ô nhập liệu + thông báo lỗi tương ứng
   const fieldInputs = {
@@ -865,6 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       function showReceiptModal(currentBooking) {
+        activeReceiptBookingId = currentBooking.bookingId;
         document.getElementById('receipt-id').textContent = currentBooking.bookingId;
         document.getElementById('receipt-name').textContent = currentBooking.customer.name;
         document.getElementById('receipt-phone').textContent = currentBooking.customer.phone;
@@ -875,11 +899,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const plateEl = document.getElementById('receipt-plate');
         if (plateEl) plateEl.textContent = currentBooking.vehicle.licensePlate;
-
         document.getElementById('receipt-pickup').textContent = currentBooking.route.pickupLocation;
         document.getElementById('receipt-dest').textContent = currentBooking.route.destinationLocation;
         document.getElementById('receipt-time').textContent = `${currentBooking.schedule.pickupTime} - ${currentBooking.schedule.pickupDate}`;
         document.getElementById('receipt-total').textContent = formatVND(currentBooking.fare.totalAmount);
+        renderReceiptProgress(currentBooking);
         
         const payStatusEl = document.getElementById('receipt-payment-status');
         if (payStatusEl) {
@@ -1026,6 +1050,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnModalDone) btnModalDone.addEventListener('click', closeModal);
   modal?.addEventListener('click', (event) => {
     if (event.target === modal) closeModal();
+  });
+  window.addEventListener('storage', (event) => {
+    if (event.key !== 'taxivinfast_bookings' || !activeReceiptBookingId) return;
+    renderReceiptProgress(bookingStore.getById(activeReceiptBookingId));
   });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeModal();

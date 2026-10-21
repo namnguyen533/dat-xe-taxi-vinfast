@@ -463,9 +463,9 @@
 
           <section id="tab-view-finance" class="admin-tab-content">
             <div class="kpi-cards-grid finance-kpis">
-              <div class="kpi-card revenue"><div class="kpi-title">Doanh thu ghi nhận</div><div class="kpi-value" id="finance-revenue">0 đ</div><div class="kpi-trend">Từ đơn chưa hủy</div></div>
-              <div class="kpi-card bookings"><div class="kpi-title">Chờ đối soát</div><div class="kpi-value" id="finance-unreconciled">0 đ</div><div class="kpi-trend">Giao dịch chưa xác nhận</div></div>
-              <div class="kpi-card fleet"><div class="kpi-title">Hoa hồng tài xế dự kiến</div><div class="kpi-value" id="finance-driver-payout">0 đ</div><div class="kpi-trend">Tạm tính 80% đơn hoàn thành</div></div>
+              <div class="kpi-card revenue"><div class="kpi-title">Doanh thu ghi nhận</div><div class="kpi-value" id="finance-revenue">0 đ</div><div class="kpi-trend">Từ chuyến đã hoàn thành</div></div>
+              <div class="kpi-card bookings"><div class="kpi-title">Chờ đối soát</div><div class="kpi-value" id="finance-unreconciled">0 đ</div><div class="kpi-trend">Chuyến hoàn thành chưa thanh toán</div></div>
+              <div class="kpi-card fleet"><div class="kpi-title">Thu nhập tài xế online</div><div class="kpi-value" id="finance-driver-payout">0 đ</div><div class="kpi-trend">80% chuyến online đã đối soát</div></div>
               <div class="kpi-card rating"><div class="kpi-title">Giao dịch</div><div class="kpi-value" id="finance-transaction-count">0</div><div class="kpi-trend">Theo lịch sử đặt xe</div></div>
             </div>
             <div class="admin-card">
@@ -476,7 +476,7 @@
               </table></div>
             </div>
             <div class="dashboard-grid-2 section-gap">
-              <div class="admin-card"><h3>🧾 Chi trả tài xế</h3><p class="subtitle">Ước tính theo chuyến đã hoàn thành; xác nhận chi trả cập nhật ví demo.</p>
+              <div class="admin-card"><h3>🧾 Chi trả tài xế</h3><p class="subtitle">Chỉ tính chuyến online đã hoàn thành và được đối soát; chuyến tiền mặt đã được tài xế thu trực tiếp.</p>
                 <div class="table-responsive"><table class="admin-table"><thead><tr><th>Tài xế</th><th>Chuyến hoàn tất</th><th>Thu nhập</th><th>Đã chi</th><th>Thao tác</th></tr></thead><tbody id="admin-payroll-table"></tbody></table></div>
               </div>
               <div class="admin-card"><h3>🔥 Nhu cầu theo khu vực</h3><p class="subtitle">Heatmap mô phỏng từ địa chỉ đón trong đơn; không dùng vị trí trực tiếp.</p><div id="admin-demand-heatmap" class="demand-heatmap"></div></div>
@@ -629,12 +629,8 @@
 
           <div class="form-row-2">
             <div class="form-group">
-              <label class="form-label" for="admin-new-status">Trạng thái đơn</label>
-              <select id="admin-new-status" class="form-select">
-                <option value="pending">Chờ xác nhận</option>
-                <option value="confirmed">Đã xác nhận</option>
-                <option value="in_progress">Đang di chuyển</option>
-              </select>
+              <label class="form-label">Trạng thái ban đầu</label>
+              <input type="text" class="form-input" value="Chờ tài xế nhận chuyến" readonly />
             </div>
             <div class="form-group">
               <label class="form-label" for="admin-new-note">Ghi chú</label>
