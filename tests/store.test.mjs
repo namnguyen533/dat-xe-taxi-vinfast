@@ -116,44 +116,62 @@ test('nextBookingId tăng dần theo mã đơn lớn nhất trong năm', () => {
   assert.equal(nextBookingId(seedBookings, 2027), 'VF-2027-9821');
 });
 
-test('cập nhật trạng thái đủ 5 trạng thái (mục 34)', () => {
+test('chuyến phải đi đúng thứ tự: chờ nhận, xác nhận, đang đi, hoàn thành', () => {
   const { store } = makeStore();
-  const id = seedBookings[0].bookingId;
-
-  for (const status of BOOKING_STATUSES) {
-    const updated = store.updateStatus(id, status.value);
-    assert.ok(updated, `cập nhật thất bại ở trạng thái ${status.value}`);
-    assert.equal(updated.status, status.value);
-    assert.equal(updated.statusText, status.text);
-    assert.equal(store.getById(id).status, status.value, 'dữ liệu chưa được ghi xuống storage');
-  }
+  const created = store.add({
+    customer: { name: 'Khách kiểm thử', phone: '0900000001' },
+    route: { pickupLocation: 'A', destinationLocation: 'B' },
+    fare: { totalAmount: 100000 },
+    payment: { method: 'cash', status: 'pending' },
+  });
+  const id = created.bookingId;
+  const accepted = store.acceptBooking(id, { name: 'Tài xế A', phone: '0900000002' });
+  assert.equal(accepted.status, 'confirmed');
+  assert.equal(accepted.driver.name, 'Tài xế A');
+  assert.equal(store.updateStatus(id, 'in_progress').status, 'in_progress');
+  assert.equal(store.updateStatus(id, 'completed').status, 'completed');
+  assert.equal(store.updateStatus(id, 'cancelled'), null, 'không được hủy chuyến đã hoàn thành');
+  assert.equal(store.getById(id).statusText, statusMeta('completed').text);
 });
 
 test('hoàn thành chuyến không tự xác nhận thanh toán online, đơn hủy được hoàn tiền', () => {
   const { store } = makeStore();
-  const id = seedBookings.find((booking) => booking.payment.method === 'banking' && booking.payment.status === 'pending').bookingId;
-
-  store.updateStatus(id, 'completed');
+  const online = store.add({
+    customer: { name: 'Khách online', phone: '0900000003' },
+    route: { pickupLocation: 'A', destinationLocation: 'B' },
+    fare: { totalAmount: 100000 },
+    payment: { method: 'banking', status: 'pending' },
+  });
+  store.acceptBooking(online.bookingId, { name: 'Tài xế B' });
+  store.updateStatus(online.bookingId, 'in_progress');
+  store.updateStatus(online.bookingId, 'completed');
+  const id = online.bookingId;
   assert.equal(store.getById(id).payment.status, 'pending');
   assert.equal(store.getById(id).status, 'completed');
 
-  store.updateStatus(id, 'cancelled');
-  assert.equal(store.getById(id).payment.status, 'refunded');
+  const cancelled = store.add({
+    customer: { name: 'Khách hủy', phone: '0900000004' },
+    route: { pickupLocation: 'A', destinationLocation: 'B' },
+    fare: { totalAmount: 100000 },
+    payment: { method: 'banking', status: 'paid' },
+  });
+  store.updateStatus(cancelled.bookingId, 'cancelled');
+  assert.equal(store.getById(cancelled.bookingId).payment.status, 'refunded');
 });
 
-test('đơn chờ xác nhận có thể bắt đầu, hoàn thành hoặc hủy chuyến', () => {
+test('chỉ tài xế được nhận đơn đang chờ và không thể nhận chuyến đã được giao cho người khác', () => {
   const { store } = makeStore();
-  const startableBooking = seedBookings.find((booking) => booking.status === 'pending');
-  const cancellableBooking = seedBookings.find((booking) => booking.status === 'confirmed');
-
-  const started = store.updateStatus(startableBooking.bookingId, 'in_progress');
-  assert.equal(started.status, 'in_progress');
-  assert.equal(started.statusText, 'Đang thực hiện');
-  assert.equal(store.updateStatus(startableBooking.bookingId, 'completed').status, 'completed');
-
-  const cancelled = store.updateStatus(cancellableBooking.bookingId, 'cancelled');
-  assert.equal(cancelled.status, 'cancelled');
-  assert.equal(cancelled.statusText, 'Đã hủy');
+  const created = store.add({
+    customer: { name: 'Khách A', phone: '0900000005' },
+    route: { pickupLocation: 'A', destinationLocation: 'B' },
+    fare: { totalAmount: 100000 },
+    driver: { name: 'Tài xế A' },
+  });
+  assert.equal(store.acceptBooking(created.bookingId, { name: 'Tài xế B' }), null);
+  assert.equal(store.updateStatus(created.bookingId, 'confirmed'), null);
+  const accepted = store.acceptBooking(created.bookingId, { name: 'Tài xế A' });
+  assert.equal(accepted.statusText, statusMeta('confirmed').text);
+  assert.equal(store.updateStatus(created.bookingId, 'cancelled').status, 'cancelled');
 });
 
 test('từ chối trạng thái không hợp lệ', () => {

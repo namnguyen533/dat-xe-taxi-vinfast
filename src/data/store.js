@@ -296,20 +296,52 @@ export function createBookingStore(options = {}) {
     const list = getAll();
     const index = list.findIndex((booking) => booking.bookingId === id);
     if (index === -1) return null;
-    list[index] = { ...list[index], ...patch };
+    list[index] = { ...list[index], ...patch, updatedAt: now().toISOString() };
     write(list);
     return list[index];
   }
 
-  /** Cập nhật trạng thái đơn (mục 34) */
+  /** Chỉ tài xế được nhận đơn đang chờ; xác nhận và gán tài xế trong một lần ghi. */
+  function acceptBooking(id, driver, vehicle) {
+    const current = getById(id);
+    if (
+      !current
+      || current.status !== 'pending'
+      || (current.driver?.name && current.driver.name !== driver?.name)
+      || !driver?.name
+    ) return null;
+
+    const list = getAll();
+    const index = list.findIndex((booking) => booking.bookingId === id);
+    if (index === -1 || list[index].status !== 'pending') return null;
+    list[index] = {
+      ...list[index],
+      driver: { ...(list[index].driver || {}), ...driver, stage: 'accepted' },
+      ...(vehicle ? { vehicle: { ...(list[index].vehicle || {}), ...vehicle } } : {}),
+      status: 'confirmed',
+      statusText: statusMeta('confirmed').text,
+      updatedAt: now().toISOString(),
+    };
+    write(list);
+    return list[index];
+  }
+
+  /** Chuyển trạng thái theo đúng thứ tự của một chuyến xe thực tế. */
   function updateStatus(id, status) {
     if (!STATUS_MAP[status]) return null;
     const current = getById(id);
     if (!current) return null;
+    const allowedNextStatuses = {
+      pending: ['cancelled'],
+      confirmed: ['in_progress', 'cancelled'],
+      in_progress: ['completed', 'cancelled'],
+      completed: [],
+      cancelled: [],
+    };
+    if (!allowedNextStatuses[current.status]?.includes(status)) return null;
 
     const patch = { status, statusText: statusMeta(status).text, updatedAt: now().toISOString() };
 
-    // Payment providers own online payment confirmation; completing a ride must not fake it.
     if (status === 'cancelled') {
       patch.payment = { ...(current.payment || {}), status: 'refunded' };
     }
@@ -333,5 +365,5 @@ export function createBookingStore(options = {}) {
     return seeded;
   }
 
-  return { getAll, getById, add, update, updateStatus, remove, reset, search: filterBookings, stats: computeStats };
+  return { getAll, getById, add, update, acceptBooking, updateStatus, remove, reset, search: filterBookings, stats: computeStats };
 }

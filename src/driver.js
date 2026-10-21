@@ -5,6 +5,7 @@ import {
   isDriverUser,
 } from './auth-client.js';
 import { bookingStore, formatDateTime, formatVND, paymentMethodLabel, serviceTypeLabel, statusMeta } from './data/booking-store.js';
+import { getAdminOperations } from './data/admin-operations.js';
 import {
   getDriverEarnings,
   getDriverSettings,
@@ -54,6 +55,14 @@ function initializeDriverPage() {
     const fare = Number(booking.fare?.totalAmount) || 0;
     return fare - Math.round(fare * 0.2);
   };
+  const withdrawableEarnings = () => assignedBookings()
+    .filter((booking) => (
+      booking.status === 'completed'
+      && booking.payment?.status === 'paid'
+      && booking.payment?.method !== 'cash'
+    ))
+    .reduce((total, booking) => total + bookingNet(booking), 0)
+    - (getAdminOperations(localStorage).drivers.find((driver) => driver.name === driverName())?.paidOut || 0);
   const bookedAt = (booking) => booking.updatedAt || booking.schedule?.createdDate || '';
   const isSameDay = (booking, date = new Date()) => {
     const value = bookedAt(booking);
@@ -178,11 +187,19 @@ function initializeDriverPage() {
   function renderIncome() {
     const completed = assignedBookings().filter((booking) => booking.status === 'completed');
     const totals = getDriverEarnings(allBookings(), driverName());
+    const cashCollected = assignedBookings()
+      .filter((booking) => (
+        booking.payment?.method === 'cash'
+        && booking.payment?.status === 'paid'
+        && booking.payment?.receivedBy === 'driver'
+      ))
+      .reduce((total, booking) => total + (Number(booking.fare?.totalAmount) || 0), 0);
     const today = completed.filter((booking) => isSameDay(booking));
     const week = completed.filter((booking) => isThisWeek(booking));
     const month = completed.filter((booking) => isThisMonth(booking));
     const sum = (trips) => trips.reduce((total, booking) => total + bookingNet(booking), 0);
     const wallet = getDriverWallet(localStorage, email);
+    const driverPayouts = getAdminOperations(localStorage).drivers.find((driver) => driver.name === driverName())?.payouts || [];
     const withdrawals = wallet.withdrawals.filter((item) => item.status === 'pending' || item.status === 'approved');
     const reserved = withdrawals.reduce((total, item) => total + item.amount, 0);
     const pendingSettlement = completed
@@ -194,14 +211,15 @@ function initializeDriverPage() {
     document.getElementById('driver-today-trip-label').textContent = `${today.length} chuyến hoàn thành`;
     document.getElementById('driver-income-week').textContent = formatVND(sum(week));
     document.getElementById('driver-week-trip-label').textContent = `${week.length} chuyến hoàn thành`;
-    document.getElementById('driver-wallet-available').textContent = formatVND(Math.max(0, totals.net - reserved));
+    document.getElementById('driver-wallet-available').textContent = formatVND(Math.max(0, withdrawableEarnings() - reserved));
+    document.getElementById('driver-cash-collected').textContent = formatVND(cashCollected);
     document.getElementById('driver-wallet-pending').textContent = formatVND(pendingSettlement);
     document.getElementById('driver-performance-trips').textContent = String(totals.trips);
     document.getElementById('driver-performance-rating').textContent = `${Number(profile.rating).toFixed(1)} ★`;
     document.getElementById('driver-performance-fees').textContent = formatVND(totals.fees);
     document.getElementById('driver-transactions').innerHTML = [
       ...completed.map((booking) => ({
-        date: bookedAt(booking),
+        date: booking.payment?.receivedAt || bookedAt(booking),
         title: `Thu nhập chuyến ${booking.bookingId}`,
         detail: `Phí nền tảng ${formatVND(Math.round((Number(booking.fare?.totalAmount) || 0) * 0.2))} · ${paymentStatusLabel(booking)}`,
         amount: bookingNet(booking),
@@ -211,6 +229,12 @@ function initializeDriverPage() {
         title: `Yêu cầu rút tiền · ${item.status === 'pending' ? 'Chờ xử lý' : item.status === 'rejected' ? 'Từ chối' : 'Đã xử lý'}`,
         detail: `${item.bankName} · ${item.bankAccount}`,
         amount: -item.amount,
+      })),
+      ...driverPayouts.map((item) => ({
+        date: item.createdAt,
+        title: 'Nền tảng đã chi trả',
+        detail: `Đã ghi nhận chi trả ${formatVND(item.amount)}`,
+        amount: item.amount,
       })),
     ].sort((a, b) => new Date(b.date) - new Date(a.date)).map((item) => `<div class="driver-transaction"><span class="driver-transaction-icon">${item.amount < 0 ? '↗' : '₫'}</span><span><strong>${escape(item.title)}</strong><small>${escape(item.detail)} · ${formatDateTime(item.date)}</small></span><b class="${item.amount < 0 ? 'is-debit' : ''}">${item.amount > 0 ? '+' : ''}${formatVND(item.amount)}</b></div>`).join('')
       || '<div class="driver-empty-state compact"><strong>Chưa có giao dịch</strong><p>Thu nhập từ chuyến hoàn thành sẽ hiển thị tại đây.</p></div>';
@@ -368,16 +392,21 @@ function initializeDriverPage() {
       return;
     }
     if (action === 'accept') {
-      if (booking.status !== 'pending' || booking.driver?.name) {
+      if (booking.status !== 'pending') {
         showNotice('Chuyến này đã được tài xế khác nhận hoặc không còn khả dụng.', 'error');
         renderAll();
         return;
       }
-      bookingStore.update(id, {
-        driver: { name: driverName(), phone: profile.phone, rating: Number(profile.rating), stage: 'accepted' },
-        vehicle: { ...(booking.vehicle || {}), model: profile.vehicle, licensePlate: profile.plate },
-      });
-      bookingStore.updateStatus(id, 'confirmed');
+      const accepted = bookingStore.acceptBooking(
+        id,
+        { name: driverName(), phone: profile.phone, rating: Number(profile.rating) },
+        { model: profile.vehicle, licensePlate: profile.plate },
+      );
+      if (!accepted) {
+        showNotice('Chuyến này vừa được tài xế khác nhận hoặc đã được điều phối.', 'error');
+        renderAll();
+        return;
+      }
       showNotice(`Bạn đã nhận chuyến ${id}.`);
     } else if (action === 'arrive') {
       if (booking.status !== 'confirmed' || booking.driver?.name !== driverName()) return;
@@ -391,8 +420,20 @@ function initializeDriverPage() {
       bookingStore.updateStatus(id, 'in_progress');
       showNotice('Chuyến đi đã bắt đầu.');
     } else if (action === 'cash-received') {
-      if (booking.payment?.method !== 'cash' || booking.status !== 'in_progress') return;
-      bookingStore.update(id, { payment: { ...(booking.payment || {}), status: 'paid', receivedAt: new Date().toISOString() } });
+      if (
+        booking.payment?.method !== 'cash'
+        || booking.status !== 'in_progress'
+        || booking.driver?.name !== driverName()
+        || booking.payment?.status === 'paid'
+      ) return;
+      bookingStore.update(id, {
+        payment: {
+          ...(booking.payment || {}),
+          status: 'paid',
+          receivedBy: 'driver',
+          receivedAt: new Date().toISOString(),
+        },
+      });
       showNotice('Đã ghi nhận bạn xác nhận nhận tiền mặt.');
     } else if (action === 'complete') {
       if (booking.status !== 'in_progress' || booking.driver?.name !== driverName()) return;
@@ -484,7 +525,7 @@ function initializeDriverPage() {
   window.addEventListener('online', renderNetworkState);
   window.addEventListener('offline', renderNetworkState);
   window.addEventListener('storage', (event) => {
-    if (!event.key || event.key === 'taxivinfast_bookings') {
+    if (!event.key || event.key === 'taxivinfast_bookings' || event.key === 'taxivinfast_admin_operations') {
       const previousOfferIds = knownOfferIds;
       renderAll();
       notifyIncomingOffers(previousOfferIds);
@@ -542,7 +583,6 @@ function initializeDriverPage() {
   document.getElementById('driver-withdraw-form').addEventListener('submit', (event) => {
     event.preventDefault();
     const amount = Number(new FormData(event.currentTarget).get('amount'));
-    const totals = getDriverEarnings(allBookings(), driverName());
     const wallet = getDriverWallet(localStorage, email);
     const reserved = wallet.withdrawals
       .filter((item) => item.status === 'pending' || item.status === 'approved')
@@ -553,7 +593,7 @@ function initializeDriverPage() {
       withdrawDialog.close();
       return;
     }
-    if (!Number.isFinite(amount) || amount < 10_000 || amount > totals.net - reserved) {
+    if (!Number.isFinite(amount) || amount < 10_000 || amount > withdrawableEarnings() - reserved) {
       showNotice('Số tiền rút phải từ 10.000 đ và không vượt quá số dư khả dụng.', 'error');
       return;
     }
